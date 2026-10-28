@@ -125,8 +125,8 @@ T12 → T13
 
 **Done when**:
 
-- [ ] `./gradlew help` succeeds with an empty `:notti` and `:example` directory stub
-- [ ] No version literal outside `libs.versions.toml` and the wrapper properties
+- [x] `./gradlew help` succeeds with an empty `:notti` and `:example` directory stub
+- [x] No version literal outside `libs.versions.toml` and the wrapper properties
 
 **Tests**: none
 **Gate**: `./gradlew help`
