@@ -20,4 +20,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "zeep-notti-android-sdk"
-include(":notti", ":example")
+include(":notti")

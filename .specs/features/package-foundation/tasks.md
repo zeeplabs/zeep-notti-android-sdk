@@ -143,9 +143,9 @@ T12 → T13
 
 **Done when**:
 
-- [ ] `:notti:assembleRelease` produces the AAR; `unzip -l` shows `AndroidManifest.xml` and `proguard.txt`
-- [ ] Removing/duplicating the constant line fails configuration with a clear message (checked by hand, noted in the commit body)
-- [ ] `NottiSdkVersionTest` passes
+- [x] `:notti:assembleRelease` produces the AAR; `unzip -l` shows `AndroidManifest.xml` and `proguard.txt`
+- [x] Removing/duplicating the constant line fails configuration with a clear message (checked by hand, noted in the commit body)
+- [x] `NottiSdkVersionTest` passes
 
 **Tests**: unit
 **Gate**: Quick + Build
@@ -227,7 +227,7 @@ T12 → T13
 
 ### T9: `:example` placeholder
 
-**What**: App module `com.zeeplabs.notti.example`, one empty Activity, `notti.usePublished` switch (project dependency by default, published coordinates when `true`), Google Services plugin applied only if `google-services.json` exists.
+**What**: Add `:example` to `settings.gradle.kts` (T4 included only `:notti`: an included project without a directory fails a clean checkout). App module `com.zeeplabs.notti.example`, one empty Activity, `notti.usePublished` switch (project dependency by default, published coordinates when `true`), Google Services plugin applied only if `google-services.json` exists.
 **Where**: `example/`
 **Depends on**: T8
 **Requirement**: PKG-03
