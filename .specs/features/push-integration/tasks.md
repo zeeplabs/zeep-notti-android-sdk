@@ -72,7 +72,7 @@ T9 → T10
 
 **Done when**:
 
-- [ ] Relay test green; `port-diff` shows only `internal`
+- [x] Relay test green; `port-diff` shows only `internal`
 
 **Tests**: unit
 **Gate**: Quick
