@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- No <application> attributes: the host app owns allowBackup, label, icon and theme (PKG-05). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" />

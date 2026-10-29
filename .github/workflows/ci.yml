@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ['*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # NottiSdkVersion.CURRENT vs CHANGELOG and, on tag builds, the tag (PKG-07).
+      - name: Version drift (PKG-07)
+        run: scripts/check-version.sh
+
+      # react-native-notti ships com.notti.*; equal FQNs fail a host build (PKG-04, AD-003).
+      - name: No com.notti package (PKG-04)
+        run: scripts/check-package-name.sh
+
+      # The guards are proved on the CI's own OS (GNU), not only on macOS.
+      - name: Script self-tests
+        run: scripts/tests/run.sh
+
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Validate Gradle wrapper (PKG-12)
+        uses: gradle/actions/wrapper-validation@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle (cache, PKG-12)
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      # This job enforces Android Lint warnings as errors on the library (PKG-10, `lint {}` in notti/build.gradle.kts).
+      - name: Style and lint (PKG-10)
+        run: ./gradlew --console=plain spotlessCheck :notti:lintRelease
+
+      - name: Unit tests (PKG-08, PKG-11)
+        run: ./gradlew --console=plain :notti:testDebugUnitTest
+
+      - name: Public API dump (PKG-13)
+        run: ./gradlew --console=plain :notti:apiCheck
+
+      - name: Build and publish to build/repo (PKG-01, PKG-02)
+        run: ./gradlew --console=plain :notti:assembleRelease :notti:publishAllPublicationsToBuildRepository
+
+      - name: AAR and POM contents (PKG-02, PKG-04, PKG-05)
+        run: |
+          set -euo pipefail
+          version="$(sed -nE 's/^[[:space:]]*const val CURRENT = "([^"]+)".*/\1/p' notti/src/main/java/com/zeeplabs/notti/NottiSdkVersion.kt)"
+          dir="build/repo/com/zeeplabs/notti-android/$version"
+          aar="$dir/notti-android-$version.aar"
+          pom="$dir/notti-android-$version.pom"
+          for f in "$aar" "$pom" "$dir/notti-android-$version-sources.jar" "$dir/notti-android-$version-javadoc.jar"; do
+            test -f "$f" || { echo "error: missing $f" >&2; exit 1; }
+          done
+          unzip -l "$aar" | grep -qE ' AndroidManifest\.xml$' || { echo "error: AAR has no AndroidManifest.xml" >&2; exit 1; }
+          unzip -l "$aar" | grep -qE ' proguard\.txt$' || { echo "error: AAR has no proguard.txt (consumer rules)" >&2; exit 1; }
+          unzip -p "$aar" classes.jar > "$RUNNER_TEMP/classes.jar"
+          if unzip -l "$RUNNER_TEMP/classes.jar" | grep -qE ' com/notti/'; then
+            echo "error: classes.jar contains com/notti/ classes" >&2; exit 1
+          fi
+          grep -q '<groupId>com.zeeplabs</groupId>' "$pom"
+          grep -q '<artifactId>notti-android</artifactId>' "$pom"
+          grep -q "<version>$version</version>" "$pom"
+          if grep -q 'com.facebook.react' "$pom"; then
+            echo "error: POM depends on React Native" >&2; exit 1
+          fi
+          echo "artifact ok: com.zeeplabs:notti-android:$version"
+
+      # Separate invocation: :example resolves the artifact published above, not the project (PKG-03).
+      - name: Example consumes the published AAR (PKG-03)
+        run: ./gradlew --console=plain -Pnotti.usePublished=true :example:assembleDebug
+
+      - name: Upload reports on failure
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: reports
+          path: |
+            notti/build/reports/
+            notti/build/test-results/
+          if-no-files-found: ignore

@@ -1,0 +1,50 @@
+# Testing
+
+## Infrastructure
+
+- JUnit 4.13.2 on the JVM (`notti/src/test/java/com/zeeplabs/notti/`).
+- Robolectric 4.14.1 for tests that need framework classes (`Bundle`, `RemoteMessage`, Views); annotate the class with `@RunWith(RobolectricTestRunner::class)` and `@Config(sdk = [34])` (or the SDK the ported RN test uses). `unitTests.isIncludeAndroidResources = true` is set.
+- Real `org.json` (20240303) on the test classpath: the android.jar stub throws "not mocked" on the plain JVM.
+- OkHttp `MockWebServer` and `okhttp-tls` 4.12.0 for HTTP and HTTPS tests.
+- Proved by the smoke tests `RobolectricSmokeTest` and `OrgJsonSmokeTest` (PKG-11).
+- Script guards have self-tests in `scripts/tests/` with temp fixture dirs; `scripts/tests/run.sh` runs them all.
+
+## Commands
+
+JDK 17 (`export JAVA_HOME=/opt/homebrew/opt/openjdk@17` on macOS with Homebrew).
+
+| What | Command |
+| --- | --- |
+| All unit tests | `./gradlew :notti:testDebugUnitTest` |
+| One class | `./gradlew :notti:testDebugUnitTest --tests 'com.zeeplabs.notti.<Class>'` |
+| Style | `./gradlew spotlessCheck` (fix: `spotlessApply`) |
+| Lint (warnings are errors) | `./gradlew :notti:lintRelease` |
+| Public ABI | `./gradlew :notti:apiCheck` (update: `:notti:apiDump`) |
+| Script guards | `scripts/check-version.sh && scripts/check-package-name.sh && scripts/tests/run.sh` |
+
+## Test Coverage Matrix
+
+| Code Layer | Required Test Type | Coverage Expectation | Location Pattern | Run Command |
+| --- | --- | --- | --- | --- |
+| Library code (`com.zeeplabs.notti`) | unit | every behavior; ported RN tests 1:1 with their requirement IDs | `notti/src/test/java/com/zeeplabs/notti/**/*Test.kt` | `./gradlew :notti:testDebugUnitTest --tests '<Class>'` |
+| Framework-dependent code (Bundle, RemoteMessage, Activity, Views) | unit (Robolectric) | same as above | same | same |
+| Gradle build, publication, ABI, lint | none (build) + negative proof | build passes; each guard proved to fail once | - | Build gate |
+| Scripts (`scripts/*.sh`) | script self-test | pass fixture + each failure mode | `scripts/tests/*-test.sh` | `scripts/tests/run.sh` |
+| CI workflow | none | `actionlint` clean; red and green runs | - | `docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest -no-color` |
+
+## Parallelism Assessment
+
+| Test Type | Parallel-Safe | Why |
+| --- | --- | --- |
+| Gradle (unit, Robolectric, build) | No | one checkout, one Gradle daemon and build dir; use a separate worktree for parallel work |
+| Script self-tests | Yes | temp fixture dirs, no Gradle |
+
+## Gate Check Commands
+
+| Gate Level | When to Use | Command |
+| --- | --- | --- |
+| Quick | tasks with unit tests | `./gradlew :notti:testDebugUnitTest --tests '<Class>'` |
+| Build | Gradle config tasks | `./gradlew :notti:assembleRelease` |
+| Full | end of a feature, before a PR | `./gradlew spotlessCheck :notti:lintRelease :notti:testDebugUnitTest :notti:apiCheck :notti:assembleRelease :notti:publishAllPublicationsToBuildRepository && ./gradlew -Pnotti.usePublished=true :example:assembleDebug && scripts/check-version.sh && scripts/check-package-name.sh && scripts/tests/run.sh` |
+
+The CI `build` job also checks the AAR (manifest, `proguard.txt`, no `com/notti/` class) and the POM (coordinates, no React Native).

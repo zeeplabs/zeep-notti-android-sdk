@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/package-foundation/design.md`
 **Testing**: `.specs/codebase/TESTING.md` (created by T13; until then the matrix below is authoritative)
-**Status**: In Progress (T1 done 2026-10-28, report in STATE AD-012/AD-013)
+**Status**: In Progress (T1-T11, T13 done 2026-10-28; T12 CI proof waits for the remote and a PR)
 
 ---
 
@@ -125,8 +125,8 @@ T12 → T13
 
 **Done when**:
 
-- [ ] `./gradlew help` succeeds with an empty `:notti` and `:example` directory stub
-- [ ] No version literal outside `libs.versions.toml` and the wrapper properties
+- [x] `./gradlew help` succeeds with an empty `:notti` and `:example` directory stub
+- [x] No version literal outside `libs.versions.toml` and the wrapper properties
 
 **Tests**: none
 **Gate**: `./gradlew help`
@@ -143,9 +143,9 @@ T12 → T13
 
 **Done when**:
 
-- [ ] `:notti:assembleRelease` produces the AAR; `unzip -l` shows `AndroidManifest.xml` and `proguard.txt`
-- [ ] Removing/duplicating the constant line fails configuration with a clear message (checked by hand, noted in the commit body)
-- [ ] `NottiSdkVersionTest` passes
+- [x] `:notti:assembleRelease` produces the AAR; `unzip -l` shows `AndroidManifest.xml` and `proguard.txt`
+- [x] Removing/duplicating the constant line fails configuration with a clear message (checked by hand, noted in the commit body)
+- [x] `NottiSdkVersionTest` passes
 
 **Tests**: unit
 **Gate**: Quick + Build
@@ -162,7 +162,7 @@ T12 → T13
 
 **Done when**:
 
-- [ ] Both pass; temporarily removing each dependency makes its test fail (noted in the commit body)
+- [x] Both pass; temporarily removing each dependency makes its test fail (noted in the commit body)
 
 **Tests**: unit
 **Gate**: Quick
@@ -179,8 +179,8 @@ T12 → T13
 
 **Done when**:
 
-- [ ] `spotlessCheck` and `:notti:lintRelease` pass
-- [ ] A 2-space indented line fails `spotlessCheck`; a lint warning (e.g. unused resource) fails `lintRelease` (both reverted)
+- [x] `spotlessCheck` and `:notti:lintRelease` pass
+- [x] A 2-space indented line fails `spotlessCheck`; a lint warning (`SimpleDateFormat` without a locale) fails `lintRelease` (both reverted)
 
 **Tests**: none
 **Gate**: Build + `./gradlew spotlessCheck :notti:lintRelease`
@@ -197,8 +197,8 @@ T12 → T13
 
 **Done when**:
 
-- [ ] Dump committed, contains no symbol (everything is `internal`)
-- [ ] Making `NottiSdkVersion` `public` fails the check (reverted)
+- [x] Dump committed, contains no symbol (everything is `internal`)
+- [x] Making `NottiSdkVersion` `public` fails the check (reverted)
 
 **Tests**: none
 **Gate**: Build + ABI check command
@@ -215,9 +215,9 @@ T12 → T13
 
 **Done when**:
 
-- [ ] `:notti:publishAllPublicationsToBuildRepository` writes `.aar`, `.pom`, `-sources.jar`, `-javadoc.jar`, `.module`
-- [ ] POM has the coordinates, license, SCM, `firebase-messaging` as `compile` scope, no `com.facebook.react`
-- [ ] Runs with no signing key and no network credentials
+- [x] `:notti:publishAllPublicationsToBuildRepository` writes `.aar`, `.pom`, `-sources.jar`, `-javadoc.jar`, `.module`
+- [x] POM has the coordinates, license, SCM, `firebase-messaging` as `compile` scope, no `com.facebook.react`
+- [x] Runs with no signing key and no network credentials
 
 **Tests**: none
 **Gate**: Build + publish command + POM inspection
@@ -227,15 +227,16 @@ T12 → T13
 
 ### T9: `:example` placeholder
 
-**What**: App module `com.zeeplabs.notti.example`, one empty Activity, `notti.usePublished` switch (project dependency by default, published coordinates when `true`), Google Services plugin applied only if `google-services.json` exists.
+**What**: Add `:example` to `settings.gradle.kts` (T4 included only `:notti`: an included project without a directory fails a clean checkout). App module `com.zeeplabs.notti.example`, one empty Activity, `notti.usePublished` switch (project dependency by default, published coordinates when `true`), Google Services plugin applied only if `google-services.json` exists.
 **Where**: `example/`
 **Depends on**: T8
 **Requirement**: PKG-03
 
 **Done when**:
 
-- [ ] `:example:assembleDebug` passes in both modes (publish first in a separate invocation for `true`)
-- [ ] `:example:dependencies --configuration debugRuntimeClasspath` shows `com.zeeplabs:notti-android:0.1.0` in published mode
+- [x] `:example:assembleDebug` passes in both modes (publish first in a separate invocation for `true`)
+- [x] `:example:dependencies --configuration debugRuntimeClasspath` shows `com.zeeplabs:notti-android:0.1.0` in published mode (and an empty `build/repo` fails with `Could not find com.zeeplabs:notti-android:0.1.0`, so it is not resolved from the project)
+- Deferred to `example-and-release`: the conditional Google Services plugin (nothing uses FCM in the placeholder; adding it now is dead config)
 
 **Tests**: none
 **Gate**: Build (both modes)
@@ -252,7 +253,7 @@ T12 → T13
 
 **Done when**:
 
-- [ ] Every fixture gives the expected exit code; runs on macOS (BSD sed) and in the Ubuntu CI job
+- [x] Every fixture gives the expected exit code; runs on macOS (BSD sed) and on Ubuntu 24.04 (GNU, checked in Docker; the CI job repeats it); shellcheck clean
 
 **Tests**: script self-test
 **Gate**: Scripts
@@ -269,7 +270,7 @@ T12 → T13
 
 **Done when**:
 
-- [ ] Every fixture gives the expected exit code
+- [x] Every fixture gives the expected exit code (macOS and Ubuntu 24.04)
 
 **Tests**: script self-test
 **Gate**: Scripts
@@ -286,7 +287,7 @@ T12 → T13
 
 **Done when**:
 
-- [ ] `actionlint` clean; Full gate passes locally
+- [x] `actionlint` clean; Full gate passes locally (2026-10-28, including the AAR/POM step run as a script)
 - [ ] After Julio OKs creating the remote and opening a PR: one green run, and red runs proven for a failing test, a lint error, an ABI change without dump, a version drift and a `com.notti` package (throwaway commits, then dropped)
 
 **Tests**: none
@@ -304,7 +305,7 @@ T12 → T13
 
 **Done when**:
 
-- [ ] Every command in AGENTS.md and TESTING.md runs as written
+- [x] Every command in AGENTS.md and TESTING.md runs as written (2026-10-28)
 - [ ] ROADMAP `package-foundation` marked done after validation
 
 **Tests**: none

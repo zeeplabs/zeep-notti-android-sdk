@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-10-28
-**Current Work:** `package-foundation` T1 done (reviewed by Julio 2026-10-28); executing T2-T11
+**Current Work:** `package-foundation` T1-T11, T13 done; PR #1 open; T12 CI proof blocked by B-002 (billing)
 
 ---
 
@@ -108,6 +108,13 @@
 **Impact:** Blocks only the 0.1.0 publish (`example-and-release`), not development.
 **Workaround:** Local Maven repository / `mavenLocal()` for the example app and RN M2 experiments.
 **Resolution:** Confirm the domain that owns `com.zeeplabs`, add the Central Portal DNS TXT record, generate the signing key.
+
+### B-002: GitHub Actions does not start jobs (billing)
+
+**Discovered:** 2026-10-28, PR #1 run 40792894429
+**Impact:** Blocks `package-foundation` T12 (CI green/red proof) and every CI gate until resolved. Same block the iOS repo had.
+**Workaround:** the full gate runs locally (TESTING.md "Full"), including the CI AAR/POM step as a script.
+**Resolution:** fix the payment method or spending limit in the `zeeplabs` organization's Billing & plans, then re-run PR #1.
 
 ---
 

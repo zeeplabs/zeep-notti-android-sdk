@@ -1,7 +1,7 @@
 # Roadmap
 
 **Current Milestone:** M1 - Native SDK with RN 0.8.0 parity
-**Status:** Planning
+**Status:** In Progress
 
 ---
 
@@ -12,7 +12,7 @@
 
 ### Features
 
-**package-foundation** - PLANNED (spec written 2026-10-28)
+**package-foundation** - IN PROGRESS (2026-10-28: T1-T11 and T13 done locally, full gate green; PR #1; open: T12 CI green/red proof, blocked by GitHub billing B-002)
 
 - Gradle (KTS) project, version catalog, library module `:notti` (namespace `com.zeeplabs.notti`, AAR), example module placeholder
 - `minSdk 24`, `compileSdk 36`, Java 17, Kotlin 2.0.x; consumer R8 rules; manifest skeleton
