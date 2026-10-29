@@ -35,6 +35,13 @@ internal class NottiRuntime internal constructor(
     @Volatile
     var currentActivity: () -> Activity? = { null }
 
+    /**
+     * Receives each foreground FCM message the SDK handles (RN `emitNotificationReceived`); null until
+     * `public-api` sets it. No buffer: RN emitted only to a live module.
+     */
+    @Volatile
+    var onNotificationReceived: ((ParsedNotification) -> Unit)? = null
+
     /** The In-App engine's lifecycle hooks; null until `in-app-messages` sets them. */
     @Volatile
     var inAppLifecycle: NottiInAppLifecycle? = null
@@ -145,9 +152,18 @@ internal class NottiRuntime internal constructor(
         /** The runtime if one exists; for callers that must not create it (observers). */
         fun peek(): NottiRuntime? = instance
 
-        /** Test-only: drops the process runtime and stops its executors. */
+        /** Test-only: makes [runtime] the process runtime (RN `setEventStoreForTest`), dropping any previous one. */
+        internal fun setForTest(runtime: NottiRuntime) {
+            synchronized(this) {
+                instance?.shutdown()
+                instance = runtime
+            }
+        }
+
+        /** Test-only: drops the process runtime, its callbacks and its executors. */
         internal fun resetForTest() {
             synchronized(this) {
+                instance?.onNotificationReceived = null
                 instance?.shutdown()
                 instance = null
             }

@@ -54,8 +54,8 @@ T9 → T10
 
 **Done when**:
 
-- [ ] 6/6 pass; received event enqueued through the runtime with no core; token reaches the live core, dropped with none
-- [ ] `port-diff` only allowed changes
+- [x] 6/6 pass; received event enqueued through the runtime with no core; token reaches the live core, dropped with none
+- [x] `port-diff` only allowed changes
 
 **Tests**: unit (Robolectric)
 **Gate**: Quick
