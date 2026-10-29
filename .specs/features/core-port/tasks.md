@@ -200,7 +200,7 @@ T13 → T14
 
 **Done when**:
 
-- [ ] 5/5 pass; In-App cases use a fake lifecycle (coordinator version listed as deferred to `in-app-messages` in T14)
+- [x] 5/5 pass; In-App cases use a fake lifecycle (coordinator version listed as deferred to `in-app-messages` in T14)
 
 **Tests**: unit (Robolectric)
 **Gate**: Quick
