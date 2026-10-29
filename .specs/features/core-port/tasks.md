@@ -125,7 +125,7 @@ T13 → T14
 
 **Done when**:
 
-- [ ] Both compile; `NottiInAppHooks` identical to RN under `diff -w` (package aside)
+- [x] Both compile; `NottiInAppHooks` identical to RN under `diff -w` (package aside)
 
 **Tests**: none
 **Gate**: Build
