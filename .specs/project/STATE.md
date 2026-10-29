@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-10-28
-**Current Work:** `package-foundation` T1 done (reviewed by Julio 2026-10-28); executing T2-T11
+**Current Work:** `package-foundation` T1-T11, T13 done locally; T12 needs the remote + a PR for the CI proof
 
 ---
 

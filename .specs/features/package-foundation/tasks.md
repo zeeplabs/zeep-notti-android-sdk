@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/package-foundation/design.md`
 **Testing**: `.specs/codebase/TESTING.md` (created by T13; until then the matrix below is authoritative)
-**Status**: In Progress (T1 done 2026-10-28, report in STATE AD-012/AD-013)
+**Status**: In Progress (T1-T11, T13 done 2026-10-28; T12 CI proof waits for the remote and a PR)
 
 ---
 
@@ -305,7 +305,7 @@ T12 → T13
 
 **Done when**:
 
-- [ ] Every command in AGENTS.md and TESTING.md runs as written
+- [x] Every command in AGENTS.md and TESTING.md runs as written (2026-10-28)
 - [ ] ROADMAP `package-foundation` marked done after validation
 
 **Tests**: none
