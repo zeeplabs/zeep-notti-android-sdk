@@ -253,7 +253,7 @@ T12 → T13
 
 **Done when**:
 
-- [ ] Every fixture gives the expected exit code; runs on macOS (BSD sed) and in the Ubuntu CI job
+- [x] Every fixture gives the expected exit code; runs on macOS (BSD sed) and on Ubuntu 24.04 (GNU, checked in Docker; the CI job repeats it); shellcheck clean
 
 **Tests**: script self-test
 **Gate**: Scripts
@@ -270,7 +270,7 @@ T12 → T13
 
 **Done when**:
 
-- [ ] Every fixture gives the expected exit code
+- [x] Every fixture gives the expected exit code (macOS and Ubuntu 24.04)
 
 **Tests**: script self-test
 **Gate**: Scripts

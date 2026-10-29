@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Shared helpers for the script self-tests. Sourced, not executed.
 failures=0
 
@@ -14,7 +15,7 @@ expect() {
     echo "ok   - $desc"
   else
     echo "FAIL - $desc (expected exit $want, got $got)"
-    echo "$out" | sed 's/^/       /'
+    printf '       %s\n' "${out//$'\n'/$'\n'       }"
     failures=$((failures + 1))
   fi
 }
