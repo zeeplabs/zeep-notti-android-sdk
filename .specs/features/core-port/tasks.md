@@ -217,9 +217,9 @@ T13 → T14
 
 **Done when**:
 
-- [ ] Registered-device fixture: no `POST /devices` on start with the same token; device id kept
-- [ ] Tags, session counters, pending events, acks, pending logout clear read back
-- [ ] Token-changed fixture: behavior equals RN's (re-register path), asserted
+- [x] Registered-device fixture: no `POST /devices` on start with the same token; device id kept
+- [x] Tags, session counters, pending events, acks, pending logout clear read back
+- [x] Token-changed fixture: behavior equals RN's (re-register path), asserted
 
 **Tests**: unit (Robolectric + MockWebServer)
 **Gate**: Quick
