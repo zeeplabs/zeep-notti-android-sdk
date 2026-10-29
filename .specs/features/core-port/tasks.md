@@ -253,7 +253,7 @@ T13 → T14
 
 **Done when**:
 
-- [ ] One or more tests per ID, or a written reason pointing to the owning feature
+- [x] One or more tests per ID, or a written reason pointing to the owning feature
 
 **Tests**: unit
 **Gate**: Full
