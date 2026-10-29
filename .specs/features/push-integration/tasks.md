@@ -193,8 +193,8 @@ T9 → T10
 
 **Done when**:
 
-- [ ] Self-test: clean tree passes; `ACTION_VIEW`, `CustomTabsIntent`, `openUri` each fail; an allowlisted exact path passes; grep status 2 fails
-- [ ] Runs green on the current tree
+- [x] Self-test: clean tree passes; `ACTION_VIEW`, `CustomTabsIntent`, `openUri` each fail; an allowlisted exact path passes; grep status 2 fails (macOS + Ubuntu 24.04, shellcheck and actionlint clean)
+- [x] Runs green on the current tree
 
 **Tests**: script self-test
 **Gate**: Scripts

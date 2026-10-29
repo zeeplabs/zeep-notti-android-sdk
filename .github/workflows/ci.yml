@@ -32,6 +32,10 @@ jobs:
       - name: No React Native (CORE-01)
         run: scripts/check-no-react-native.sh
 
+      # A tapped push's data reaches the host untouched; the SDK never opens a URL (PUSH-12).
+      - name: No URL opening (PUSH-12)
+        run: scripts/check-no-url-open.sh
+
       # The guards are proved on the CI's own OS (GNU), not only on macOS.
       - name: Script self-tests
         run: scripts/tests/run.sh
