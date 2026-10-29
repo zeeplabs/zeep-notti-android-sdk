@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-10-28
-**Current Work:** `core-port` spec written (branch `feat/core-port`), awaiting review. `package-foundation` merged (PR #1); its T12 CI proof still waits for B-002
+**Current Work:** `core-port` spec, design and tasks written (branch `feat/core-port`), awaiting review before Execute. `package-foundation` merged (PR #1); its T12 CI proof still waits for B-002
 
 ---
 

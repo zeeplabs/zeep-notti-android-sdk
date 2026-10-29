@@ -30,9 +30,9 @@ All of Notti's Android core behavior (registration, identity, tags, profile fiel
 | --- | --- | --- | --- |
 | Behavior source | RN tag `v0.8.0` (`291d5a7`); RN `main` has no `android/` change after it (checked 2026-10-28) | AD-002 | y |
 | Requirement IDs | Reuse the RN IDs as the behavior spec; this spec adds only `CORE-` IDs for port concerns | Same as iOS core-port | y |
-| Companion statics | Replaced by one SDK-owned process container (`NottiRuntime`, name final in Design) holding the active core, the session gate and the event store; cold-start safe (an event enqueued before any core exists is persisted and flushed later) | Statics are the RN coupling; iOS did the same | n - shape in Design |
-| Platform providers | The readers that live in `NottiModule` today (app version, OS, model, timezone, language, permission status, location permission check, country, FCM token) move into SDK code with their own tests | They are core behavior (DPF, SEGTEL), not RN bridge code | n - placement in Design |
-| `NottiForegroundObserver` | Ported here (session start/end, 60 s heartbeat, cold-start sync); registering it with `ProcessLifecycleOwner` stays with the process hook in `push-integration` | SEGTEL behavior lives in it; the hook is integration | n - Design |
+| Companion statics | Replaced by one SDK-owned process container (`NottiRuntime`, name final in Design) holding the active core, the session gate and the event store; cold-start safe (an event enqueued before any core exists is persisted and flushed later) | Statics are the RN coupling; iOS did the same | n - proposed in `design.md` (`NottiRuntime`) |
+| Platform providers | The readers that live in `NottiModule` today (app version, OS, model, timezone, language, permission status, location permission check, country, FCM token) move into SDK code with their own tests | They are core behavior (DPF, SEGTEL), not RN bridge code | n - proposed in `design.md` (`NottiAndroidProviders`) |
+| `NottiForegroundObserver` | Ported here (session start/end, 60 s heartbeat, cold-start sync); registering it with `ProcessLifecycleOwner` stays with the process hook in `push-integration` | SEGTEL behavior lives in it; the hook is integration | n - proposed in `design.md` |
 | `sdk_version` | From `NottiSdkVersion.CURRENT`, never from a caller; RN JS passed its package version | Same as iOS CORE-05. The backend will see `0.1.0` from native apps; the RN-on-native value is an M2 decision | y (iOS precedent) |
 | Logging | One internal logger replaces RN's `Log.e(NAME, …)` lambda; no PII; default level error; level API in `public-api` | AD-011 | y |
 | Threading | Single-thread executors (`notti-io`, `notti-geo`), blocking OkHttp with retry/backoff, as RN | AD-002 | y |
@@ -130,23 +130,23 @@ Port-specific requirements:
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| CORE-01 | P1 Core without RN: components ported, internal, no RN symbols | Design | Pending |
-| CORE-02 | P1 Core without RN: all dependencies injectable | Design | Pending |
-| CORE-03 | P1 Core without RN: container replaces companion statics | Design | Pending |
-| CORE-04 | P1 Core without RN: pre-core events persisted and flushed | Design | Pending |
-| CORE-05 | P1 Core without RN: native `sdk_version` | Design | Pending |
-| CORE-06 | P1 Providers: RN 0.8.0 behavior for each reader | Design | Pending |
-| CORE-07 | P1 Providers: failure returns null | Design | Pending |
-| CORE-08 | P1 Providers: unit tests | Design | Pending |
-| CORE-09 | P1 Parity: suite ported, counts, drop list | Design | Pending |
-| CORE-10 | P1 Parity: every applicable RN ID mapped | Design | Pending |
-| CORE-11 | P1 Parity: direct tests for SDK-04/08/12/13/17 core parts | Design | Pending |
-| CORE-12 | P1 Continuity: same file, keys, types, encodings | Design | Pending |
-| CORE-13 | P1 Continuity: no re-register on migrated state | Design | Pending |
-| CORE-14 | P1 Continuity: fixture and golden file-name tests | Design | Pending |
-| CORE-15 | P2 Logs: single logger, no PII | Design | Pending |
-| CORE-16 | P2 Logs: errors-only default | Design | Pending |
-| CORE-17 | P2 Logs: sentinel test | Design | Pending |
+| CORE-01 | P1 Core without RN: components ported, internal, no RN symbols | Tasks | Mapped |
+| CORE-02 | P1 Core without RN: all dependencies injectable | Tasks | Mapped |
+| CORE-03 | P1 Core without RN: container replaces companion statics | Tasks | Mapped |
+| CORE-04 | P1 Core without RN: pre-core events persisted and flushed | Tasks | Mapped |
+| CORE-05 | P1 Core without RN: native `sdk_version` | Tasks | Mapped |
+| CORE-06 | P1 Providers: RN 0.8.0 behavior for each reader | Tasks | Mapped |
+| CORE-07 | P1 Providers: failure returns null | Tasks | Mapped |
+| CORE-08 | P1 Providers: unit tests | Tasks | Mapped |
+| CORE-09 | P1 Parity: suite ported, counts, drop list | Tasks | Mapped |
+| CORE-10 | P1 Parity: every applicable RN ID mapped | Tasks | Mapped |
+| CORE-11 | P1 Parity: direct tests for SDK-04/08/12/13/17 core parts | Tasks | Mapped |
+| CORE-12 | P1 Continuity: same file, keys, types, encodings | Tasks | Mapped |
+| CORE-13 | P1 Continuity: no re-register on migrated state | Tasks | Mapped |
+| CORE-14 | P1 Continuity: fixture and golden file-name tests | Tasks | Mapped |
+| CORE-15 | P2 Logs: single logger, no PII | Tasks | Mapped |
+| CORE-16 | P2 Logs: errors-only default | Tasks | Mapped |
+| CORE-17 | P2 Logs: sentinel test | Tasks | Mapped |
 
 Inherited behavior requirements (verified through CORE-10; test-by-test mapping in `traceability.md` at Tasks):
 
@@ -157,7 +157,7 @@ Inherited behavior requirements (verified through CORE-10; test-by-test mapping 
 - `device-profile-fields` (DPF-01..21): all core logic here; JS wording → `public-api`
 - `logout-clears-external-id` (DLOG-01..07) and the RN 0.8.0 login/logout coalescing (#41): all here
 
-**Coverage:** 17 port requirements, 0 mapped to tasks.
+**Coverage:** 17 port requirements, 17 mapped to tasks (`tasks.md`).
 
 ---
 
