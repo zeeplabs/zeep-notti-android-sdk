@@ -95,9 +95,42 @@ jobs:
           fi
           echo "artifact ok: com.zeeplabs:notti-android:$version"
 
-      # Separate invocation: :example resolves the artifact published above, not the project (PKG-03).
-      - name: Example consumes the published AAR (PKG-03)
-        run: ./gradlew --console=plain -Pnotti.usePublished=true :example:assembleDebug
+      # Separate invocation: the apps resolve the artifact published above, not the project (PKG-03). The
+      # :example release build is minified (R8); :example-manual-fcm removes the SDK's FCM service (PUSH-15).
+      - name: Example apps consume the published AAR (PKG-03, PUSH-15)
+        run: ./gradlew --console=plain -Pnotti.usePublished=true :example:assembleDebug :example:assembleRelease :example-manual-fcm:assembleDebug
+
+      # A host with its own FirebaseMessagingService: its service is merged, the SDK's is removed (PUSH-15).
+      - name: Manual FCM merged manifest (PUSH-15)
+        run: |
+          set -euo pipefail
+          manifest="$(find example-manual-fcm/build/intermediates -path '*/merged_manifest/debug/*' -name AndroidManifest.xml -print -quit)"
+          test -n "$manifest" || { echo "error: no merged debug manifest under example-manual-fcm/build/intermediates" >&2; exit 1; }
+          grep -q 'android:name="com.zeeplabs.notti.example.manualfcm.ManualFcmService"' "$manifest" || {
+            echo "error: $manifest lacks the app's own FCM service" >&2; exit 1
+          }
+          if grep -q 'com.zeeplabs.notti.NottiFirebaseMessagingService' "$manifest"; then
+            echo "error: $manifest still has the SDK's FCM service" >&2; exit 1
+          fi
+          echo "manual FCM manifest ok: $manifest"
+
+      # R8 keeps the SDK's manifest components with no keep rules in consumer-rules.pro (PUSH-01, PUSH-07).
+      - name: Minified example keeps the SDK components (PUSH-01)
+        run: |
+          set -euo pipefail
+          apk="$(find example/build/outputs/apk/release -name '*.apk' -print -quit)"
+          test -n "$apk" || { echo "error: no release APK under example/build/outputs/apk/release" >&2; exit 1; }
+          dex="$RUNNER_TEMP/example-dex"
+          rm -rf "$dex"
+          mkdir -p "$dex"
+          unzip -q -o "$apk" 'classes*.dex' -d "$dex"
+          for cls in NottiInitProvider NottiFirebaseMessagingService NottiPermissionActivity; do
+            # grep on the files, not through a pipe: grep -q exits early and pipefail would see SIGPIPE.
+            if ! grep -aqF "Lcom/zeeplabs/notti/$cls;" "$dex"/classes*.dex; then
+              echo "error: $apk dex lacks com.zeeplabs.notti.$cls" >&2; exit 1
+            fi
+          done
+          echo "minified example ok: $apk"
 
       - name: Upload reports on failure
         if: failure()
@@ -107,4 +140,5 @@ jobs:
           path: |
             notti/build/reports/
             notti/build/test-results/
+            example-manual-fcm/build/intermediates/merged_manifest/
           if-no-files-found: ignore

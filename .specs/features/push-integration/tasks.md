@@ -175,8 +175,8 @@ T9 → T10
 
 **Done when**:
 
-- [ ] Manifest test green; manual module merged manifest has its service and not `com.zeeplabs.notti.NottiFirebaseMessagingService`; minified example builds and the release APK's dex contains the three component classes
-- [ ] `actionlint` clean
+- [x] Manifest test green; manual module merged manifest has its service and not `com.zeeplabs.notti.NottiFirebaseMessagingService`; minified example builds and the release APK's dex contains the three component classes
+- [x] `actionlint` clean
 
 **Tests**: unit (Robolectric) + build
 **Gate**: Full
