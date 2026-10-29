@@ -179,11 +179,11 @@ T13 → T14
 
 **Done when**:
 
-- [ ] Lazy single instance across threads; `stop` identity-guarded
-- [ ] Event enqueued with no core is persisted and flushed by a later `start` + registration (MockWebServer)
-- [ ] Registration body `sdk_version` == `NottiSdkVersion.CURRENT`
-- [ ] Replacing a core shuts the old executor down
-- [ ] Production prefs name is `notti_prefs`
+- [x] Lazy single instance across threads; `stop` identity-guarded
+- [x] Event enqueued with no core is persisted and flushed by a later `start` + registration (MockWebServer)
+- [x] Registration body `sdk_version` == `NottiSdkVersion.CURRENT`
+- [x] Replacing a core shuts the old executor down
+- [x] Production prefs name is `notti_prefs`
 
 **Tests**: unit (Robolectric)
 **Gate**: Quick

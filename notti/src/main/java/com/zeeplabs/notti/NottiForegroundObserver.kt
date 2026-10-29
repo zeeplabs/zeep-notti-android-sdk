@@ -34,15 +34,15 @@ internal object NottiForegroundObserver : DefaultLifecycleObserver {
 
     /** Where the callbacks/ticker find the live core. Test seam; production never reassigns it. */
     @Volatile
-    internal var coreProvider: () -> NottiCore? = { null } // T8 points this at NottiRuntime.peek().
+    internal var coreProvider: () -> NottiCore? = { NottiRuntime.peek()?.core }
 
     /** Where the callbacks find the In-App coordinator. Test seam, like [coreProvider]. */
     @Volatile
-    internal var inAppProvider: () -> NottiInAppLifecycle? = { null } // T8 points this at NottiRuntime.peek().
+    internal var inAppProvider: () -> NottiInAppLifecycle? = { NottiRuntime.peek()?.inAppLifecycle }
 
-    /** Where [onStop] finds the process session gate; null skips the close (no runtime yet). */
+    /** Where [onStop] finds the process session gate; null (no runtime) skips the close: no session was opened. */
     @Volatile
-    internal var gateProvider: () -> NottiCore.SessionGate? = { null } // T8 points this at NottiRuntime.peek().
+    internal var gateProvider: () -> NottiCore.SessionGate? = { NottiRuntime.peek()?.sessionGate }
 
     private val heartbeat = object : Runnable {
         override fun run() {
