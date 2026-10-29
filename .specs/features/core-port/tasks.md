@@ -91,7 +91,7 @@ T13 → T14
 
 **Done when**:
 
-- [ ] 7/7 pass, incl. the corrupt-JSON self-heal case
+- [x] 7/7 pass, incl. the corrupt-JSON self-heal case
 
 **Tests**: unit
 **Gate**: Quick
