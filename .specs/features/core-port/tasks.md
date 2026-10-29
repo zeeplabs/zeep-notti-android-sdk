@@ -142,8 +142,8 @@ T13 → T14
 
 **Done when**:
 
-- [ ] 48/48 and 128/128 pass (retry 5 attempts, 2/4/8/16 s via the injected sleeper, transient 408/429/5xx/network)
-- [ ] Only allowed changes (KDoc `NottiModule` mentions rewritten; `t.message`/`e.message` replaced as listed)
+- [x] 48/48 and 128/128 pass (retry 5 attempts, 2/4/8/16 s via the injected sleeper, transient 408/429/5xx/network)
+- [x] Only allowed changes (KDoc `NottiModule` mentions rewritten; `t.message`/`e.message` replaced as listed)
 
 **Tests**: unit
 **Gate**: Quick
