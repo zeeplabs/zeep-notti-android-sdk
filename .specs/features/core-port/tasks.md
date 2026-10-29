@@ -108,7 +108,7 @@ T13 → T14
 
 **Done when**:
 
-- [ ] 36/36 and 13/13 pass; `port-diff` shows only allowed changes
+- [x] 36/36 and 13/13 pass; `port-diff` shows only allowed changes
 
 **Tests**: unit
 **Gate**: Quick
