@@ -157,7 +157,7 @@ class NottiCoreGapsTest {
     }
 
     @Test
-    fun sdk08DefaultRuntimeRequesterDeniesWithoutPromptingUntilPushIntegration() {
+    fun sdk08DefaultRuntimeRequesterDeniesWithoutPromptingWhenNoActivityIsResumed() {
         val runtime = runtime()
         val core = runtime.start("app-fixture", "key-fixture", baseUrl)
         awaitUntil { runtime.deviceStore.getDeviceId() == "device-fixture" }

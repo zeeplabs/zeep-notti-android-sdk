@@ -54,7 +54,8 @@ class NottiManifestTest {
         assertFalse(activity.exported)
         assertEquals(android.R.style.Theme_Translucent_NoTitleBar, activity.theme)
         assertTrue(activity.flags and ActivityInfo.FLAG_EXCLUDE_FROM_RECENTS != 0)
-        assertTrue(activity.flags and ActivityInfo.FLAG_NO_HISTORY != 0)
+        // No noHistory: it could finish the Activity before the result while the system dialog is up.
+        assertEquals(0, activity.flags and ActivityInfo.FLAG_NO_HISTORY)
     }
 
     @Test

@@ -149,6 +149,8 @@ Carried from `zeep-notti-ios-sdk` (`.specs/LESSONS.md`, candidates there), to ap
 
 ## Todos
 
+- Flaky ported test: `NottiCoreTest` "logout clears the external user id server-side and clears email and phone" failed once (expected 5 requests, saw 4) in 1 of 5 full-suite runs on 2026-10-29, passes alone; ported verbatim from RN (AD-002). Watch it in CI; if it recurs, fix the wait in both repos
+
 - Confirm `com.zeeplabs` Central namespace domain (B-001)
 - Confirm AD-005, AD-008..AD-011 (proposed)
 - Evaluate `kotlin.stdlib.default.dependency=false` + stdlib 2.0.x in the POM (AD-012 trade-off)

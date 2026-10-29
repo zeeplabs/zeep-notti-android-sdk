@@ -81,7 +81,7 @@ Allowed changes in ported files: the `core-port` list (header, package, `interna
   3. `deviceStore.setPermissionRequested(true)` (RN, before the dialog); register `callback` under a new id in a process-wide `ConcurrentHashMap<Int, (Boolean) -> Unit>`; `currentActivity.startActivity(Intent(…, NottiPermissionActivity).putExtra(id))` with no animation.
   4. `NottiPermissionActivity.onCreate`: `requestPermissions(arrayOf(POST_NOTIFICATIONS), id)`; `onRequestPermissionsResult`: `remove(id)?.invoke(granted)`, `finish()` with no animation. Missing id or a recreated Activity (saved state) whose request already ran: finish without asking again.
   5. Each id resolves exactly once (`remove` returns the callback once); an Activity destroyed without a result (e.g. process death) leaves no callback to call, and a later request works normally.
-- **Theme**: `@android:style/Theme.Translucent.NoTitleBar`, `excludeFromRecents`, `noHistory`, `exported="false"`, `taskAffinity` of the host (default).
+- **Theme**: `@android:style/Theme.Translucent.NoTitleBar`, `excludeFromRecents`, `exported="false"` (no `noHistory`: the Activity finishes itself after the result, and `noHistory` could finish it before the result if it is stopped while the system dialog is up; removed 2026-10-29), `taskAffinity` of the host (default).
 
 ### NottiRuntime changes
 
@@ -115,7 +115,7 @@ Same bodies as the service (shared internal functions so both paths are one code
   <service android:name=".NottiFirebaseMessagingService" android:exported="false">
     <intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT" /></intent-filter>
   </service>
-  <activity android:name=".NottiPermissionActivity" android:exported="false" android:excludeFromRecents="true" android:noHistory="true" android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+  <activity android:name=".NottiPermissionActivity" android:exported="false" android:excludeFromRecents="true" android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 </application>
 ```
 
