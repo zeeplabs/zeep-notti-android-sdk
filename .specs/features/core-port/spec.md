@@ -155,7 +155,7 @@ Inherited behavior requirements (verified through CORE-10; test-by-test mapping 
 - `opened-event-reporting` (SDKOPEN-01..11): reporting here; tap detection → `push-integration`; JS events and docs → `public-api`, `example-and-release`
 - `segment-telemetry-reporting` (SEGTEL-01..15): all here (Android variants: `ProcessLifecycleOwner` foreground, `notti_last_foreground_at_ms` heartbeat)
 - `device-profile-fields` (DPF-01..21): all core logic here; JS wording → `public-api`
-- `logout-clears-external-id` (DLOG-01..07) and the RN 0.8.0 login/logout coalescing (#41): all here
+- `logout-clears-external-id` (DLOG-10..15, DLOG-22; the RN spec has no DLOG-01..09) and the RN 0.8.0 login/logout coalescing (#41): all here
 
 **Coverage:** 17 port requirements, 17 mapped to tasks (`tasks.md`).
 

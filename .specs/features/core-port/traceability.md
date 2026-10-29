@@ -75,7 +75,7 @@ Test names below are exact (`Class#method`; backtick names as written). `C#` = `
 | SDKCTR-11 | Removed on success or terminal | C#`` `registration success flushes a queued event and removes it` ``, C#`` `flushEventQueue drops the event on a terminal 4xx report` ``, ES#`` `remove then all no longer contains the removed record` `` |
 | SDKCTR-12 | Flush on launch | C#`` `registration success flushes a queued event and removes it` ``, C#`` `onAppForegrounded flushes the event queue even when already REGISTERED` ``, `R#eventEnqueuedBeforeAnyCoreIsFlushedAfterStartAndRegistration` |
 | SDKCTR-13 | Flush on reconnect | NO#`` `register captures a default-network callback and an available network triggers the flush` ``, NO#`` `onLost and onUnavailable do not trigger the flush` ``, C#`` `repeated flush triggers while one is pending are coalesced into a single flush` ``; registering the observer → push-integration |
-| SDKCTR-14 | Duplicate report after crash tolerated (no idempotency key) | **GAP** (see GAPS): by design, no test in RN either |
+| SDKCTR-14 | Duplicate report after crash tolerated (no idempotency key) | Accepted by design (see GAPS): follows from SDKCTR-10 (write-ahead) + SDKCTR-11 (removed only after 2xx/terminal), both tested |
 
 ### opened-event-reporting (SDKOPEN-01..11)
 
@@ -150,7 +150,7 @@ The RN spec defines DLOG-10..15 and DLOG-22 (no DLOG-01..09 or 16..21 exist).
 | DLOG-12 | logout then login ends with the new id | C#`` `logout then login ends linked to the new user` `` |
 | DLOG-13 | Clear re-sent after failure / before init | C#`` `a failed logout clear is re-sent at the next registration` ``, C#`` `logout before initialize sends the clear once registration completes` ``, `NottiContinuityTest#registeredFixtureKeepsDeviceIdAndDoesNotRegisterAsNew` (RN pending flag honored) |
 | DLOG-14 | Tags and subscription untouched | Asserted inside C#`` `logout clears the external user id server-side and clears email and phone` `` (as RN) |
-| DLOG-15 | Harmless against an old server | **GAP** (see GAPS): server-side behavior, no client test in RN either |
+| DLOG-15 | Harmless against an old server | Accepted, server-side (see GAPS) |
 | DLOG-22 | CHANGELOG + README | → example-and-release (docs) |
 | RN #41 | Only the latest login/logout queued before registration is kept | C#`` `logout login logout queued before registration ends with the id cleared` ``, C#`` `logout then login queued before registration ends linked to the new user` ``, C#`` `login queued before registration then logout still ends with the id cleared` `` |
 
@@ -162,10 +162,14 @@ The RN spec defines DLOG-10..15 and DLOG-22 (no DLOG-01..09 or 16..21 exist).
 
 ## GAPS
 
-RN IDs with no test here and no owning feature:
+None open. Two RN IDs have no test of their own and no owning feature; both accepted by Claude on 2026-10-28 (reported to Julio):
 
-| ID | Why | Proposal |
+| ID | Why no dedicated test | Decision |
 | --- | --- | --- |
+| SDKCTR-14 | "A duplicate report after a crash between 2xx and local cleanup is allowed" describes the absence of an idempotency key, not a client action. It is the consequence of SDKCTR-10 (event persisted before sending) and SDKCTR-11 (removed only after 2xx or a terminal 4xx), which are tested; RN mapped it to "design+flush" with no test | Accepted by design. Idempotency keys are M3 `queue-resilience` |
+| DLOG-15 | Old servers answer the null clear as a 2xx no-op: server-side behavior; RN "Done (no test)" | Accepted: not testable in the SDK; the client side (PATCH `external_user_id: null` sent) is covered under DLOG-10..12 |
+
+--- | --- | --- |
 | SDKCTR-14 | "A duplicate report after a crash between 2xx and local cleanup is allowed" is the absence of an idempotency key; RN mapped it to "design+flush" with no test | Accept as by-design (no client behavior to assert), or add a core test that a re-queued event is re-sent; needs a decision |
 | DLOG-15 | Old servers answer the null clear as a 2xx no-op: server-side behavior, RN "Done (no test)" | Accept: not testable in the SDK |
 
