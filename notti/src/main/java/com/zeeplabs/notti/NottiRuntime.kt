@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import okhttp3.OkHttpClient
+import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -31,9 +32,27 @@ internal class NottiRuntime internal constructor(
 
     val deviceStore = NottiDeviceStore(prefs)
 
-    /** The resumed Activity, for the permission rationale read. `push-integration` sets it. */
+    /** Weak: a destroyed or collected Activity is never held (no leak). */
     @Volatile
-    var currentActivity: () -> Activity? = { null }
+    private var currentActivityRef: WeakReference<Activity>? = null
+
+    /**
+     * The last resumed Activity not yet destroyed (RN `ReactContext.currentActivity`), set by
+     * [NottiActivityLifecycleListener]; read by the permission rationale and the permission request.
+     */
+    val currentActivity: () -> Activity? = { currentActivityRef?.get() }
+
+    /** Called by the lifecycle listener on every resume: the resumed Activity becomes current. */
+    @Synchronized
+    internal fun activityResumed(activity: Activity) {
+        currentActivityRef = WeakReference(activity)
+    }
+
+    /** Called by the lifecycle listener on destroy: clears the current Activity only if it is [activity]. */
+    @Synchronized
+    internal fun activityDestroyed(activity: Activity) {
+        if (currentActivityRef?.get() === activity) currentActivityRef = null
+    }
 
     /**
      * Receives each foreground FCM message the SDK handles (RN `emitNotificationReceived`); null until

@@ -89,8 +89,8 @@ T9 → T10
 
 **Done when**:
 
-- [ ] 20/20 ported pass; tracker tests pass
-- [ ] `port-diff`: only allowed changes plus the tracker lines (listed in the commit body)
+- [x] 20/20 ported pass; tracker tests pass
+- [x] `port-diff`: only allowed changes plus the tracker lines (listed in the commit body)
 
 **Tests**: unit (Robolectric)
 **Gate**: Quick
