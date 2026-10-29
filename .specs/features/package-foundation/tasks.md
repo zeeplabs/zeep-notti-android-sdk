@@ -287,7 +287,7 @@ T12 → T13
 
 **Done when**:
 
-- [ ] `actionlint` clean; Full gate passes locally
+- [x] `actionlint` clean; Full gate passes locally (2026-10-28, including the AAR/POM step run as a script)
 - [ ] After Julio OKs creating the remote and opening a PR: one green run, and red runs proven for a failing test, a lint error, an ABI change without dump, a version drift and a `com.notti` package (throwaway commits, then dropped)
 
 **Tests**: none
