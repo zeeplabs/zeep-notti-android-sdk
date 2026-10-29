@@ -107,7 +107,7 @@ T9 → T10
 
 **Done when**:
 
-- [ ] API 32 true without an Activity; API 34 no Activity false; granted/denied resolve once; two concurrent requests resolve once each; flag set before the dialog; `startActivity` failure resolves false
+- [x] API 32 true without an Activity; API 34 no Activity false; granted/denied resolve once; two concurrent requests resolve once each; flag set before the dialog; `startActivity` failure resolves false
 
 **Tests**: unit (Robolectric)
 **Gate**: Quick
