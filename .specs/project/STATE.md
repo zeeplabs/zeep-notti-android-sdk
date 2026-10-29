@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-10-28
-**Current Work:** `package-foundation` T1-T11, T13 done; PR #1 open; T12 CI proof blocked by B-002 (billing)
+**Current Work:** `core-port` spec written (branch `feat/core-port`), awaiting review. `package-foundation` merged (PR #1); its T12 CI proof still waits for B-002
 
 ---
 
@@ -114,7 +114,8 @@
 **Discovered:** 2026-10-28, PR #1 run 40792894429
 **Impact:** Blocks `package-foundation` T12 (CI green/red proof) and every CI gate until resolved. Same block the iOS repo had.
 **Workaround:** the full gate runs locally (TESTING.md "Full"), including the CI AAR/POM step as a script.
-**Resolution:** fix the payment method or spending limit in the `zeeplabs` organization's Billing & plans, then re-run PR #1.
+**Resolution:** fix the payment method or spending limit in the `zeeplabs` organization's Billing & plans, then run CI on `main` and do the T12 red/green proof on a throwaway PR.
+**Note:** PR #1 was merged with `--admin` without CI on Julio's decision (2026-10-28), after the full gate passed locally.
 
 ---
 

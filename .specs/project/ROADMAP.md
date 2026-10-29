@@ -12,14 +12,14 @@
 
 ### Features
 
-**package-foundation** - IN PROGRESS (2026-10-28: T1-T11 and T13 done locally, full gate green; PR #1; open: T12 CI green/red proof, blocked by GitHub billing B-002)
+**package-foundation** - DONE except the CI proof (2026-10-28: PR #1 merged with `--admin`, full gate green locally; open: T12 CI green/red proof, blocked by GitHub billing B-002)
 
 - Gradle (KTS) project, version catalog, library module `:notti` (namespace `com.zeeplabs.notti`, AAR), example module placeholder
 - `minSdk 24`, `compileSdk 36`, Java 17, Kotlin 2.0.x; consumer R8 rules; manifest skeleton
 - Single version source (`NottiSdkVersion.CURRENT`) checked against the Gradle publication version
 - Public API guard (Binary Compatibility Validator `.api` dump), Kotlin lint, CI on PRs, `maven-publish` + signing wired but not run
 
-**core-port** - PLANNED
+**core-port** - IN PROGRESS (spec written 2026-10-28)
 
 - Port `NottiCore`, `NottiApiClient`, `NottiDeviceStore`, `NottiEventStore`, `NottiNetworkObserver`, parsing and the click relay from RN `v0.8.0`
 - Remove the RN coupling (`NottiModule` companion statics, `ReactApplicationContext`, `WritableMap`) behind an owned runtime that stays cold-start safe
