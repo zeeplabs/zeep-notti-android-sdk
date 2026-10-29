@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Fails when SDK or example sources reference React Native (CORE-01): the SDK must build and run without it.
+# Fails when SDK or example app sources reference React Native (CORE-01): the SDK must build and run without it.
 #
 # Usage: scripts/check-no-react-native.sh [repo-root]
 set -euo pipefail
 
 root="${1:-$(cd "$(dirname "$0")/.." && pwd)}"
-dirs=("$root/notti/src" "$root/example/src")
+dirs=("$root/notti/src" "$root/example/src" "$root/example-manual-fcm/src")
 for d in "${dirs[@]}"; do
   if [[ ! -d "$d" ]]; then
     echo "error: $d not found" >&2

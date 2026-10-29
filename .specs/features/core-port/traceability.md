@@ -45,7 +45,7 @@ Test names below are exact (`Class#method`; backtick names as written). `C#` = `
 | SDK-05 | Registration retry 5x backoff, then wait for foreground/token refresh | A#`` `5xx responses exhaust the retry cap at exactly 5 attempts` ``, A#`` `network error is retried per the same backoff schedule` ``, A#`` `5xx response retries then succeeds without exhausting the cap` ``, C#`` `registration that exhausted its retry cap is resumed on the next app foreground` ``, C#`` `repeated foregrounds while an attempt is in flight do not stack registration attempts` ``, C#`` `a token fetch that never completes does not disable the next foreground retry` `` |
 | SDK-06 | Token refresh re-registers | C#`` `onTokenRefreshed re-registers with the new token` ``; OS hook (`FirebaseMessagingService.onNewToken`) → push-integration |
 | SDK-07 | Repeat initialize is a no-op | C#`` `repeat initialize with identical args is a no-op` ``; facade rules (AD-008) → public-api |
-| SDK-08 | requestPermission triggers the OS prompt | `G#sdk08RequestPermissionCallsTheInjectedRequesterAndPatchesItsAnswer`, `G#sdk08DefaultRuntimeRequesterDeniesWithoutPromptingUntilPushIntegration`, C#`` `requestPermission called before initialize logs and does not prompt` ``; real OS dialog → push-integration |
+| SDK-08 | requestPermission triggers the OS prompt | `G#sdk08RequestPermissionCallsTheInjectedRequesterAndPatchesItsAnswer`, `G#sdk08DefaultRuntimeRequesterDeniesWithoutPromptingWhenNoActivityIsResumed`, C#`` `requestPermission called before initialize logs and does not prompt` ``; real OS dialog → push-integration |
 | SDK-09 | Grant → PATCH `subscribed: true` | C#`` `requestPermission grant path invokes the native prompt and PATCHes subscribed true` `` |
 | SDK-10 | Deny → PATCH `subscribed: false` | C#`` `requestPermission deny path PATCHes subscribed false` `` |
 | SDK-11 | Android < 13 needs no runtime permission (auto-grant, no Activity) | → push-integration (`requestNativePermission` is the injected `permissionRequester`; RN tested it on `NottiModule`); the status read below 33 is `P#permissionStatusApi32Enabled`, `P#permissionStatusApi32Disabled` |
@@ -212,7 +212,7 @@ No RN test of a ported class was dropped.
 | SDK-08 real OS dialog; SDK-11 below-33 auto-grant (`permissionRequester`) | push-integration | Runtime default requester answers `false` without prompting |
 | SDK-12/13 `Notti.User` tag facade | public-api | Core merge covered |
 | SDK-17/18 listener emission, FCM receive, click relay, `parseRemoteMessage` | public-api / push-integration | No core part |
-| `currentActivity` injection (permission rationale on API 33+) | push-integration | See Accepted exceptions |
+| `currentActivity` injection (permission rationale on API 33+) | push-integration | Done (push-integration T3/T5); see Accepted exceptions |
 | Registering `NottiForegroundObserver` / `NottiNetworkObserver` at process start | push-integration | Process hook |
 
 ---
@@ -222,7 +222,7 @@ No RN test of a ported class was dropped.
 | Exception | Reason | Decided |
 | --- | --- | --- |
 | AD-011: `NottiCore.initialize` logs an invalid `baseUrl` verbatim (`"baseUrl \"$baseUrl\" is not a valid http(s) URL"`), kept as RN | `baseUrl` is integrator configuration, not user data, and is logged only on a failed `initialize`; the sentinel test runs with a valid URL and stays green | Coordinator, 2026-10-28 |
-| `permission_status` omitted on API 33+ for a never-requested, ungranted permission | Until `push-integration` injects `currentActivity`, the rationale read is `null`, which RN maps to "omit" (RN does the same with no resumed Activity); full parity returns with the Activity tracker | Design ("RN coupling map", parity note) |
+| ~~`permission_status` omitted on API 33+ for a never-requested, ungranted permission~~ **Closed** by push-integration T5 | Was: until `push-integration` injects `currentActivity`, the rationale read is `null`, which RN maps to "omit". Now `NottiRuntime` tracks the resumed Activity and wires `NottiPermissionRequester`; `NottiRuntimeTest` `permissionStatusIsSentOnApi34WithAResumedActivity` proves `notDetermined` is sent (RN parity) | Design ("RN coupling map", parity note); closed 2026-10-29 |
 
 ---
 

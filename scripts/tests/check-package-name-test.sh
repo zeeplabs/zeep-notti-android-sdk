@@ -12,7 +12,7 @@ trap 'chmod -R u+rwx "$tmp" 2>/dev/null || true; rm -rf "$tmp"' EXIT
 # fixture <name> <namespace> <file-relative-path> <file-content>
 fixture() {
   local dir="$tmp/$1"
-  mkdir -p "$dir/notti/src/main/java" "$dir/example/src/main/java"
+  mkdir -p "$dir/notti/src/main/java" "$dir/example/src/main/java" "$dir/example-manual-fcm/src/main/java"
   printf 'android {\n    namespace = "%s"\n}\n' "$2" >"$dir/notti/build.gradle.kts"
   if [[ -n "$3" ]]; then
     mkdir -p "$(dirname "$dir/$3")"
@@ -32,6 +32,9 @@ expect 1 "package com.notti fails" "$script" "$pkg"
 
 sub="$(fixture sub com.zeeplabs.notti example/src/main/java/C.kt 'package com.notti.inapp')"
 expect 1 "package com.notti.<sub> in example fails" "$script" "$sub"
+
+manual="$(fixture manual com.zeeplabs.notti example-manual-fcm/src/main/java/C.kt 'import com.notti.NottiBridge')"
+expect 1 "import com.notti.* in example-manual-fcm fails" "$script" "$manual"
 
 imp="$(fixture imp com.zeeplabs.notti notti/src/main/java/D.kt 'package com.zeeplabs.notti
 
@@ -54,6 +57,10 @@ expect 1 "missing build file fails" "$script" "$nobuild"
 nosrc="$(fixture nosrc com.zeeplabs.notti "" "")"
 rm -rf "$nosrc/example/src"
 expect 1 "missing source dir fails" "$script" "$nosrc"
+
+nomanual="$(fixture nomanual com.zeeplabs.notti "" "")"
+rm -rf "$nomanual/example-manual-fcm/src"
+expect 1 "missing example-manual-fcm source dir fails" "$script" "$nomanual"
 
 if [[ "$(id -u)" != "0" ]]; then
   unreadable="$(fixture unreadable com.zeeplabs.notti notti/src/main/java/G.kt 'package com.zeeplabs.notti')"

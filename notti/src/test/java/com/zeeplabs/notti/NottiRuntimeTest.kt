@@ -1,5 +1,6 @@
 package com.zeeplabs.notti
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import com.google.android.gms.tasks.Tasks
@@ -18,8 +19,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import java.util.Collections
 import java.util.concurrent.CountDownLatch
@@ -57,6 +60,8 @@ class NottiRuntimeTest {
 
     @After
     fun tearDown() {
+        NottiActivityLifecycleListener.resetRegistrationForTest()
+        NottiPermissionRequester.resetForTest()
         NottiRuntime.resetForTest()
         executors.forEach { it.shutdownNow() }
         server.shutdown()
@@ -202,5 +207,57 @@ class NottiRuntimeTest {
         val core = runtime.start("app-fixture", "key-fixture", baseUrl)
         assertNotNull(core)
         assertSame(core, NottiForegroundObserver.coreProvider())
+    }
+
+    /**
+     * PUSH-19, closes the core-port accepted exception: with the tracked Activity the rationale read is
+     * real, so a never-requested, ungranted permission on API 34 is sent as `notDetermined` (RN parity)
+     * instead of being omitted.
+     */
+    @Test
+    fun permissionStatusIsSentOnApi34WithAResumedActivity() {
+        val runtime = testRuntime()
+        NottiRuntime.setForTest(runtime)
+        NottiActivityLifecycleListener.registerOnce(app)
+        val activity =
+            Robolectric
+                .buildActivity(Activity::class.java)
+                .create()
+                .start()
+                .resume()
+                .get()
+        assertSame(activity, runtime.currentActivity())
+
+        runtime.start("app-fixture", "key-fixture", baseUrl)
+
+        fun statusBodies() =
+            synchronized(requests) {
+                requests
+                    .filter { it.method == "PATCH" }
+                    .map { JSONObject(it.body.clone().readUtf8()) }
+                    .filter { it.has("permission_status") }
+            }
+        awaitUntil { statusBodies().isNotEmpty() }
+        assertEquals("notDetermined", statusBodies().single().getString("permission_status"))
+    }
+
+    @Test
+    fun defaultPermissionRequesterShowsTheSdkDialogFromTheCurrentActivity() {
+        val runtime = testRuntime()
+        val activity =
+            Robolectric
+                .buildActivity(Activity::class.java)
+                .create()
+                .start()
+                .resume()
+                .get()
+        runtime.activityResumed(activity)
+        val core = runtime.start("app-fixture", "key-fixture", baseUrl)
+
+        core.requestPermission { }
+
+        val started = shadowOf(activity).nextStartedActivity
+        assertEquals(NottiPermissionActivity::class.java.name, started?.component?.className)
+        assertTrue(runtime.deviceStore.getPermissionRequested())
     }
 }

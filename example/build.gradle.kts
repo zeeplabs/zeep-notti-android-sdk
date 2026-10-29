@@ -14,6 +14,16 @@ android {
         versionName = "1.0"
     }
 
+    // Minified release (push-integration T8): CI checks R8 keeps the SDK's manifest components with no keep
+    // rules in consumer-rules.pro. Signed with the debug key; this sample is never distributed.
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17

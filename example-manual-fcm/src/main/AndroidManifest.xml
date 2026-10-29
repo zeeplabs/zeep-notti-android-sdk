@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="false"
+        android:label="Notti Manual FCM">
+        <!-- Android delivers FCM to one service per app: drop the SDK's and forward from ours. -->
+        <service
+            android:name="com.zeeplabs.notti.NottiFirebaseMessagingService"
+            tools:node="remove" />
+
+        <service
+            android:name=".ManualFcmService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+    </application>
+</manifest>

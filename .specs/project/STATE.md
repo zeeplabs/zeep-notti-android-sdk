@@ -1,7 +1,7 @@
 # State
 
-**Last Updated:** 2026-10-28
-**Current Work:** `core-port` Execute done 2026-10-28 on local branch `feat/core-port` (T1-T14; 318 tests green; traceability in `.specs/features/core-port/traceability.md`), awaiting review/PR (push only with Julio's OK). `package-foundation` merged (PR #1); its T12 CI proof still waits for B-002
+**Last Updated:** 2026-10-29
+**Current Work:** `push-integration` Execute done T1-T10 (branch `feat/push-integration`, local, not pushed): FCM service, click relay, tap detection + current-Activity tracker, permission Activity/requester, process hook, `NottiBridge` (first public API), manifest test, `:example-manual-fcm`, minified example, CI steps; 390 unit tests green; awaiting review/PR. Next: `public-api`. `core-port` merged (PR #2, admin, 2026-10-29).
 
 ---
 
@@ -35,7 +35,7 @@
 **Trade-off:** Needs namespace verification of `com.zeeplabs` (DNS TXT on the domain that backs it) and a GPG signing key stored as CI secrets. Releases are immutable.
 **Impact:** `package-foundation` wires `maven-publish` + `signing` with a local-repository dry run; `example-and-release` does the real publish. [Incerto] which domain verifies `com.zeeplabs`: to validate before the first publish (B-001).
 
-### AD-005: Integration through manifest-merged components plus a manual API (proposed, 2026-10-28)
+### AD-005: Integration through manifest-merged components plus a manual API (2026-10-28; `ContentProvider` kept in push-integration design 2026-10-29)
 
 **Decision:** Keep RN's model: the library manifest declares `NottiFirebaseMessagingService` (`MESSAGING_EVENT`) and `NottiInitProvider` (process-start hook, no I/O), so a host only calls `Notti.initialize`. Hosts with their own `FirebaseMessagingService` forward through `NottiBridge.onMessageReceived` / `onNewToken` and remove ours with `tools:node="remove"`.
 **Reason:** One-line integration (iOS AD-004 counterpart). The `ContentProvider` is the only hook early enough for a cold-start click (RN P3-AC7). Android delivers FCM to one service per app, so the manual path is required.
@@ -138,6 +138,8 @@ Carried from `zeep-notti-ios-sdk` (`.specs/LESSONS.md`, candidates there), to ap
 
 ## Deferred Ideas
 
+- Detect a warm tap in `singleTop`/`singleTask` hosts without `setIntent` through `ComponentActivity.addOnNewIntentListener` (RN 0.8.0 requires `setIntent`; post-M1, both SDKs' docs)
+
 - Foreground image push: FCM does not display a notification while the app is in the foreground and RN 0.8.0 only emits `received`; showing it (with the image) would be new behavior, after M1
 
 - Coroutines/Flow rewrite of the core (after M1, with iOS's Swift concurrency equivalent)
@@ -146,6 +148,8 @@ Carried from `zeep-notti-ios-sdk` (`.specs/LESSONS.md`, candidates there), to ap
 ---
 
 ## Todos
+
+- Flaky ported test: `NottiCoreTest` "logout clears the external user id server-side and clears email and phone" failed once (expected 5 requests, saw 4) in 1 of 5 full-suite runs on 2026-10-29, passes alone; ported verbatim from RN (AD-002). Watch it in CI; if it recurs, fix the wait in both repos
 
 - Confirm `com.zeeplabs` Central namespace domain (B-001)
 - Confirm AD-005, AD-008..AD-011 (proposed)

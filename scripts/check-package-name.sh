@@ -8,7 +8,7 @@ set -euo pipefail
 
 root="${1:-$(cd "$(dirname "$0")/.." && pwd)}"
 build_file="$root/notti/build.gradle.kts"
-dirs=("$root/notti/src" "$root/example/src")
+dirs=("$root/notti/src" "$root/example/src" "$root/example-manual-fcm/src")
 
 if [[ ! -f "$build_file" ]]; then
   echo "error: $build_file not found" >&2

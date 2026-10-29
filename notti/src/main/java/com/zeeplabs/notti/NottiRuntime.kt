@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import okhttp3.OkHttpClient
+import java.lang.ref.WeakReference
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -31,9 +32,34 @@ internal class NottiRuntime internal constructor(
 
     val deviceStore = NottiDeviceStore(prefs)
 
-    /** The resumed Activity, for the permission rationale read. `push-integration` sets it. */
+    /** Weak: a destroyed or collected Activity is never held (no leak). */
     @Volatile
-    var currentActivity: () -> Activity? = { null }
+    private var currentActivityRef: WeakReference<Activity>? = null
+
+    /**
+     * The last resumed Activity not yet destroyed (RN `ReactContext.currentActivity`), set by
+     * [NottiActivityLifecycleListener]; read by the permission rationale and the permission request.
+     */
+    val currentActivity: () -> Activity? = { currentActivityRef?.get() }
+
+    /** Called by the lifecycle listener on every resume: the resumed Activity becomes current. */
+    @Synchronized
+    internal fun activityResumed(activity: Activity) {
+        currentActivityRef = WeakReference(activity)
+    }
+
+    /** Called by the lifecycle listener on destroy: clears the current Activity only if it is [activity]. */
+    @Synchronized
+    internal fun activityDestroyed(activity: Activity) {
+        if (currentActivityRef?.get() === activity) currentActivityRef = null
+    }
+
+    /**
+     * Receives each foreground FCM message the SDK handles (RN `emitNotificationReceived`); null until
+     * `public-api` sets it. No buffer: RN emitted only to a live module.
+     */
+    @Volatile
+    var onNotificationReceived: ((ParsedNotification) -> Unit)? = null
 
     /** The In-App engine's lifecycle hooks; null until `in-app-messages` sets them. */
     @Volatile
@@ -48,6 +74,9 @@ internal class NottiRuntime internal constructor(
 
     /** Reverse geocoding (blocking network call), one per runtime as one per module in RN. */
     private val geoExecutor: ExecutorService = newDaemonExecutor("notti-geo")
+
+    /** The API 33+ dialog from the current Activity (RN `requestNativePermission`), the core's default requester. */
+    private val defaultPermissionRequester = NottiPermissionRequester(appContext, deviceStore, currentActivity)
 
     private val providers: NottiAndroidProviders =
         providersFactory?.invoke(deviceStore) { currentActivity() }
@@ -64,7 +93,7 @@ internal class NottiRuntime internal constructor(
         appId: String,
         clientKey: String,
         baseUrl: String,
-        permissionRequester: (callback: (Boolean) -> Unit) -> Unit = { it(false) },
+        permissionRequester: (callback: (Boolean) -> Unit) -> Unit = defaultPermissionRequester::request,
         onDeviceIdChanged: (String) -> Unit = {},
     ): NottiCore {
         val io = executorFactory()
@@ -145,9 +174,18 @@ internal class NottiRuntime internal constructor(
         /** The runtime if one exists; for callers that must not create it (observers). */
         fun peek(): NottiRuntime? = instance
 
-        /** Test-only: drops the process runtime and stops its executors. */
+        /** Test-only: makes [runtime] the process runtime (RN `setEventStoreForTest`), dropping any previous one. */
+        internal fun setForTest(runtime: NottiRuntime) {
+            synchronized(this) {
+                instance?.shutdown()
+                instance = runtime
+            }
+        }
+
+        /** Test-only: drops the process runtime, its callbacks and its executors. */
         internal fun resetForTest() {
             synchronized(this) {
+                instance?.onNotificationReceived = null
                 instance?.shutdown()
                 instance = null
             }

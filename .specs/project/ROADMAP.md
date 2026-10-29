@@ -19,7 +19,7 @@
 - Single version source (`NottiSdkVersion.CURRENT`) checked against the Gradle publication version
 - Public API guard (Binary Compatibility Validator `.api` dump), Kotlin lint, CI on PRs, `maven-publish` + signing wired but not run
 
-**core-port** - Execute done 2026-10-28, local; awaiting review/PR
+**core-port** - DONE except CI (2026-10-28: 318 tests green locally; PR #2 open, merge pending Julio; CI blocked by B-002)
 
 - Port `NottiCore`, `NottiApiClient`, `NottiDeviceStore`, `NottiEventStore`, `NottiNetworkObserver`, parsing and the click relay from RN `v0.8.0`
 - Remove the RN coupling (`NottiModule` companion statics, `ReactApplicationContext`, `WritableMap`) behind an owned runtime that stays cold-start safe
@@ -32,7 +32,7 @@
 - Java interop; listeners multi-subscriber with removable handles; callbacks on the main thread (iOS AD-009 parity)
 - `NottiLogger` with level control (default error, no PII)
 
-**push-integration** - PLANNED (Android counterpart of iOS `delegate-integration`)
+**push-integration** - Execute done 2026-10-29, local; awaiting review/PR (390 tests green; Android counterpart of iOS `delegate-integration`)
 
 - Manifest-merged `NottiFirebaseMessagingService` and `NottiInitProvider` process hook; activity-lifecycle click detection (`opened`/`clicked`), cold-start initial click
 - `NottiBridge` manual forwarding for hosts with their own FCM service; documented manifest opt-out
