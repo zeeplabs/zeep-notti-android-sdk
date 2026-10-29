@@ -234,8 +234,9 @@ T12 → T13
 
 **Done when**:
 
-- [ ] `:example:assembleDebug` passes in both modes (publish first in a separate invocation for `true`)
-- [ ] `:example:dependencies --configuration debugRuntimeClasspath` shows `com.zeeplabs:notti-android:0.1.0` in published mode
+- [x] `:example:assembleDebug` passes in both modes (publish first in a separate invocation for `true`)
+- [x] `:example:dependencies --configuration debugRuntimeClasspath` shows `com.zeeplabs:notti-android:0.1.0` in published mode (and an empty `build/repo` fails with `Could not find com.zeeplabs:notti-android:0.1.0`, so it is not resolved from the project)
+- Deferred to `example-and-release`: the conditional Google Services plugin (nothing uses FCM in the placeholder; adding it now is dead config)
 
 **Tests**: none
 **Gate**: Build (both modes)
