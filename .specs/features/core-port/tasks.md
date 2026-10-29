@@ -54,8 +54,8 @@ T13 → T14
 
 **Done when**:
 
-- [ ] Default level emits `error` only; `NONE` emits nothing; lazy message not evaluated below level
-- [ ] Default sink tag `Notti` (Robolectric `ShadowLog`)
+- [x] Default level emits `error` only; `NONE` emits nothing; lazy message not evaluated below level
+- [x] Default sink tag `Notti` (Robolectric `ShadowLog`)
 
 **Tests**: unit
 **Gate**: Quick
