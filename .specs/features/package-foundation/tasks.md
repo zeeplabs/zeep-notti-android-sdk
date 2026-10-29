@@ -162,7 +162,7 @@ T12 → T13
 
 **Done when**:
 
-- [ ] Both pass; temporarily removing each dependency makes its test fail (noted in the commit body)
+- [x] Both pass; temporarily removing each dependency makes its test fail (noted in the commit body)
 
 **Tests**: unit
 **Gate**: Quick
