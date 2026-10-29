@@ -99,20 +99,20 @@ T13 → T14
 
 ---
 
-### T4: Port NottiApiClient
+### T4: Port the In-App data files
 
-**What**: Port `NottiApiClient.kt` and its 48 tests (MockWebServer).
-**Where**: `notti/src/main/java/com/zeeplabs/notti/NottiApiClient.kt`, test
+**What**: Port `NottiInAppModels.kt` and `NottiInAppEventStore.kt` with `NottiInAppModelsTest` (36) and `NottiInAppEventStoreTest` (13). Data and persistence only (design amendment 2026-10-28).
+**Where**: `notti/src/main/java/com/zeeplabs/notti/NottiInAppModels.kt`, `NottiInAppEventStore.kt`, tests
 **Depends on**: T3
-**Requirement**: CORE-01, CORE-02, CORE-09
+**Requirement**: CORE-01, CORE-09, CORE-12
 
 **Done when**:
 
-- [ ] 48/48 pass (retry 5 attempts, 2/4/8/16 s via the injected sleeper, transient 408/429/5xx/network)
+- [ ] 36/36 and 13/13 pass; `port-diff` shows only allowed changes
 
 **Tests**: unit
 **Gate**: Quick
-**Commit**: `feat(core): port NottiApiClient`
+**Commit**: `feat(core): port the In-App data models and event store`
 
 ---
 
@@ -133,21 +133,21 @@ T13 → T14
 
 ---
 
-### T6: Port NottiCore
+### T6: Port NottiApiClient and NottiCore
 
-**What**: Port `NottiCore.kt` (incl. `SessionGate`, companion helpers) and its 128 tests.
-**Where**: `notti/src/main/java/com/zeeplabs/notti/NottiCore.kt`, test
+**What**: Port `NottiApiClient.kt` (48 tests, MockWebServer) and `NottiCore.kt` (incl. `SessionGate`, companion helpers, `formatIsoUtc`; 128 tests) together: each needs the other to compile (design amendment 2026-10-28). Apply allowed change 5 as amended (no exception message in any log line).
+**Where**: `notti/src/main/java/com/zeeplabs/notti/NottiApiClient.kt`, `NottiCore.kt`, tests
 **Depends on**: T5
-**Requirement**: CORE-01, CORE-02, CORE-09, CORE-12
+**Requirement**: CORE-01, CORE-02, CORE-09, CORE-12, CORE-15
 
 **Done when**:
 
-- [ ] 128/128 pass
-- [ ] Only allowed changes (KDoc `NottiModule` mentions rewritten)
+- [ ] 48/48 and 128/128 pass (retry 5 attempts, 2/4/8/16 s via the injected sleeper, transient 408/429/5xx/network)
+- [ ] Only allowed changes (KDoc `NottiModule` mentions rewritten; `t.message`/`e.message` replaced as listed)
 
 **Tests**: unit
 **Gate**: Quick
-**Commit**: `feat(core): port NottiCore`
+**Commit**: `feat(core): port NottiApiClient and NottiCore`
 
 ---
 
@@ -288,7 +288,7 @@ T13 → T14
 
 **Done when**:
 
-- [ ] No unmapped Android-applicable core ID; counts ≥ RN (208) plus new tests
+- [ ] No unmapped Android-applicable core ID; counts ≥ RN (257: 208 core + 49 In-App data) plus new tests
 - [ ] Every `port-diff` hunk is an allowed change or a listed `SPEC_DEVIATION`
 - [ ] Full gate green
 
@@ -346,7 +346,7 @@ T13 → T14
 | CORE-12 | T2, T3, T6, T10 |
 | CORE-13 | T10 |
 | CORE-14 | T8, T10 |
-| CORE-15 | T1, T11 |
+| CORE-15 | T1, T6, T11 |
 | CORE-16 | T1 |
 | CORE-17 | T11 |
 

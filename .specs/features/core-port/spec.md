@@ -17,7 +17,7 @@ All of Notti's Android core behavior (registration, identity, tags, profile fiel
 | Public facade (`Notti.initialize`, `Notti.User`, listeners, `trackEvent`) | `public-api`. This feature exposes `internal` core API only |
 | `NottiFirebaseMessagingService`, `NottiInitProvider`, `NottiActivityLifecycleListener`, `NottiNotificationClickRelay`, `NottiBridge`, `parseRemoteMessage`, manifest entries | `push-integration`. This feature ports the core entry points they call (`onTokenRefreshed`, event enqueue, foreground/background), not who calls them |
 | Runtime permission request (`POST_NOTIFICATIONS` dialog, needs an Activity) | `push-integration`; the core takes the requester as an injected function, as in RN |
-| In-App engine (`NottiInApp*`) | `in-app-messages`. Only the `NottiInAppHooks` seam the core calls is ported here, with its no-op default |
+| In-App engine (session, coordinator, presenter, views, style, image loader, setup, push-permission action) | `in-app-messages`. Ported here: the `NottiInAppHooks` seam and the In-App data files `NottiApiClient` depends on (`NottiInAppModels`, `NottiInAppEventStore`; design amendment 2026-10-28) |
 | Any behavior change (Retry-After, queue TTL, secure storage, consent) | AD-002; M3 |
 | Coroutines/Flow rewrite | AD-002 |
 | Backend contract changes | Contract fixed at `zeep-notti` >= v0.11.0 (>= v0.24.0 for the logout unlink) |
@@ -48,7 +48,7 @@ All of Notti's Android core behavior (registration, identity, tags, profile fiel
 
 **Acceptance Criteria**:
 
-1. WHEN `:notti` is built THEN it SHALL contain the ported `NottiCore` (with `SessionGate`), `NottiApiClient`, `NottiDeviceStore`, `NottiEventStore` (and `NottiEventType`), `NottiNetworkObserver`, `NottiForegroundObserver` and the `NottiInAppHooks` seam, all `internal`, under `com.zeeplabs.notti`, and SHALL NOT reference any React Native symbol (CI grep).
+1. WHEN `:notti` is built THEN it SHALL contain the ported `NottiCore` (with `SessionGate`), `NottiApiClient`, `NottiDeviceStore`, `NottiEventStore` (and `NottiEventType`), `NottiNetworkObserver`, `NottiForegroundObserver`, the `NottiInAppHooks` seam and the In-App data files `NottiInAppModels`/`NottiInAppEventStore`, all `internal`, under `com.zeeplabs.notti`, and SHALL NOT reference any React Native symbol (CI grep).
 2. WHEN the core is constructed THEN every dependency SHALL stay injectable as in RN (prefs, API client factory, executor, clock, every provider, session gate, In-App hooks, logger), so tests run on the JVM.
 3. WHEN code outside the core (event detection sites, network and foreground observers) needs the active core, the session gate or the event store THEN it SHALL reach them through the SDK-owned container, not through statics spread across types; the container SHALL keep RN's identity rules (a torn-down core never unhooks its replacement).
 4. WHEN a received/opened/clicked event is enqueued before any core exists THEN it SHALL be persisted to `notti_pending_events` and flushed after the next registration, network regain or foreground, as RN does (SDKCTR-02, SDKCTR-12).
@@ -78,7 +78,7 @@ All of Notti's Android core behavior (registration, identity, tags, profile fiel
 
 **Acceptance Criteria**:
 
-1. WHEN the ported suite runs THEN every RN test for a ported file SHALL exist here and pass, with counts at least RN's: `NottiCoreTest` 128, `NottiApiClientTest` 48, `NottiDeviceStoreTest` 20, `NottiEventStoreTest` 7, `NottiForegroundObserverTest` 3, `NottiNetworkObserverTest` 2 (208). Tests dropped as RN-only SHALL be listed with a reason.
+1. WHEN the ported suite runs THEN every RN test for a ported file SHALL exist here and pass, with counts at least RN's: `NottiCoreTest` 128, `NottiApiClientTest` 48, `NottiDeviceStoreTest` 20, `NottiEventStoreTest` 7, `NottiForegroundObserverTest` 3, `NottiNetworkObserverTest` 2 (208), plus `NottiInAppModelsTest` 36 and `NottiInAppEventStoreTest` 13 (257). Tests dropped as RN-only SHALL be listed with a reason.
 2. WHEN the traceability table is complete THEN every Android-applicable core RN requirement ID SHALL map to at least one test here, and IDs owned by another feature SHALL name it.
 3. WHEN an RN requirement was recorded with indirect coverage only (sdk-core-v1 validation: SDK-04, SDK-08, SDK-12, SDK-13, SDK-17) THEN this port SHALL add a direct test for its core-layer part or name the feature that owns the rest.
 
@@ -163,7 +163,7 @@ Inherited behavior requirements (verified through CORE-10; test-by-test mapping 
 
 ## Success Criteria
 
-- [ ] Ported suite green, at least 208 tests from the six RN classes plus the new provider, container, continuity and log tests.
+- [ ] Ported suite green, at least 257 tests from the eight RN classes plus the new provider, container, continuity and log tests.
 - [ ] `traceability.md` shows no unmapped Android-applicable core RN ID.
 - [ ] The RN 0.8.0 state fixture test passes with no duplicate registration.
 - [ ] No React Native symbol in `notti/src`.

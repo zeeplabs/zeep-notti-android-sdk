@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Dev tool (not CI): shows what a ported file changed against its react-native-notti source, ignoring the
-# mechanical port changes: the provenance header, `@file:Suppress` lines, the `package` and `import` lines,
+# mechanical port changes: the provenance header, the `@file:Suppress` block (one or many lines), the `package` and `import` lines,
 # blank lines and all whitespace (AD-009). Every remaining hunk must be an allowed change of the feature's
 # design or a listed SPEC_DEVIATION.
 #
@@ -26,9 +26,15 @@ fi
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
+# Drops the header, a one-line or multi-line `@file:Suppress(...)` block, package/import lines and blank lines.
 normalize() {
-  grep -vE '^[[:space:]]*(// Ported from react-native-notti|@file:Suppress|package |import )' |
-    grep -vE '^[[:space:]]*$' || true
+  awk '
+    in_suppress { if ($0 ~ /^[[:space:]]*\)[[:space:]]*$/) in_suppress = 0; next }
+    /^[[:space:]]*@file:Suppress\(/ { if ($0 !~ /\)[[:space:]]*$/) in_suppress = 1; next }
+    /^[[:space:]]*(\/\/ Ported from react-native-notti|package |import )/ { next }
+    /^[[:space:]]*$/ { next }
+    { print }
+  '
 }
 
 git -C "$rn" show "$tag:android/src/$src" | normalize >"$tmp/rn.kt"

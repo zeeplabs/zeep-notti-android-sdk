@@ -72,6 +72,8 @@ Parity note: with `currentActivity` null and no earlier request, `mapPermissionS
 | `NottiNetworkObserver` | `NottiNetworkObserver.kt` | Port; default callback → runtime |
 | `NottiForegroundObserver` | bottom of `NottiInitProvider.kt` | Moved to its own file; providers → runtime |
 | `NottiInAppHooks` (+ `None`) | `NottiInAppCoordinator.kt:45` | Extracted to its own file, unchanged |
+| `NottiInAppModels` (`InAppMessage`, `parseEligibleResponse`, `parseHexColor`, …) | `NottiInAppModels.kt` | Port with `NottiInAppModelsTest` (36): `NottiApiClient` returns these types (amendment, below) |
+| `NottiInAppEventStore` (`InAppPendingEvent`, `InAppEventType`) | `NottiInAppEventStore.kt` | Port with `NottiInAppEventStoreTest` (13): `NottiApiClient.reportInAppEvent` takes these types; key `notti_pending_inapp_events` |
 | Provider bodies | `NottiModule.kt` (`readAppVersion` … `fetchFcmToken`) | Moved into `NottiAndroidProviders`, bodies verbatim except `reactApplicationContext` → `context` and the log line |
 | Tests | `android/src/test/java/com/notti/{NottiCore,NottiApiClient,NottiDeviceStore,NottiEventStore,NottiForegroundObserver,NottiNetworkObserver}Test.kt` | Port 1:1; `NottiModule.*` statics in tests → an isolated `NottiRuntime` |
 | Process | iOS `core-port` (NottiRuntime, logger sentinel test, fixture continuity test) | Same shapes |
@@ -82,7 +84,7 @@ Parity note: with `currentActivity` null and no earlier request, `mapPermissionS
 2. `package com.notti` → `package com.zeeplabs.notti`; imports of RN types removed.
 3. Visibility: top-level `class`/`object`/`fun` become `internal` (ABI dump stays empty, AD-010).
 4. Re-indent 2 → 4 spaces (AD-009); `spotlessApply` formatting only.
-5. `Log.e(NottiModule.NAME, "… - ${t.message}")` → `NottiLogger.error("… - ${t.javaClass.simpleName}")` (AD-011: exception messages can carry URLs).
+5. Exception messages never reach a log line (AD-011; iOS logs `domain#code` for the same reason): `Log.e(NottiModule.NAME, "… - ${t.message}")` → `NottiLogger.error("… - ${t.javaClass.simpleName}")`; in `NottiCore`, the three `logger("… - ${t.message}")` lines use `${t.javaClass.simpleName}`; in `NottiApiClient`, `lastError = e.message ?: "network error"` becomes `lastError = e.javaClass.simpleName` (that string only feeds `ApiResult.Failure.message`, which the core only logs; no RN test asserts it). Amended 2026-10-28 after T4 found the core's `logger` lines carry `result.message` from OkHttp exceptions.
 6. `NottiModule.activeCore` / `processSessionGate` / `NottiInApp.get()` references → runtime / seam, in the two observers only.
 7. KDoc references to `NottiModule` rewritten to the runtime (comments only).
 8. Per-file `@file:Suppress(...)` only for lint/ktlint findings that fire on unchanged RN code.
@@ -150,14 +152,23 @@ Unchanged from RN 0.8.0 (continuity, CORE-12). Recorded here as the contract the
 | --- | --- | --- |
 | `notti_device_id`, `notti_last_token`, `notti_external_user_id`, `notti_email`, `notti_phone`, `notti_app_version`, `notti_last_synced_*` | String | `NottiDeviceStore` |
 | `notti_tag_<key>` | String | `NottiDeviceStore` |
-| `notti_session_count`, `notti_session_time_ms`, `*_at_ms` keys | Long or Int exactly as RN `put*` calls them (Design check in T2: read every `put*`/`get*` call and list its type in `traceability.md`) | `NottiDeviceStore` |
+| `notti_session_count` | Int (`putInt`) | `NottiDeviceStore` |
+| `notti_session_time_ms`, `*_at_ms` keys | Long | `NottiDeviceStore` (full list with defaults in `traceability.md`, Storage contract) |
 | `notti_subscribed`, `notti_permission_requested`, `notti_location_sharing_enabled`, `notti_pending_*_clear`, `notti_profile_field_ack_migrated` | Boolean | `NottiDeviceStore` |
 | `notti_pending_events` | String: JSON array of `{id, notificationId, deliveryId, type, createdAtMs}`, cap 32 (`MAX_PENDING_EVENTS`) | `NottiEventStore` |
-| `notti_pending_inapp_events` | Owned by `in-app-messages`; must not be touched here | - |
+| `notti_pending_inapp_events` | String: JSON array of In-App events (RN schema) | `NottiInAppEventStore`, ported here as data code; only `in-app-messages` writes to it at runtime |
 
 Corrupt `notti_pending_events` (spec edge case): RN `all()` drops the key and returns an empty list; ported unchanged and already covered by an RN `NottiEventStoreTest` case.
 
 ---
+
+## Amendment 2026-10-28 (found executing T4)
+
+RN's `NottiApiClient` is not core-only: it also carries the In-App routes (`fetchEligibleInAppMessages`, `reportInAppEvent`, 13 of its 48 tests) and uses `InAppMessage`/`parseEligibleResponse` (`NottiInAppModels.kt`), `InAppPendingEvent`/`InAppEventType` (`NottiInAppEventStore.kt`) and `formatIsoUtc` (`NottiCore.kt:1368`), while `NottiCore` uses `NottiApiClient`. Decision (Claude, within the port rule; reported to Julio):
+
+- Port the two In-App data files (pure models/parsers and the persisted queue, no UI, no engine) with their RN tests here, so `NottiApiClient` stays a verbatim port with all 48 tests. Splitting the In-App routes out of the client would change a ported file and drop 13 tests below the RN count.
+- `NottiApiClient` and `NottiCore` are ported in one task and one commit (they need each other to compile).
+- The In-App engine (`Session`, `Coordinator`, `Presenter`, `ViewFactory`, `Style`, `ImageLoader`, `Accessibility`, `Setup`, `PushPermissionAction`) stays in `in-app-messages`.
 
 ## Error Handling Strategy
 

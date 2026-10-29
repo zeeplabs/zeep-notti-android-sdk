@@ -44,6 +44,8 @@ expect 0 "4-space level becomes 8" check_line "        return 1"
 expect 0 "KDoc continuation keeps its odd space" check_line " * Doc line."
 
 expect 0 "port-diff: mechanical changes only" "$port_diff" main/java/com/notti/Sample.kt "$ported" "$rn" v0.0.1
+{ head -1 "$ported"; printf '@file:Suppress(\n    "ktlint:standard:a",\n    "UseKtx",\n)\n\n'; tail -n +2 "$ported"; } >"$tmp/with-suppress.kt"
+expect 0 "port-diff: multi-line @file:Suppress is ignored" "$port_diff" main/java/com/notti/Sample.kt "$tmp/with-suppress.kt" "$rn" v0.0.1
 sed -i.bak 's/return 1/return 2/' "$ported"
 expect 1 "port-diff: a code change shows" "$port_diff" main/java/com/notti/Sample.kt "$ported" "$rn" v0.0.1
 expect 2 "port-diff: missing ported file" "$port_diff" main/java/com/notti/Sample.kt "$tmp/none.kt" "$rn" v0.0.1
