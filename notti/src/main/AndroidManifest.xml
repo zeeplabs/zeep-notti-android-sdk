@@ -1,8 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- No <application> attributes: the host app owns allowBackup, label, icon and theme (PKG-05). -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application>
+        <!--
+          Runs at process start, before any Activity: the only hook early enough to see a cold-start
+          notification tap's launch intent. The authority differs from react-native-notti's
+          (`${applicationId}.nottiinitprovider`) so both can be installed together.
+        -->
+        <provider
+            android:name=".NottiInitProvider"
+            android:authorities="${applicationId}.com.zeeplabs.notti.initprovider"
+            android:exported="false"
+            android:initOrder="100" />
+
+        <!-- A host with its own FirebaseMessagingService removes this with tools:node="remove" and forwards to NottiBridge. -->
+        <service
+            android:name=".NottiFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <!-- Hosts the POST_NOTIFICATIONS dialog for NottiPermissionRequester, from any host Activity. -->
         <activity
             android:name=".NottiPermissionActivity"

@@ -55,7 +55,7 @@ class NottiActivityLifecycleListenerTest {
         // Process start: the ContentProvider runs before any Activity, and long
         // before the lazy TurboModule is constructed (spec P3-AC7 - a tap from a
         // killed app). Nothing is attached to emit on yet.
-        NottiActivityLifecycleListener.registerOnce(RuntimeEnvironment.getApplication())
+        Robolectric.buildContentProvider(NottiInitProvider::class.java).create()
 
         val intent = Intent().apply {
             putExtra("google.message_id", "msg-1")
@@ -303,7 +303,7 @@ class NottiActivityLifecycleListenerTest {
         // SDKOPEN-02/10: no module or JS listener exists yet; the event is queued
         // by the native hook and the payload stays available to
         // getInitialNotificationClick().
-        NottiActivityLifecycleListener.registerOnce(RuntimeEnvironment.getApplication())
+        Robolectric.buildContentProvider(NottiInitProvider::class.java).create()
 
         val intent = Intent().apply {
             putExtra("google.message_id", "msg-1")

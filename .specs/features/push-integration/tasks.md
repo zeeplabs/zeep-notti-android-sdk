@@ -141,7 +141,7 @@ T9 → T10
 
 **Done when**:
 
-- [ ] Runtime created, listener registered once, network observer registered, foreground observer added after the main-looper post; no request reaches MockWebServer; a throwing step does not stop the others
+- [x] Runtime created, listener registered once, network observer registered, foreground observer added after the main-looper post; no request reaches MockWebServer; a throwing step does not stop the others
 
 **Tests**: unit (Robolectric)
 **Gate**: Quick
