@@ -236,7 +236,7 @@ T13 → T14
 
 **Done when**:
 
-- [ ] No sentinel (incl. token, base URL with ids) appears in captured output; a deliberately leaking log line makes the test fail (checked once, reverted)
+- [x] No sentinel (incl. token, base URL with ids) appears in captured output; a deliberately leaking log line makes the test fail (checked once, reverted)
 
 **Tests**: unit
 **Gate**: Quick
