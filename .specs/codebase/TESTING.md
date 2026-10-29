@@ -32,6 +32,8 @@ JDK 17 (`export JAVA_HOME=/opt/homebrew/opt/openjdk@17` on macOS with Homebrew).
 | Scripts (`scripts/*.sh`) | script self-test | pass fixture + each failure mode | `scripts/tests/*-test.sh` | `scripts/tests/run.sh` |
 | CI workflow | none | `actionlint` clean; red and green runs | - | `docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:latest -no-color` |
 
+Coverage (2026-10-28, `core-port`): 318 unit tests. 257 ported 1:1 from RN v0.8.0 (eight classes, counts equal to RN), 58 new (providers, runtime, continuity fixture, log privacy sentinel, RN validation gaps, logger), 3 smoke. RN requirement ID → test map, counts per class and the deferred list: `.specs/features/core-port/traceability.md`. Ported test files keep RN's names and `@Config`; ktlint findings on them are suppressed per file, not reformatted.
+
 ## Parallelism Assessment
 
 | Test Type | Parallel-Safe | Why |

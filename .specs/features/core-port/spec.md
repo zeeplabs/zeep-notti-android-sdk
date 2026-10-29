@@ -130,23 +130,23 @@ Port-specific requirements:
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| CORE-01 | P1 Core without RN: components ported, internal, no RN symbols | Tasks | Mapped |
-| CORE-02 | P1 Core without RN: all dependencies injectable | Tasks | Mapped |
-| CORE-03 | P1 Core without RN: container replaces companion statics | Tasks | Mapped |
-| CORE-04 | P1 Core without RN: pre-core events persisted and flushed | Tasks | Mapped |
-| CORE-05 | P1 Core without RN: native `sdk_version` | Tasks | Mapped |
-| CORE-06 | P1 Providers: RN 0.8.0 behavior for each reader | Tasks | Mapped |
-| CORE-07 | P1 Providers: failure returns null | Tasks | Mapped |
-| CORE-08 | P1 Providers: unit tests | Tasks | Mapped |
-| CORE-09 | P1 Parity: suite ported, counts, drop list | Tasks | Mapped |
-| CORE-10 | P1 Parity: every applicable RN ID mapped | Tasks | Mapped |
-| CORE-11 | P1 Parity: direct tests for SDK-04/08/12/13/17 core parts | Tasks | Mapped |
-| CORE-12 | P1 Continuity: same file, keys, types, encodings | Tasks | Mapped |
-| CORE-13 | P1 Continuity: no re-register on migrated state | Tasks | Mapped |
-| CORE-14 | P1 Continuity: fixture and golden file-name tests | Tasks | Mapped |
-| CORE-15 | P2 Logs: single logger, no PII | Tasks | Mapped |
-| CORE-16 | P2 Logs: errors-only default | Tasks | Mapped |
-| CORE-17 | P2 Logs: sentinel test | Tasks | Mapped |
+| CORE-01 | P1 Core without RN: components ported, internal, no RN symbols | Execute | Done (T2-T6, T9, T13) |
+| CORE-02 | P1 Core without RN: all dependencies injectable | Execute | Done (T6-T8) |
+| CORE-03 | P1 Core without RN: container replaces companion statics | Execute | Done (T8, T9) |
+| CORE-04 | P1 Core without RN: pre-core events persisted and flushed | Execute | Done (T8) |
+| CORE-05 | P1 Core without RN: native `sdk_version` | Execute | Done (T8) |
+| CORE-06 | P1 Providers: RN 0.8.0 behavior for each reader | Execute | Done (T7) |
+| CORE-07 | P1 Providers: failure returns null | Execute | Done (T7) |
+| CORE-08 | P1 Providers: unit tests | Execute | Done (T7) |
+| CORE-09 | P1 Parity: suite ported, counts, drop list | Execute | Done (T2-T6, T9) |
+| CORE-10 | P1 Parity: every applicable RN ID mapped | Execute | Done (T14) |
+| CORE-11 | P1 Parity: direct tests for SDK-04/08/12/13/17 core parts | Execute | Done (T12) |
+| CORE-12 | P1 Continuity: same file, keys, types, encodings | Execute | Done (T2, T10) |
+| CORE-13 | P1 Continuity: no re-register on migrated state | Execute | Done (T10) |
+| CORE-14 | P1 Continuity: fixture and golden file-name tests | Execute | Done (T8, T10) |
+| CORE-15 | P2 Logs: single logger, no PII | Execute | Done (T1, T11) |
+| CORE-16 | P2 Logs: errors-only default | Execute | Done (T1) |
+| CORE-17 | P2 Logs: sentinel test | Execute | Done (T11) |
 
 Inherited behavior requirements (verified through CORE-10; test-by-test mapping in `traceability.md` at Tasks):
 

@@ -19,7 +19,7 @@
 - Single version source (`NottiSdkVersion.CURRENT`) checked against the Gradle publication version
 - Public API guard (Binary Compatibility Validator `.api` dump), Kotlin lint, CI on PRs, `maven-publish` + signing wired but not run
 
-**core-port** - IN PROGRESS (spec written 2026-10-28)
+**core-port** - Execute done 2026-10-28, local; awaiting review/PR
 
 - Port `NottiCore`, `NottiApiClient`, `NottiDeviceStore`, `NottiEventStore`, `NottiNetworkObserver`, parsing and the click relay from RN `v0.8.0`
 - Remove the RN coupling (`NottiModule` companion statics, `ReactApplicationContext`, `WritableMap`) behind an owned runtime that stays cold-start safe

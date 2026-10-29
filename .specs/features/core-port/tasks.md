@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/core-port/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Draft (2026-10-28)
+**Status**: Execute done (2026-10-28), local; awaiting review/PR
 
 ---
 
@@ -181,7 +181,7 @@ T13 → T14
 
 - [x] Lazy single instance across threads; `stop` identity-guarded
 - [x] Event enqueued with no core is persisted and flushed by a later `start` + registration (MockWebServer)
-- [x] Registration body `sdk_version` == `NottiSdkVersion.CURRENT`
+- [x] `sdk_version` in the profile-field PATCH after registration equals `NottiSdkVersion.CURRENT` (as RN, it is not in the `POST /devices` body)
 - [x] Replacing a core shuts the old executor down
 - [x] Production prefs name is `notti_prefs`
 
@@ -217,7 +217,7 @@ T13 → T14
 
 **Done when**:
 
-- [x] Registered-device fixture: no `POST /devices` on start with the same token; device id kept
+- [x] Registered-device fixture: as RN 0.8.0 (upsert on every `initialize`), exactly one `POST /devices` with the stored token, same device id, no device-id change callback, acks not re-sent
 - [x] Tags, session counters, pending events, acks, pending logout clear read back
 - [x] Token-changed fixture: behavior equals RN's (re-register path), asserted
 
@@ -288,9 +288,9 @@ T13 → T14
 
 **Done when**:
 
-- [ ] No unmapped Android-applicable core ID; counts ≥ RN (257: 208 core + 49 In-App data) plus new tests
-- [ ] Every `port-diff` hunk is an allowed change or a listed `SPEC_DEVIATION`
-- [ ] Full gate green
+- [x] No unmapped Android-applicable core ID (two by-design gaps listed in `traceability.md` GAPS); counts ≥ RN (257: 208 core + 49 In-App data) plus new tests (318 total)
+- [x] Every `port-diff` hunk is an allowed change or a listed `SPEC_DEVIATION`
+- [x] Full gate green
 
 **Tests**: none
 **Gate**: Full
