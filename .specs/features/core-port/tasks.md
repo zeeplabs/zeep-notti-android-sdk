@@ -263,15 +263,15 @@ T13 → T14
 
 ### T13: React Native guard and port-diff tool [P]
 
-**What**: `scripts/check-no-react-native.sh` + self-test + CI step in `checks`; `scripts/port-diff.sh` (dev tool: strip header, package/imports, indentation; `diff -w`).
+**What**: `scripts/check-no-react-native.sh` + self-test + CI step in `checks`; dev tools `scripts/port-file.sh` (copy from the RN tag with header, package rename and 2 → 4 reindent that keeps KDoc's odd space) and `scripts/port-diff.sh` (strip header, `@file:Suppress`, package/imports, blank lines; `diff -w`), with a self-test on a throwaway RN-shaped repo.
 **Where**: `scripts/`, `.github/workflows/ci.yml`
 **Depends on**: None
 **Requirement**: CORE-01
 
 **Done when**:
 
-- [ ] Self-test: clean tree passes; `import com.facebook.react…`, `ReactApplicationContext`, `WritableMap`, `NativeNottiSpec` each fail; grep status 2 fails
-- [ ] `actionlint` clean
+- [x] Self-test: clean tree passes; `import com.facebook.react…`, `ReactApplicationContext`, `WritableMap`, `NativeNottiSpec` each fail; grep status 2 fails
+- [x] `actionlint` clean (port tools self-test also green on macOS and Ubuntu 24.04; shellcheck clean)
 
 **Tests**: script self-test
 **Gate**: Scripts

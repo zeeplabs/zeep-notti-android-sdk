@@ -28,6 +28,10 @@ jobs:
       - name: No com.notti package (PKG-04)
         run: scripts/check-package-name.sh
 
+      # The SDK builds and runs without React Native (CORE-01).
+      - name: No React Native (CORE-01)
+        run: scripts/check-no-react-native.sh
+
       # The guards are proved on the CI's own OS (GNU), not only on macOS.
       - name: Script self-tests
         run: scripts/tests/run.sh
