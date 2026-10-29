@@ -135,8 +135,8 @@ T13 → T14
 
 ### T6: Port NottiApiClient and NottiCore
 
-**What**: Port `NottiApiClient.kt` (48 tests, MockWebServer) and `NottiCore.kt` (incl. `SessionGate`, companion helpers, `formatIsoUtc`; 128 tests) together: each needs the other to compile (design amendment 2026-10-28). Apply allowed change 5 as amended (no exception message in any log line).
-**Where**: `notti/src/main/java/com/zeeplabs/notti/NottiApiClient.kt`, `NottiCore.kt`, tests
+**What**: Port `NottiApiClient.kt` (48 tests, MockWebServer) and `NottiCore.kt` (incl. `SessionGate`, companion helpers, `formatIsoUtc`; 128 tests) together: each needs the other to compile (design amendment 2026-10-28). Also port `NottiForegroundObserver` (from RN `NottiInitProvider.kt`, own file) because `NottiCoreTest` calls it; temporary null providers per the design's second amendment; its own RN tests stay in T9. Apply allowed change 5 as amended (no exception message in any log line or failure message).
+**Where**: `notti/src/main/java/com/zeeplabs/notti/NottiApiClient.kt`, `NottiCore.kt`, `NottiForegroundObserver.kt`, tests
 **Depends on**: T5
 **Requirement**: CORE-01, CORE-02, CORE-09, CORE-12, CORE-15
 
@@ -147,7 +147,7 @@ T13 → T14
 
 **Tests**: unit
 **Gate**: Quick
-**Commit**: `feat(core): port NottiApiClient and NottiCore`
+**Commit**: `feat(core): port NottiApiClient, NottiCore and the foreground observer`
 
 ---
 
@@ -172,7 +172,7 @@ T13 → T14
 
 ### T8: NottiRuntime
 
-**What**: `NottiRuntime` per design + `NottiRuntimeTest`.
+**What**: `NottiRuntime` per design + `NottiRuntimeTest`; point `NottiForegroundObserver`'s `coreProvider`/`inAppProvider`/`gateProvider` at `NottiRuntime.peek()` (closes the T6 temporary state).
 **Where**: `notti/src/main/java/com/zeeplabs/notti/NottiRuntime.kt`, test
 **Depends on**: T7
 **Requirement**: CORE-02, CORE-03, CORE-04, CORE-05, CORE-14 (golden file name)
@@ -193,7 +193,7 @@ T13 → T14
 
 ### T9: Port the foreground and network observers
 
-**What**: Port `NottiForegroundObserver` (from RN `NottiInitProvider.kt`, own file) and `NottiNetworkObserver` with 3 + 2 tests; RN statics → runtime, In-App → `NottiInAppLifecycle` fake.
+**What**: Port `NottiNetworkObserver` and the RN tests of both observers (`NottiForegroundObserverTest` 3, `NottiNetworkObserverTest` 2; the foreground observer itself came in T6); RN statics → runtime, In-App → `NottiInAppLifecycle` fake.
 **Where**: `NottiForegroundObserver.kt`, `NottiNetworkObserver.kt`, tests
 **Depends on**: T8
 **Requirement**: CORE-03, CORE-09

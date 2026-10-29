@@ -84,7 +84,7 @@ Parity note: with `currentActivity` null and no earlier request, `mapPermissionS
 2. `package com.notti` → `package com.zeeplabs.notti`; imports of RN types removed.
 3. Visibility: top-level `class`/`object`/`fun` become `internal` (ABI dump stays empty, AD-010).
 4. Re-indent 2 → 4 spaces (AD-009); `spotlessApply` formatting only.
-5. Exception messages never reach a log line (AD-011; iOS logs `domain#code` for the same reason): `Log.e(NottiModule.NAME, "… - ${t.message}")` → `NottiLogger.error("… - ${t.javaClass.simpleName}")`; in `NottiCore`, the three `logger("… - ${t.message}")` lines use `${t.javaClass.simpleName}`; in `NottiApiClient`, `lastError = e.message ?: "network error"` becomes `lastError = e.javaClass.simpleName` (that string only feeds `ApiResult.Failure.message`, which the core only logs; no RN test asserts it). Amended 2026-10-28 after T4 found the core's `logger` lines carry `result.message` from OkHttp exceptions.
+5. Exception messages never reach a log line (AD-011; iOS logs `domain#code` for the same reason): `Log.e(NottiModule.NAME, "… - ${t.message}")` → `NottiLogger.error("… - ${t.javaClass.simpleName}")`; in `NottiCore`, the four `logger("… - ${t.message}")` lines use `${t.javaClass.simpleName}`; in `NottiApiClient`, `lastError = e.message ?: "network error"` becomes `lastError = e.javaClass.simpleName` and `EventResult.Failure("invalid events request: ${e.message}", …)` uses `${e.javaClass.simpleName}` (that string only feeds `ApiResult.Failure.message`, which the core only logs; no RN test asserts it). Amended 2026-10-28 after T4 found the core's `logger` lines carry `result.message` from OkHttp exceptions.
 6. `NottiModule.activeCore` / `processSessionGate` / `NottiInApp.get()` references → runtime / seam, in the two observers only.
 7. KDoc references to `NottiModule` rewritten to the runtime (comments only).
 8. Per-file `@file:Suppress(...)` only for lint/ktlint findings that fire on unchanged RN code.
@@ -169,6 +169,8 @@ RN's `NottiApiClient` is not core-only: it also carries the In-App routes (`fetc
 - Port the two In-App data files (pure models/parsers and the persisted queue, no UI, no engine) with their RN tests here, so `NottiApiClient` stays a verbatim port with all 48 tests. Splitting the In-App routes out of the client would change a ported file and drop 13 tests below the RN count.
 - `NottiApiClient` and `NottiCore` are ported in one task and one commit (they need each other to compile).
 - The In-App engine (`Session`, `Coordinator`, `Presenter`, `ViewFactory`, `Style`, `ImageLoader`, `Accessibility`, `Setup`, `PushPermissionAction`) stays in `in-app-messages`.
+
+Second amendment (2026-10-28, found executing T6): `NottiCoreTest` calls `NottiForegroundObserver.syncWithCurrentState` and `handleProcessBackground` (RN lines 2459-2506), so the observer is ported in T6 with the core. Until `NottiRuntime` exists (T8), its RN defaults that read `NottiModule` statics are replaced by `{ null }` providers (`coreProvider`, `inAppProvider`) and `onStop` reads the gate through a `gateProvider: () -> NottiCore.SessionGate? = { null }` and skips the close when it is null. T8 points the three providers at `NottiRuntime.peek()` (design "Ported observers") and removes the null-gate skip if the runtime always exists by then; the observer's own RN tests stay in T9. Temporary state between T6 and T8 only; nothing ships in between.
 
 ## Error Handling Strategy
 
