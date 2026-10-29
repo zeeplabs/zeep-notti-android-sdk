@@ -215,9 +215,9 @@ T12 → T13
 
 **Done when**:
 
-- [ ] `:notti:publishAllPublicationsToBuildRepository` writes `.aar`, `.pom`, `-sources.jar`, `-javadoc.jar`, `.module`
-- [ ] POM has the coordinates, license, SCM, `firebase-messaging` as `compile` scope, no `com.facebook.react`
-- [ ] Runs with no signing key and no network credentials
+- [x] `:notti:publishAllPublicationsToBuildRepository` writes `.aar`, `.pom`, `-sources.jar`, `-javadoc.jar`, `.module`
+- [x] POM has the coordinates, license, SCM, `firebase-messaging` as `compile` scope, no `com.facebook.react`
+- [x] Runs with no signing key and no network credentials
 
 **Tests**: none
 **Gate**: Build + publish command + POM inspection

@@ -1,3 +1,6 @@
+import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
 import kotlinx.validation.KotlinApiBuildTask
 import kotlinx.validation.KotlinApiCompareTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -6,6 +9,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.vanniktech.publish)
 }
 
 // NottiSdkVersion.CURRENT is the only version literal (PKG-06): the publication reads it here, so
@@ -121,3 +125,55 @@ val apiCheck =
     }
 
 tasks.named("check") { dependsOn(apiCheck) }
+
+// Publication (PKG-02, AD-003, AD-004). `publishAllPublicationsToBuildRepository` writes to build/repo with no
+// credentials; Maven Central publishing is done only at release time (example-and-release).
+mavenPublishing {
+    configure(
+        AndroidSingleVariantLibrary(
+            javadocJar = JavadocJar.Javadoc(),
+            sourcesJar = SourcesJar.Sources(),
+            variant = "release",
+        ),
+    )
+    coordinates("com.zeeplabs", "notti-android", nottiVersion)
+
+    pom {
+        name.set("Notti Android SDK")
+        description.set("Native Android SDK for Notti push notifications and In-App Messages.")
+        url.set("https://github.com/zeeplabs/zeep-notti-android-sdk")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/licenses/MIT")
+                distribution.set("repo")
+            }
+        }
+        developers {
+            developer {
+                id.set("zeeplabs")
+                name.set("Zeep Tecnologia")
+                url.set("https://github.com/zeeplabs")
+            }
+        }
+        scm {
+            url.set("https://github.com/zeeplabs/zeep-notti-android-sdk")
+            connection.set("scm:git:git://github.com/zeeplabs/zeep-notti-android-sdk.git")
+            developerConnection.set("scm:git:ssh://git@github.com/zeeplabs/zeep-notti-android-sdk.git")
+        }
+    }
+
+    // Signed only when the release job provides the in-memory key; local and PR publishes stay unsigned.
+    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
+        signAllPublications()
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "build"
+            url = uri(rootProject.layout.buildDirectory.dir("repo"))
+        }
+    }
+}
