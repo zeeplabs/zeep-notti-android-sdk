@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/push-integration/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Draft (2026-10-29)
+**Status**: Execute done (2026-10-29, local; awaiting review/PR)
 
 ---
 
@@ -211,7 +211,7 @@ T9 → T10
 
 **Done when**:
 
-- [ ] Every PUSH-xx and every RN ID routed here mapped to a test; full gate green
+- [x] Every PUSH-xx and every RN ID routed here mapped to a test; full gate green
 
 **Tests**: none
 **Gate**: Full

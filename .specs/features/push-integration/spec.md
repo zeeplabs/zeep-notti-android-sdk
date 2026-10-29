@@ -6,10 +6,10 @@ After `core-port`, the core runs without React Native but nothing connects it to
 
 ## Goals
 
-- [ ] Zero-code path: with only the dependency and `google-services.json`, the merged manifest brings the FCM service and the process hook; FCM token refresh reaches the core; a foreground message reports `received`; a tap (cold, warm or hot) reports `opened` + `clicked` once and buffers the cold-start click.
-- [ ] Manual path: a host with its own `FirebaseMessagingService` removes ours from the manifest and forwards through `NottiBridge` with the same results.
-- [ ] Permission on API 33+: `requestPermission` shows the system dialog from the current Activity and `permission_status` regains RN parity (closes the core-port temporary gap).
-- [ ] Behavior parity with RN 0.8.0 for every ported component, proven by its RN tests.
+- [x] Zero-code path: with only the dependency and `google-services.json`, the merged manifest brings the FCM service and the process hook; FCM token refresh reaches the core; a foreground message reports `received`; a tap (cold, warm or hot) reports `opened` + `clicked` once and buffers the cold-start click.
+- [x] Manual path: a host with its own `FirebaseMessagingService` removes ours from the manifest and forwards through `NottiBridge` with the same results.
+- [x] Permission on API 33+: `requestPermission` shows the system dialog from the current Activity and `permission_status` regains RN parity (closes the core-port temporary gap).
+- [x] Behavior parity with RN 0.8.0 for every ported component, proven by its RN tests.
 
 ## Out of Scope
 
@@ -131,35 +131,35 @@ After `core-port`, the core runs without React Native but nothing connects it to
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| PUSH-01 | FCM: manifest service, not exported, POST_NOTIFICATIONS | Tasks | Mapped |
-| PUSH-02 | FCM: token refresh to the live core | Tasks | Mapped |
-| PUSH-03 | FCM: parse, received relay, received event | Tasks | Mapped |
-| PUSH-04 | FCM: no event without both ids | Tasks | Mapped |
-| PUSH-05 | Hook: registrations at process start | Tasks | Mapped |
-| PUSH-06 | Hook: no I/O beyond construction, failures logged, no crash | Tasks | Mapped |
-| PUSH-07 | Hook: provider not exported, non-colliding authority | Tasks | Mapped |
-| PUSH-08 | Hook: removed provider documented, lazy runtime still works | Tasks | Mapped |
-| PUSH-09 | Tap: parse and handle each intent once | Tasks | Mapped |
-| PUSH-10 | Tap: click relay buffer and opened + clicked | Tasks | Mapped |
-| PUSH-11 | Tap: created/resumed dedupe, new intent re-reports | Tasks | Mapped |
-| PUSH-12 | Tap: data untouched, no URL opened (CI guard) | Tasks | Mapped |
-| PUSH-13 | Bridge: same results, safe no-ops | Tasks | Mapped |
-| PUSH-14 | Bridge: public, Java-callable, in the ABI dump | Tasks | Mapped |
-| PUSH-15 | Bridge: service removable from the manifest | Tasks | Mapped |
-| PUSH-16 | Permission: API < 33 resolves true | Tasks | Mapped |
-| PUSH-17 | Permission: API ≥ 33 dialog, flag, single resolution | Tasks | Mapped |
-| PUSH-18 | Permission: no Activity resolves false | Tasks | Mapped |
-| PUSH-19 | Permission: runtime wires requester and Activity tracker | Tasks | Mapped |
+| PUSH-01 | FCM: manifest service, not exported, POST_NOTIFICATIONS | Execute | Verified |
+| PUSH-02 | FCM: token refresh to the live core | Execute | Verified |
+| PUSH-03 | FCM: parse, received relay, received event | Execute | Verified |
+| PUSH-04 | FCM: no event without both ids | Execute | Verified |
+| PUSH-05 | Hook: registrations at process start | Execute | Verified |
+| PUSH-06 | Hook: no I/O beyond construction, failures logged, no crash | Execute | Verified |
+| PUSH-07 | Hook: provider not exported, non-colliding authority | Execute | Verified |
+| PUSH-08 | Hook: removed provider documented, lazy runtime still works | Execute | Verified |
+| PUSH-09 | Tap: parse and handle each intent once | Execute | Verified |
+| PUSH-10 | Tap: click relay buffer and opened + clicked | Execute | Verified |
+| PUSH-11 | Tap: created/resumed dedupe, new intent re-reports | Execute | Verified |
+| PUSH-12 | Tap: data untouched, no URL opened (CI guard) | Execute | Verified |
+| PUSH-13 | Bridge: same results, safe no-ops | Execute | Verified |
+| PUSH-14 | Bridge: public, Java-callable, in the ABI dump | Execute | Verified |
+| PUSH-15 | Bridge: service removable from the manifest | Execute | Verified |
+| PUSH-16 | Permission: API < 33 resolves true | Execute | Verified |
+| PUSH-17 | Permission: API ≥ 33 dialog, flag, single resolution | Execute | Verified |
+| PUSH-18 | Permission: no Activity resolves false | Execute | Verified |
+| PUSH-19 | Permission: runtime wires requester and Activity tracker | Execute | Verified |
 
 Inherited RN IDs owned here (named in `core-port/traceability.md`): SDK-11 and the detection/receive parts of SDK-04/08/17, SDKCTR (detection sites), SDKOPEN-01..04 detection, SEGTEL foreground hook registration.
 
-**Coverage:** 19 requirements, 19 mapped to tasks (`tasks.md`).
+**Coverage:** 19 requirements, 19 mapped to tasks (`tasks.md`), 19 verified (`traceability.md`, 2026-10-29).
 
 ---
 
 ## Success Criteria
 
-- [ ] Ported tests green: `NottiActivityLifecycleListenerTest` 20, `NottiFirebaseMessagingServiceTest` 6, `NottiBridgeTest` 2, plus the RN module's API < 33 permission case.
-- [ ] Merged-manifest checks (service, provider, permission, authority) and a URL-open guard in CI.
-- [ ] `permission_status` sent on API 33+ again, matching RN.
-- [ ] Example app (placeholder) receives a push and reports events on a device (full device checklist in `example-and-release`).
+- [x] Ported tests green: `NottiActivityLifecycleListenerTest` 20, `NottiFirebaseMessagingServiceTest` 6, `NottiBridgeTest` 2, plus the RN module's API < 33 permission case.
+- [x] Merged-manifest checks (service, provider, permission, authority) and a URL-open guard in CI.
+- [x] `permission_status` sent on API 33+ again, matching RN.
+- [ ] Example app (placeholder) receives a push and reports events on a device (full device checklist in `example-and-release`). Pending: no device run in this feature.

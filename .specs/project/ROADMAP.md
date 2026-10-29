@@ -32,7 +32,7 @@
 - Java interop; listeners multi-subscriber with removable handles; callbacks on the main thread (iOS AD-009 parity)
 - `NottiLogger` with level control (default error, no PII)
 
-**push-integration** - IN PROGRESS (spec written 2026-10-29; Android counterpart of iOS `delegate-integration`)
+**push-integration** - Execute done 2026-10-29, local; awaiting review/PR (390 tests green; Android counterpart of iOS `delegate-integration`)
 
 - Manifest-merged `NottiFirebaseMessagingService` and `NottiInitProvider` process hook; activity-lifecycle click detection (`opened`/`clicked`), cold-start initial click
 - `NottiBridge` manual forwarding for hosts with their own FCM service; documented manifest opt-out

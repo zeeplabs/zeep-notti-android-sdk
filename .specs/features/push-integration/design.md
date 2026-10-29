@@ -1,7 +1,7 @@
 # Push Integration Design
 
 **Spec**: `.specs/features/push-integration/spec.md`
-**Status**: Draft (2026-10-29)
+**Status**: Execute done (2026-10-29, local; awaiting review/PR)
 **Depends on**: `core-port` (`NottiRuntime`, `NottiAndroidProviders`, observers, `NottiLogger`)
 
 ---
