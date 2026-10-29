@@ -212,7 +212,7 @@ No RN test of a ported class was dropped.
 | SDK-08 real OS dialog; SDK-11 below-33 auto-grant (`permissionRequester`) | push-integration | Runtime default requester answers `false` without prompting |
 | SDK-12/13 `Notti.User` tag facade | public-api | Core merge covered |
 | SDK-17/18 listener emission, FCM receive, click relay, `parseRemoteMessage` | public-api / push-integration | No core part |
-| `currentActivity` injection (permission rationale on API 33+) | push-integration | See Accepted exceptions |
+| `currentActivity` injection (permission rationale on API 33+) | push-integration | Done (push-integration T3/T5); see Accepted exceptions |
 | Registering `NottiForegroundObserver` / `NottiNetworkObserver` at process start | push-integration | Process hook |
 
 ---
@@ -222,7 +222,7 @@ No RN test of a ported class was dropped.
 | Exception | Reason | Decided |
 | --- | --- | --- |
 | AD-011: `NottiCore.initialize` logs an invalid `baseUrl` verbatim (`"baseUrl \"$baseUrl\" is not a valid http(s) URL"`), kept as RN | `baseUrl` is integrator configuration, not user data, and is logged only on a failed `initialize`; the sentinel test runs with a valid URL and stays green | Coordinator, 2026-10-28 |
-| `permission_status` omitted on API 33+ for a never-requested, ungranted permission | Until `push-integration` injects `currentActivity`, the rationale read is `null`, which RN maps to "omit" (RN does the same with no resumed Activity); full parity returns with the Activity tracker | Design ("RN coupling map", parity note) |
+| ~~`permission_status` omitted on API 33+ for a never-requested, ungranted permission~~ **Closed** by push-integration T5 | Was: until `push-integration` injects `currentActivity`, the rationale read is `null`, which RN maps to "omit". Now `NottiRuntime` tracks the resumed Activity and wires `NottiPermissionRequester`; `NottiRuntimeTest` `permissionStatusIsSentOnApi34WithAResumedActivity` proves `notDetermined` is sent (RN parity) | Design ("RN coupling map", parity note); closed 2026-10-29 |
 
 ---
 

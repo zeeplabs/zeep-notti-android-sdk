@@ -75,6 +75,9 @@ internal class NottiRuntime internal constructor(
     /** Reverse geocoding (blocking network call), one per runtime as one per module in RN. */
     private val geoExecutor: ExecutorService = newDaemonExecutor("notti-geo")
 
+    /** The API 33+ dialog from the current Activity (RN `requestNativePermission`), the core's default requester. */
+    private val defaultPermissionRequester = NottiPermissionRequester(appContext, deviceStore, currentActivity)
+
     private val providers: NottiAndroidProviders =
         providersFactory?.invoke(deviceStore) { currentActivity() }
             ?: NottiAndroidProviders(appContext, deviceStore, { currentActivity() }, geoExecutor)
@@ -90,7 +93,7 @@ internal class NottiRuntime internal constructor(
         appId: String,
         clientKey: String,
         baseUrl: String,
-        permissionRequester: (callback: (Boolean) -> Unit) -> Unit = { it(false) },
+        permissionRequester: (callback: (Boolean) -> Unit) -> Unit = defaultPermissionRequester::request,
         onDeviceIdChanged: (String) -> Unit = {},
     ): NottiCore {
         val io = executorFactory()

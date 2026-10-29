@@ -124,7 +124,7 @@ T9 → T10
 
 **Done when**:
 
-- [ ] `permission_status` present in the PATCH on API 34 (rationale read from the tracked Activity); core-port exception marked closed
+- [x] `permission_status` present in the PATCH on API 34 (rationale read from the tracked Activity); core-port exception marked closed
 
 **Tests**: unit (Robolectric + MockWebServer)
 **Gate**: Quick
