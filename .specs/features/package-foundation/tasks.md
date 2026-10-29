@@ -197,8 +197,8 @@ T12 → T13
 
 **Done when**:
 
-- [ ] Dump committed, contains no symbol (everything is `internal`)
-- [ ] Making `NottiSdkVersion` `public` fails the check (reverted)
+- [x] Dump committed, contains no symbol (everything is `internal`)
+- [x] Making `NottiSdkVersion` `public` fails the check (reverted)
 
 **Tests**: none
 **Gate**: Build + ABI check command

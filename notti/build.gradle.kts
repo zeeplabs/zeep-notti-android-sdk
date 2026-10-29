@@ -1,5 +1,8 @@
+import kotlinx.validation.KotlinApiBuildTask
+import kotlinx.validation.KotlinApiCompareTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.android.library)
@@ -80,3 +83,41 @@ dependencies {
     testImplementation(libs.org.json)
     testImplementation(libs.robolectric)
 }
+
+// ABI guard (PKG-13, AD-010, AD-012). KGP's built-in ABI validation and BCV's auto-wiring both key off the
+// `org.jetbrains.kotlin.android` plugin, which AGP 9 built-in Kotlin does not apply, so BCV's task types
+// are wired by hand on the release classes. `apiDump` updates notti/api/notti.api; `apiCheck` runs in `check`.
+val bcvRuntime: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+}
+
+dependencies {
+    bcvRuntime(libs.asm)
+    bcvRuntime(libs.asm.tree)
+    bcvRuntime(libs.kotlin.metadata.jvm)
+}
+
+val apiBuild =
+    tasks.register<KotlinApiBuildTask>("apiBuild") {
+        inputClassesDirs.from(tasks.named<KotlinCompile>("compileReleaseKotlin").flatMap { it.destinationDirectory })
+        outputApiFile.set(layout.buildDirectory.file("api/notti.api"))
+        runtimeClasspath.from(bcvRuntime)
+    }
+
+tasks.register<Copy>("apiDump") {
+    group = "verification"
+    description = "Writes the public ABI of the release classes to api/notti.api."
+    from(apiBuild.flatMap { it.outputApiFile })
+    into(layout.projectDirectory.dir("api"))
+}
+
+val apiCheck =
+    tasks.register<KotlinApiCompareTask>("apiCheck") {
+        group = "verification"
+        description = "Fails when the public ABI differs from api/notti.api."
+        projectApiFile.set(layout.projectDirectory.file("api/notti.api"))
+        generatedApiFile.set(apiBuild.flatMap { it.outputApiFile })
+    }
+
+tasks.named("check") { dependsOn(apiCheck) }
