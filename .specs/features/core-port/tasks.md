@@ -161,8 +161,8 @@ T13 → T14
 
 **Done when**:
 
-- [ ] Every reader tested incl. failure → null (cases listed in design)
-- [ ] `FirebaseMessaging.getInstance()` throwing → callback `null`, no crash
+- [x] Every reader tested incl. failure → null (cases listed in design)
+- [x] `FirebaseMessaging.getInstance()` throwing → callback `null`, no crash
 
 **Tests**: unit (Robolectric)
 **Gate**: Quick
