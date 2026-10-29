@@ -73,8 +73,8 @@ T13 → T14
 
 **Done when**:
 
-- [ ] 20/20 tests pass; `port-diff` shows only allowed changes (run after T13 if not yet available, noted in T14)
-- [ ] Key/type table written
+- [x] 20/20 tests pass; `port-diff` shows only allowed changes (run after T13 if not yet available, noted in T14)
+- [x] Key/type table written
 
 **Tests**: unit
 **Gate**: Quick
