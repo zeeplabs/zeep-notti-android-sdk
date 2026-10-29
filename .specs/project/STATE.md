@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-10-28
-**Current Work:** `core-port` Execute done 2026-10-28 on local branch `feat/core-port` (T1-T14; 318 tests green; traceability in `.specs/features/core-port/traceability.md`), awaiting review/PR (push only with Julio's OK). `package-foundation` merged (PR #1); its T12 CI proof still waits for B-002
+**Current Work:** `push-integration` spec written (branch `feat/push-integration`, based on `feat/core-port`), awaiting review. `core-port` PR #2 open, merge pending Julio (the agent's admin merge was blocked by the permission classifier).
 
 ---
 
@@ -137,6 +137,8 @@ Carried from `zeep-notti-ios-sdk` (`.specs/LESSONS.md`, candidates there), to ap
 ---
 
 ## Deferred Ideas
+
+- Detect a warm tap in `singleTop`/`singleTask` hosts without `setIntent` through `ComponentActivity.addOnNewIntentListener` (RN 0.8.0 requires `setIntent`; post-M1, both SDKs' docs)
 
 - Foreground image push: FCM does not display a notification while the app is in the foreground and RN 0.8.0 only emits `received`; showing it (with the image) would be new behavior, after M1
 
