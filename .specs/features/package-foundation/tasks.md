@@ -179,8 +179,8 @@ T12 → T13
 
 **Done when**:
 
-- [ ] `spotlessCheck` and `:notti:lintRelease` pass
-- [ ] A 2-space indented line fails `spotlessCheck`; a lint warning (e.g. unused resource) fails `lintRelease` (both reverted)
+- [x] `spotlessCheck` and `:notti:lintRelease` pass
+- [x] A 2-space indented line fails `spotlessCheck`; a lint warning (`SimpleDateFormat` without a locale) fails `lintRelease` (both reverted)
 
 **Tests**: none
 **Gate**: Build + `./gradlew spotlessCheck :notti:lintRelease`

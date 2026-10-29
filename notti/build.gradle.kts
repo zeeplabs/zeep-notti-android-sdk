@@ -46,6 +46,14 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+
+    // Warnings are errors on the library (PKG-10). The version-staleness checks are off: they fail the
+    // build whenever upstream publishes, and versions are pinned on purpose (AD-012, AD-013).
+    lint {
+        warningsAsErrors = true
+        abortOnError = true
+        disable += setOf("GradleDependency", "NewerVersionAvailable", "AndroidGradlePluginVersion")
+    }
 }
 
 kotlin {
