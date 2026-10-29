@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-10-28
-**Current Work:** `push-integration` spec written (branch `feat/push-integration`, based on `feat/core-port`), awaiting review. `core-port` PR #2 open, merge pending Julio (the agent's admin merge was blocked by the permission classifier).
+**Current Work:** `push-integration` spec, design and tasks written (branch `feat/push-integration`), awaiting review. `core-port` merged (PR #2, admin, 2026-10-29).
 
 ---
 
@@ -35,7 +35,7 @@
 **Trade-off:** Needs namespace verification of `com.zeeplabs` (DNS TXT on the domain that backs it) and a GPG signing key stored as CI secrets. Releases are immutable.
 **Impact:** `package-foundation` wires `maven-publish` + `signing` with a local-repository dry run; `example-and-release` does the real publish. [Incerto] which domain verifies `com.zeeplabs`: to validate before the first publish (B-001).
 
-### AD-005: Integration through manifest-merged components plus a manual API (proposed, 2026-10-28)
+### AD-005: Integration through manifest-merged components plus a manual API (2026-10-28; `ContentProvider` kept in push-integration design 2026-10-29)
 
 **Decision:** Keep RN's model: the library manifest declares `NottiFirebaseMessagingService` (`MESSAGING_EVENT`) and `NottiInitProvider` (process-start hook, no I/O), so a host only calls `Notti.initialize`. Hosts with their own `FirebaseMessagingService` forward through `NottiBridge.onMessageReceived` / `onNewToken` and remove ours with `tools:node="remove"`.
 **Reason:** One-line integration (iOS AD-004 counterpart). The `ContentProvider` is the only hook early enough for a cold-start click (RN P3-AC7). Android delivers FCM to one service per app, so the manual path is required.

@@ -30,11 +30,11 @@ After `core-port`, the core runs without React Native but nothing connects it to
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --- | --- | --- | --- |
 | Behavior source | RN tag `v0.8.0` (`291d5a7`) | AD-002 | y |
-| Process hook | Manifest `ContentProvider` (RN `NottiInitProvider`), not `androidx.startup` | Port; no extra dependency; a host can still remove it with `tools:node="remove"` (AD-005) | n - confirm in Design |
-| Provider authority | Distinct from RN's `${applicationId}.nottiinitprovider` | Two providers with one authority fail installation while RN and the SDK coexist (M2, brownfield) | n - name in Design |
+| Process hook | Manifest `ContentProvider` (RN `NottiInitProvider`), not `androidx.startup` | Port; no extra dependency; a host can still remove it with `tools:node="remove"` (AD-005) | y (design: `ContentProvider` kept; AD-005) |
+| Provider authority | Distinct from RN's `${applicationId}.nottiinitprovider` | Two providers with one authority fail installation while RN and the SDK coexist (M2, brownfield) | y (design: `${applicationId}.com.zeeplabs.notti.initprovider`) |
 | FCM service | Manifest-merged `NottiFirebaseMessagingService` (`MESSAGING_EVENT`, not exported) | RN model, AD-005 | y (AD-005 proposed) |
-| Permission request without RN's `PermissionAwareActivity` | SDK-owned mechanism that works from any host Activity (options: a translucent trampoline Activity, or `ActivityResultRegistry` on a `ComponentActivity`) | RN relied on an RN-only interface | n - Design |
-| Current Activity | Tracked by the SDK's lifecycle callbacks (last resumed, weak reference) | Needed by `permissionStatus` and the permission request | n - Design |
+| Permission request without RN's `PermissionAwareActivity` | SDK-owned mechanism that works from any host Activity (options: a translucent trampoline Activity, or `ActivityResultRegistry` on a `ComponentActivity`) | RN relied on an RN-only interface | y (design: SDK translucent Activity / weak-reference tracker) |
+| Current Activity | Tracked by the SDK's lifecycle callbacks (last resumed, weak reference) | Needed by `permissionStatus` and the permission request | y (design: SDK translucent Activity / weak-reference tracker) |
 | `onNewIntent` without `setIntent` | Kept as RN (host calls `setIntent`); README documents it | Port rule; `ComponentActivity.addOnNewIntentListener` could remove the need, recorded as a post-M1 idea | y (parity) |
 | Received/clicked delivery to the host | Internal relays (click relay with a one-slot cold-start buffer as RN; received with no buffer as RN) consumed by `public-api` | RN semantics; facade belongs to `public-api` | y |
 | `POST_NOTIFICATIONS` | Declared in the library manifest | RN does | y |
@@ -131,29 +131,29 @@ After `core-port`, the core runs without React Native but nothing connects it to
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| PUSH-01 | FCM: manifest service, not exported, POST_NOTIFICATIONS | Design | Pending |
-| PUSH-02 | FCM: token refresh to the live core | Design | Pending |
-| PUSH-03 | FCM: parse, received relay, received event | Design | Pending |
-| PUSH-04 | FCM: no event without both ids | Design | Pending |
-| PUSH-05 | Hook: registrations at process start | Design | Pending |
-| PUSH-06 | Hook: no I/O beyond construction, failures logged, no crash | Design | Pending |
-| PUSH-07 | Hook: provider not exported, non-colliding authority | Design | Pending |
-| PUSH-08 | Hook: removed provider documented, lazy runtime still works | Design | Pending |
-| PUSH-09 | Tap: parse and handle each intent once | Design | Pending |
-| PUSH-10 | Tap: click relay buffer and opened + clicked | Design | Pending |
-| PUSH-11 | Tap: created/resumed dedupe, new intent re-reports | Design | Pending |
-| PUSH-12 | Tap: data untouched, no URL opened (CI guard) | Design | Pending |
-| PUSH-13 | Bridge: same results, safe no-ops | Design | Pending |
-| PUSH-14 | Bridge: public, Java-callable, in the ABI dump | Design | Pending |
-| PUSH-15 | Bridge: service removable from the manifest | Design | Pending |
-| PUSH-16 | Permission: API < 33 resolves true | Design | Pending |
-| PUSH-17 | Permission: API ≥ 33 dialog, flag, single resolution | Design | Pending |
-| PUSH-18 | Permission: no Activity resolves false | Design | Pending |
-| PUSH-19 | Permission: runtime wires requester and Activity tracker | Design | Pending |
+| PUSH-01 | FCM: manifest service, not exported, POST_NOTIFICATIONS | Tasks | Mapped |
+| PUSH-02 | FCM: token refresh to the live core | Tasks | Mapped |
+| PUSH-03 | FCM: parse, received relay, received event | Tasks | Mapped |
+| PUSH-04 | FCM: no event without both ids | Tasks | Mapped |
+| PUSH-05 | Hook: registrations at process start | Tasks | Mapped |
+| PUSH-06 | Hook: no I/O beyond construction, failures logged, no crash | Tasks | Mapped |
+| PUSH-07 | Hook: provider not exported, non-colliding authority | Tasks | Mapped |
+| PUSH-08 | Hook: removed provider documented, lazy runtime still works | Tasks | Mapped |
+| PUSH-09 | Tap: parse and handle each intent once | Tasks | Mapped |
+| PUSH-10 | Tap: click relay buffer and opened + clicked | Tasks | Mapped |
+| PUSH-11 | Tap: created/resumed dedupe, new intent re-reports | Tasks | Mapped |
+| PUSH-12 | Tap: data untouched, no URL opened (CI guard) | Tasks | Mapped |
+| PUSH-13 | Bridge: same results, safe no-ops | Tasks | Mapped |
+| PUSH-14 | Bridge: public, Java-callable, in the ABI dump | Tasks | Mapped |
+| PUSH-15 | Bridge: service removable from the manifest | Tasks | Mapped |
+| PUSH-16 | Permission: API < 33 resolves true | Tasks | Mapped |
+| PUSH-17 | Permission: API ≥ 33 dialog, flag, single resolution | Tasks | Mapped |
+| PUSH-18 | Permission: no Activity resolves false | Tasks | Mapped |
+| PUSH-19 | Permission: runtime wires requester and Activity tracker | Tasks | Mapped |
 
 Inherited RN IDs owned here (named in `core-port/traceability.md`): SDK-11 and the detection/receive parts of SDK-04/08/17, SDKCTR (detection sites), SDKOPEN-01..04 detection, SEGTEL foreground hook registration.
 
-**Coverage:** 19 requirements, 0 mapped to tasks.
+**Coverage:** 19 requirements, 19 mapped to tasks (`tasks.md`).
 
 ---
 
