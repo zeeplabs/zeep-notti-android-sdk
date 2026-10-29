@@ -158,7 +158,7 @@ T9 → T10
 
 **Done when**:
 
-- [ ] 2/2 pass; safe no-ops with no runtime/core; `notti.api` lists exactly `NottiBridge` and its two methods
+- [x] 2/2 pass; safe no-ops with no runtime/core; `notti.api` lists exactly `NottiBridge` and its two methods
 
 **Tests**: unit
 **Gate**: Quick + `:notti:apiCheck`

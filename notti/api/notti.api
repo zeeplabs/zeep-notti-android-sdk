@@ -1,0 +1,6 @@
+public final class com/zeeplabs/notti/NottiBridge {
+	public static final field INSTANCE Lcom/zeeplabs/notti/NottiBridge;
+	public static final fun onMessageReceived (Lcom/google/firebase/messaging/RemoteMessage;)V
+	public static final fun onNewToken (Ljava/lang/String;)V
+}
+

@@ -32,27 +32,36 @@ internal fun parseRemoteMessage(remoteMessage: RemoteMessage): ParsedNotificatio
 internal class NottiFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
-        NottiRuntime.peek()?.core?.onTokenRefreshed(token)
+        deliverNewToken(token)
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        val runtime = NottiRuntime.get(applicationContext)
-        runtime.onNotificationReceived?.invoke(parseRemoteMessage(remoteMessage))
+        deliverRemoteMessage(NottiRuntime.get(applicationContext), remoteMessage)
+    }
+}
 
-        // Event reporting - the "received" detection site (T4). Fires in the
-        // foreground only (the class doc above); background/killed-state clicks
-        // are detected by the Activity-lifecycle hook instead. The event goes into
-        // the process-wide companion store (this Service runs before the lazy
-        // module exists on a cold start) and is opportunistically flushed if the
-        // core is already live; otherwise it stays queued for the next
-        // network-available / foreground / registration-success trigger. A message
-        // without the SDK's `notification_id`/`delivery_id` keys is not an
-        // event-reporting notification and is skipped silently.
-        val data = parseRemoteMessage(remoteMessage).data
-        val notificationId = data["notification_id"]
-        val deliveryId = data["delivery_id"]
-        if (!notificationId.isNullOrBlank() && !deliveryId.isNullOrBlank()) {
-            runtime.enqueueEvent(notificationId, deliveryId, NottiEventType.RECEIVED)
-        }
+/** The token path of the service and [NottiBridge.onNewToken]: the live core, else dropped (RN). */
+internal fun deliverNewToken(token: String) {
+    NottiRuntime.peek()?.core?.onTokenRefreshed(token)
+}
+
+/** The message path of the service and [NottiBridge.onMessageReceived]. */
+internal fun deliverRemoteMessage(runtime: NottiRuntime, remoteMessage: RemoteMessage) {
+    runtime.onNotificationReceived?.invoke(parseRemoteMessage(remoteMessage))
+
+    // Event reporting - the "received" detection site (T4). Fires in the
+    // foreground only (the class doc above); background/killed-state clicks
+    // are detected by the Activity-lifecycle hook instead. The event goes into
+    // the process-wide companion store (this Service runs before the lazy
+    // module exists on a cold start) and is opportunistically flushed if the
+    // core is already live; otherwise it stays queued for the next
+    // network-available / foreground / registration-success trigger. A message
+    // without the SDK's `notification_id`/`delivery_id` keys is not an
+    // event-reporting notification and is skipped silently.
+    val data = parseRemoteMessage(remoteMessage).data
+    val notificationId = data["notification_id"]
+    val deliveryId = data["delivery_id"]
+    if (!notificationId.isNullOrBlank() && !deliveryId.isNullOrBlank()) {
+        runtime.enqueueEvent(notificationId, deliveryId, NottiEventType.RECEIVED)
     }
 }
