@@ -1,7 +1,7 @@
 # State
 
-**Last Updated:** 2026-10-29
-**Current Work:** `push-integration` Execute done T1-T10 (branch `feat/push-integration`, local, not pushed): FCM service, click relay, tap detection + current-Activity tracker, permission Activity/requester, process hook, `NottiBridge` (first public API), manifest test, `:example-manual-fcm`, minified example, CI steps; 390 unit tests green; awaiting review/PR. Next: `public-api`. `core-port` merged (PR #2, admin, 2026-10-29).
+**Last Updated:** 2026-10-30
+**Current Work:** `public-api` Specify (branch `feat/public-api`, local): `spec.md` with API-01..15, parity table, proposed rows awaiting Julio. `push-integration` merged (PR #3, `d5ab683`, admin, 2026-10-29); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
 
 ---
 

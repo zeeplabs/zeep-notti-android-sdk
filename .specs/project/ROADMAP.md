@@ -19,20 +19,21 @@
 - Single version source (`NottiSdkVersion.CURRENT`) checked against the Gradle publication version
 - Public API guard (Binary Compatibility Validator `.api` dump), Kotlin lint, CI on PRs, `maven-publish` + signing wired but not run
 
-**core-port** - DONE except CI (2026-10-28: 318 tests green locally; PR #2 open, merge pending Julio; CI blocked by B-002)
+**core-port** - DONE except CI (318 tests green locally; PR #2 merged with `--admin` 2026-10-29, `b722874`; CI blocked by B-002)
 
 - Port `NottiCore`, `NottiApiClient`, `NottiDeviceStore`, `NottiEventStore`, `NottiNetworkObserver`, parsing and the click relay from RN `v0.8.0`
 - Remove the RN coupling (`NottiModule` companion statics, `ReactApplicationContext`, `WritableMap`) behind an owned runtime that stays cold-start safe
 - `sdk_version` becomes a native constant; package `com.notti` becomes `com.zeeplabs.notti`
 - Port the JUnit suite 1:1, traceable to the RN requirement IDs (SDK-, SDKCTR-, SDKOPEN-, SEGTEL-, DPF-)
 
-**public-api** - PLANNED
+**public-api** - Specify (2026-10-30, `feat/public-api`; awaiting Julio on the proposed rows)
 
-- Kotlin facade: `Notti.initialize`, `login`/`logout`, `Notti.User` (tags, email, phone, subscription, location sharing), `Notti.Notifications` (requestPermission, listeners, initial click), device id accessor and observer, `Notti.trackEvent`
+- Kotlin facade: `Notti.initialize`, `login`/`logout`, `Notti.User` (tags, email, phone), subscription, location sharing, `Notti.Notifications` (requestPermission, listeners, initial click), device id accessor and observer (`trackEvent` moved to `in-app-messages`, as on iOS)
+- `initialize` installs the process hooks when the host removed `NottiInitProvider`
 - Java interop; listeners multi-subscriber with removable handles; callbacks on the main thread (iOS AD-009 parity)
 - `NottiLogger` with level control (default error, no PII)
 
-**push-integration** - Execute done 2026-10-29, local; awaiting review/PR (390 tests green; Android counterpart of iOS `delegate-integration`)
+**push-integration** - DONE except CI (390 tests green locally; PR #3 merged with `--admin` 2026-10-29, `d5ab683`; Android counterpart of iOS `delegate-integration`)
 
 - Manifest-merged `NottiFirebaseMessagingService` and `NottiInitProvider` process hook; activity-lifecycle click detection (`opened`/`clicked`), cold-start initial click
 - `NottiBridge` manual forwarding for hosts with their own FCM service; documented manifest opt-out
@@ -40,6 +41,7 @@
 
 **in-app-messages** - PLANNED
 
+- `Notti.trackEvent`, `Notti.InAppMessages.addClickListener` and the URL-open initialize option (moved from `public-api`)
 - Port the RN In-App engine (session, coordinator, presenter, view factory, style, image loader, event store, accessibility)
 - `push_permission` button; `url` actions opened in the browser with the iOS AD-020 allowlist and an option to turn it off (AD-006)
 - Guard script: no URL open outside the two allowlisted files
