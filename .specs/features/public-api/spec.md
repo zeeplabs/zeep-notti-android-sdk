@@ -23,7 +23,7 @@ After `core-port` and `push-integration`, the SDK runs on Android but a host app
 | Email/phone out of plain `SharedPreferences` | `pii-secure-storage` (M3) |
 | Coroutines/Flow API (`suspend`, `Flow` listeners) | No coroutines in M1 (AD-002); a `kotlinx-coroutines` dependency would be forced on hosts. Callback API only; revisit after M1 |
 | Initialized-state accessor, permission-change listener, foreground listener | Not in RN 0.8.0 nor in iOS M1 |
-| Detecting a cold-start tap when the host removed `NottiInitProvider` | Impossible without a process-start hook: `initialize` runs after the launch Activity read its intent. README limitation (see Edge Cases) |
+| Detecting a cold-start tap when the host removed `NottiInitProvider` **and** calls `initialize` after the launch Activity's first `onResume` | No hook exists yet when the launch Activity reads its intent. README recommends `initialize` in `Application.onCreate` (see Edge Cases) |
 
 ---
 
@@ -31,7 +31,7 @@ After `core-port` and `push-integration`, the SDK runs on Android but a host app
 
 | Capability | RN 0.8.0 (JS facade / `NottiModule`) | iOS SDK | Android (this spec) |
 | --- | --- | --- | --- |
-| Initialize | `Notti.initialize(appId, clientKey, {baseUrl})`, default `https://app.zeepnotti.app` (TS), every call re-runs `core.initialize` | `Notti.initialize(appId:clientKey:options:)`, same config no-op, different rebuilds | `Notti.initialize(context, appId, clientKey, options)`; iOS rules. **Divergence from RN**: needs a `Context` (Android only) |
+| Initialize | `Notti.initialize(appId, clientKey, {baseUrl})`, default `https://app.zeepnotti.app` (TS); same config no-op, different config re-initializes the same core (SDK-07) | `Notti.initialize(appId:clientKey:options:)`, same config no-op, different rebuilds the core | `Notti.initialize(context, appId, clientKey, options)`; RN mechanism, same observable result as iOS (design D1). Needs a `Context` (Android only) |
 | Login / logout | `login(id)` / `logout()` | same | same |
 | Tags | `User.addTag/addTags/removeTag/removeTags`, non-string values dropped (native) | same, `sanitizeTags` in the ObjC layer | same; Kotlin/Java types are `String` so nothing to drop |
 | Email / phone | `User.setEmail/clearEmail/setPhone/clearPhone` | same | same |
@@ -50,25 +50,25 @@ After `core-port` and `push-integration`, the SDK runs on Android but a host app
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --- | --- | --- | --- |
 | Behavior source | RN 0.8.0 for what the core does; iOS SDK `public-api` for facade-only rules (AD-008) | AD-002, AD-008 | y (AD) |
-| Shape | `object Notti` with nested `object User` and `object Notifications`; every method `@JvmStatic`, so Java calls `Notti.User.addTag(...)` | Mirrors RN/iOS naming; one surface for Kotlin and Java (no separate interop layer as iOS needed for ObjC) | n |
-| `Context` in `initialize` | Required first parameter; the SDK keeps only `applicationContext` | The runtime needs it when the provider was removed; RN had `ReactApplicationContext`. The M2 bridge has one | n |
-| Options type | `NottiOptions` class with `baseUrl: String?` (null = default), built in Kotlin with named args and in Java with a builder or no-arg constructor + setter | Room for the AD-006 flag in `in-app-messages` without breaking the ABI (adding a field to a data class breaks `copy`/`componentN`) | n |
-| `initialize` called again | Same normalized `appId`/`clientKey`/`baseUrl`: no-op. Different: stop the old core, start a new one | AD-008, iOS API-02. **Divergence from RN**, which re-ran `core.initialize` (and `POST /devices`) on every call; the M2 bridge is unaffected because JS calls it once | y (AD-008) |
+| Shape | `object Notti` with nested `object User` and `object Notifications`; every method `@JvmStatic`, so Java calls `Notti.User.addTag(...)` | Mirrors RN/iOS naming; one surface for Kotlin and Java (no separate interop layer as iOS needed for ObjC) || y (Julio, 2026-10-30) |
+| `Context` in `initialize` | Required first parameter; the SDK keeps only `applicationContext` | The runtime needs it when the provider was removed; RN had `ReactApplicationContext`. The M2 bridge has one || y (Julio, 2026-10-30) |
+| Options type | `NottiOptions` class with `baseUrl: String?` (null = default), built in Kotlin with named args and in Java with a builder or no-arg constructor + setter | Room for the AD-006 flag in `in-app-messages` without breaking the ABI (adding a field to a data class breaks `copy`/`componentN`) || y (Julio, 2026-10-30) |
+| `initialize` called again | Same normalized `appId`/`clientKey`/`baseUrl`: no-op. Different: register again with the new config | AD-008, iOS API-02; RN already did this inside `NottiCore.initialize` (SDK-07), corrected in design D1 | y (AD-008) |
 | Default `baseUrl` | `https://app.zeepnotti.app` when `options.baseUrl` is null | AD-008; RN `SAAS_BASE_URL` | y (AD-008) |
-| Placement of `setSubscription` / `setLocationSharingEnabled` | Top level (`Notti.setSubscription`, `Notti.setLocationSharingEnabled`), as RN; iOS put `setSubscription` under `User` | The M2 bridge maps 1:1 and RN docs stay valid. Divergence from iOS listed here | n |
-| Permission API | `Notti.Notifications.requestPermission(callback: (Boolean) -> Unit)`; the `Boolean` is the dialog result as the core reports it (RN `Promise<boolean>`) | No coroutines in M1 | n |
-| Before `initialize` | Exactly RN: RN built its core lazily on the first call of any method, so a call before `initialize` reached an un-initialized core, which queues or drops it by its own rules (pending mutations coalesced and flushed after the first registration; email/phone persisted, DPF-19; `requestPermission` answers `false` without the dialog). The runtime gets an `ensureCore()` that creates that un-initialized core (iOS did the same, `NottiRuntime.ensureCore()`), and `start` initializes it instead of building a second one | AD-002; iOS API-04..08 | n |
-| Runtime before `initialize` | Facade calls use the runtime the provider created (`NottiRuntime.peek()`). With no runtime (provider removed and no `initialize` yet) a call is dropped with a warn line and `deviceId` returns null | No context is available otherwise; no new behavior when the provider is present | n |
+| Placement of `setSubscription` / `setLocationSharingEnabled` | Top level (`Notti.setSubscription`, `Notti.setLocationSharingEnabled`), as RN; iOS put `setSubscription` under `User` | The M2 bridge maps 1:1 and RN docs stay valid. Divergence from iOS listed here || y (Julio, 2026-10-30) |
+| Permission API | `Notti.Notifications.requestPermission(callback: (Boolean) -> Unit)`; the `Boolean` is the dialog result as the core reports it (RN `Promise<boolean>`) | No coroutines in M1 || y (Julio, 2026-10-30) |
+| Before `initialize` | Exactly RN: RN built its core lazily on the first call of any method, so a call before `initialize` reached an un-initialized core, which queues or drops it by its own rules (pending mutations coalesced and flushed after the first registration; email/phone persisted, DPF-19; `requestPermission` answers `false` without the dialog). The runtime gets an `ensureCore()` that creates that un-initialized core (iOS did the same, `NottiRuntime.ensureCore()`), and `start` initializes it instead of building a second one | AD-002; iOS API-04..08 || y (Julio, 2026-10-30) |
+| Runtime before `initialize` | Facade calls use the runtime the provider created (`NottiRuntime.peek()`). With no runtime (provider removed and no `initialize` yet) a call is dropped with a warn line and `deviceId` returns null | No context is available otherwise; no new behavior when the provider is present || y (Julio, 2026-10-30) |
 | Failure model | Nothing in the facade throws. Invalid input (blank ids, invalid `baseUrl`) is logged without the values and ignored | Core contract; iOS API-01 | y (inherited) |
 | Listener model | Multi-listener, each `add…Listener` returns a `NottiSubscription` with idempotent `remove()`; multiplexed over the runtime's single slot per event | AD-008, RN `EventSubscription` | y (AD-008) |
 | Callback thread | Every host callback (listeners, permission callback) runs on the main thread, in emission order per listener | AD-008 | y (AD-008) |
-| `received` replay | None: an FCM message that arrives with no listener is not buffered | RN 0.8.0 Android had no buffer (`NottiRuntime.onNotificationReceived` doc). iOS core buffers; Android does not get a buffer in M1 (would be new behavior) | n |
-| Click delivery vs initial click | While at least one clicked listener exists, the click relay is attached and clicks go to the listeners; with none, the relay buffers the last click for `takeInitialClick()` (RN relay semantics). A host that adds the clicked listener in `Application.onCreate` therefore receives the cold-start click as an event, and `takeInitialClick()` returns null | Follows the ported relay unchanged; RN's "not replayed" rule was about JS timing, which native hosts do not have | n |
-| Payload | Public `NottiNotification` with `title: String?`, `body: String?`, `data: Map<String, String>` and nothing else; a plain class (`equals`/`hashCode`/`toString`), not a `data class` | iOS API-10 payload; avoids `copy`/`componentN` in the ABI. `toString` does not print `data` values (may hold PII) | n |
+| `received` replay | None: an FCM message that arrives with no listener is not buffered | RN 0.8.0 Android had no buffer (`NottiRuntime.onNotificationReceived` doc). iOS core buffers; Android does not get a buffer in M1 (would be new behavior) || y (Julio, 2026-10-30) |
+| Click delivery vs initial click | While at least one clicked listener exists, the click relay is attached and clicks go to the listeners; with none, the relay buffers the last click for `takeInitialClick()` (RN relay semantics). A host that adds the clicked listener in `Application.onCreate` therefore receives the cold-start click as an event, and `takeInitialClick()` returns null | Follows the ported relay unchanged; RN's "not replayed" rule was about JS timing, which native hosts do not have || y (Julio, 2026-10-30) |
+| Payload | Public `NottiNotification` with `title: String?`, `body: String?`, `data: Map<String, String>` and nothing else; a plain class (`equals`/`hashCode`/`toString`), not a `data class` | iOS API-10 payload; avoids `copy`/`componentN` in the ABI. `toString` does not print `data` values (may hold PII) || y (Julio, 2026-10-30) |
 | Log level | Public `NottiLogLevel` enum (`NONE`, `ERROR`, `WARN`, `INFO`, `DEBUG`, `VERBOSE`), `Notti.logLevel` get/set, default `ERROR`, mapped to the internal `NottiLogger.Level` | iOS API-14; AD-011 | n (iOS confirmed) |
-| Hooks without the provider | `initialize` installs, once per process, what `NottiInitProvider.onCreate` installs (lifecycle listener, network observer, foreground observer) if the provider has not run | push-integration open item | n |
+| Hooks without the provider | `initialize` installs, once per process, what `NottiInitProvider.onCreate` installs (lifecycle listener, network observer, foreground observer) if the provider has not run | push-integration open item || y (Julio, 2026-10-30) |
 
-Open questions: every row marked `n` is a proposal; Julio confirms or changes them before Design.
+Open questions: none. Proposed rows confirmed by Julio on 2026-10-30.
 
 ---
 
@@ -83,8 +83,8 @@ Open questions: every row marked `n` is a proposal; Julio confirms or changes th
 **Acceptance Criteria**:
 
 1. WHEN the host calls `Notti.initialize(context, appId, clientKey, options)` THEN the facade SHALL start the process runtime (`NottiRuntime.get(context)`) with those values and `baseUrl` from `options.baseUrl`, or `https://app.zeepnotti.app` when it is null (API-01).
-2. WHEN `appId` or `clientKey` is blank or `baseUrl` is invalid THEN the facade SHALL NOT throw, SHALL log through `NottiLogger` without any of the three values (accepted exception AD-011: an invalid `baseUrl` may be logged as given), and SHALL leave the SDK as it was: no core is created, and a running core is not replaced (API-01).
-3. WHEN `initialize` is called again with the same normalized `appId`, `clientKey` and `baseUrl` THEN the facade SHALL NOT rebuild the core and SHALL NOT send a second registration. WHEN any of them differs THEN it SHALL stop the old core and start a new one (API-02).
+2. WHEN `appId` or `clientKey` is blank or `baseUrl` is invalid THEN the facade SHALL NOT throw, SHALL log through `NottiLogger` without `appId`/`clientKey` (accepted exception AD-011: an invalid `baseUrl` may be logged as given), and SHALL leave the SDK as it was: no registration, and an initialized core keeps its config (API-01).
+3. WHEN `initialize` is called again with the same normalized `appId`, `clientKey` and `baseUrl` THEN the SDK SHALL NOT send a second registration. WHEN any of them differs THEN it SHALL register again with the new config (the core re-initializes in place, RN SDK-07/L2; design D1) (API-02).
 4. WHEN the facade runs in production THEN it SHALL use the process runtime backed by `notti_prefs`, and a test SHALL prove the facade path reads and writes that file (API-03).
 5. WHEN the host calls `Notti.login(externalUserId)` / `Notti.logout()` THEN the facade SHALL call `core.login` / `core.logout`; persistence, pending-mutation queueing and server-side clearing of email/phone SHALL stay exactly the core's (API-04).
 6. WHEN the host reads `Notti.deviceId` THEN it SHALL receive the persisted id synchronously, also before `initialize`, or null if the device never registered or no runtime exists (API-05).
@@ -186,7 +186,7 @@ Open questions: every row marked `n` is a proposal; Julio confirms or changes th
 - WHEN a listener is added before `initialize` THEN it SHALL work once events flow (the relays exist before any core).
 - WHEN `requestPermission` is called twice before the first answers THEN both callbacks SHALL be called, each once.
 - WHEN a subscription is kept after `remove()` THEN it SHALL hold no reference to the listener.
-- WHEN the provider was removed and the app was cold-started by a tap THEN that tap SHALL NOT be detected (no hook ran before the Activity); the README states it (example-and-release).
+- WHEN the provider was removed and the app was cold-started by a tap THEN: with `initialize` in `Application.onCreate` the tap SHALL be detected as with the provider; with `initialize` in the launch Activity's `onCreate` it SHALL be detected on `onActivityResumed`, and the replay guards that today run only on `onActivityCreated` (`savedInstanceState`, `FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY`) SHALL also apply so a Recents reopen or process restore does not count twice; with `initialize` after the first `onResume` the tap SHALL NOT be detected. The README states the three cases (example-and-release).
 - WHEN `initialize` receives a non-application `Context` (an Activity) THEN the SDK SHALL keep only `applicationContext` (no Activity leak).
 
 ---

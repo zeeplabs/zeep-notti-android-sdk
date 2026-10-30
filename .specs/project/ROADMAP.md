@@ -26,7 +26,7 @@
 - `sdk_version` becomes a native constant; package `com.notti` becomes `com.zeeplabs.notti`
 - Port the JUnit suite 1:1, traceable to the RN requirement IDs (SDK-, SDKCTR-, SDKOPEN-, SEGTEL-, DPF-)
 
-**public-api** - Specify (2026-10-30, `feat/public-api`; awaiting Julio on the proposed rows)
+**public-api** - Design (2026-10-30, `feat/public-api`; spec confirmed, design awaiting approval)
 
 - Kotlin facade: `Notti.initialize`, `login`/`logout`, `Notti.User` (tags, email, phone), subscription, location sharing, `Notti.Notifications` (requestPermission, listeners, initial click), device id accessor and observer (`trackEvent` moved to `in-app-messages`, as on iOS)
 - `initialize` installs the process hooks when the host removed `NottiInitProvider`
