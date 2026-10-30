@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/public-api/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Execute (approved by Julio 2026-10-30; T1-T8 done)
+**Status**: Execute (approved by Julio 2026-10-30; T1-T9 done)
 
 ---
 
@@ -219,8 +219,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Java test compiles and runs in `testDebugUnitTest` (`Notti.User.addTag`, `new NottiOptions()`, `Notti.setLogLevel`, lambdas for the three interfaces)
-- [ ] No sentinel (email, phone, token, external id, country, tag value, URL) reaches the sink at `VERBOSE`
+- [x] Java test compiles and runs in `testDebugUnitTest` (`Notti.User.addTag`, `new NottiOptions()`, `Notti.setLogLevel`, lambdas for the three interfaces)
+- [x] No sentinel (email, phone, token, external id, country, tag value, URL) reaches the sink at `VERBOSE`
 
 **Tests**: unit
 **Gate**: Quick
