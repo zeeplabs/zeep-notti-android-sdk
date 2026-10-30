@@ -152,6 +152,66 @@ object Notti {
         }
     }
 
+    /** Push permission and notification events. */
+    object Notifications {
+        private val receivedListeners = NottiListeners<NottiNotification>("received")
+
+        /** Installed into the runtime's received slot whenever the facade reaches a runtime (design D3). */
+        internal val receivedSlot: (ParsedNotification) -> Unit = { receivedListeners.dispatch(it.toPublic()) }
+
+        /** The click relay's emitter while at least one clicked listener exists (API-11). */
+        private val clickEmitter: (ParsedNotification) -> Unit = { clickedListeners.dispatch(it.toPublic()) }
+
+        private val clickedListeners: NottiListeners<NottiNotification> =
+            NottiListeners(
+                "clicked",
+                onFirstAdded = { NottiNotificationClickRelay.attach(clickEmitter) },
+                onLastRemoved = { NottiNotificationClickRelay.detach(clickEmitter) },
+            )
+
+        /**
+         * Shows the system notification-permission dialog (Android 13+) from the current Activity and
+         * reports the answer once, on the main thread. Below Android 13 the permission is granted at
+         * install and the answer is `true`. Before [initialize] the answer is `false` and no dialog
+         * is shown.
+         */
+        @JvmStatic
+        fun requestPermission(callback: NottiPermissionCallback) {
+            val core = core("Notifications.requestPermission")
+            if (core == null) {
+                NottiMainThread.post { callback.onResult(false) }
+                return
+            }
+            core.requestPermission { granted -> NottiMainThread.post { callback.onResult(granted) } }
+        }
+
+        /** Calls [listener] for each push received while the app is in the foreground. Not replayed. */
+        @JvmStatic
+        fun addReceivedListener(listener: NottiNotificationListener): NottiSubscription {
+            NottiRuntime.peek()?.let(::wire)
+            return receivedListeners.add { listener.onNotification(it) }
+        }
+
+        /**
+         * Calls [listener] for each notification tap. While no clicked listener exists, the last tap
+         * is kept for [takeInitialClick] instead; add the listener in `Application.onCreate` to get the
+         * tap that launched the app as an event.
+         */
+        @JvmStatic
+        fun addClickedListener(listener: NottiNotificationListener): NottiSubscription =
+            clickedListeners.add { listener.onNotification(it) }
+
+        /** The tap kept while no clicked listener existed (usually the one that launched the app), once. */
+        @JvmStatic
+        fun takeInitialClick(): NottiNotification? = NottiNotificationClickRelay.takePending()?.toPublic()
+
+        internal fun resetForTest() {
+            receivedListeners.clearForTest()
+            clickedListeners.clearForTest()
+            NottiNotificationClickRelay.detach(clickEmitter)
+        }
+    }
+
     /** The core of the process runtime (built lazily, RN parity), or null with a warn line. */
     internal fun core(method: String): NottiCore? = runtimeOrWarn(method)?.ensureCore()
 
@@ -171,10 +231,12 @@ object Notti {
 
     private fun wire(runtime: NottiRuntime) {
         runtime.onDeviceIdChanged = deviceIdSlot
+        runtime.onNotificationReceived = Notifications.receivedSlot
     }
 
-    /** Test-only: drops every listener the facade holds. */
+    /** Test-only: drops every listener the facade holds and detaches the click relay. */
     internal fun resetForTest() {
         deviceIdListeners.clearForTest()
+        Notifications.resetForTest()
     }
 }

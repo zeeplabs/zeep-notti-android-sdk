@@ -13,6 +13,14 @@ public final class com/zeeplabs/notti/Notti {
 	public static final fun setSubscription (Z)V
 }
 
+public final class com/zeeplabs/notti/Notti$Notifications {
+	public static final field INSTANCE Lcom/zeeplabs/notti/Notti$Notifications;
+	public static final fun addClickedListener (Lcom/zeeplabs/notti/NottiNotificationListener;)Lcom/zeeplabs/notti/NottiSubscription;
+	public static final fun addReceivedListener (Lcom/zeeplabs/notti/NottiNotificationListener;)Lcom/zeeplabs/notti/NottiSubscription;
+	public static final fun requestPermission (Lcom/zeeplabs/notti/NottiPermissionCallback;)V
+	public static final fun takeInitialClick ()Lcom/zeeplabs/notti/NottiNotification;
+}
+
 public final class com/zeeplabs/notti/Notti$User {
 	public static final field INSTANCE Lcom/zeeplabs/notti/Notti$User;
 	public static final fun addTag (Ljava/lang/String;Ljava/lang/String;)V

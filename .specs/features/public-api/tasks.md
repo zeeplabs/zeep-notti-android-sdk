@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/public-api/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Execute (approved by Julio 2026-10-30; T1-T7 done)
+**Status**: Execute (approved by Julio 2026-10-30; T1-T8 done)
 
 ---
 
@@ -199,10 +199,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Received: two listeners each get a delivered payload (`deliverRemoteMessage` with synthetic `fixture` data) as `NottiNotification`; removed one stops
-- [ ] Listener added before initialize works once events flow
-- [ ] Clicked: with a listener the click is delivered, not buffered; after the last remove, a click is buffered and `takeInitialClick()` returns it once, then null
-- [ ] `requestPermission`: callback once on main; before initialize `false` with no dialog; two concurrent calls each called once
+- [x] Received: two listeners each get a delivered payload (`deliverRemoteMessage` with synthetic `fixture` data) as `NottiNotification`; removed one stops
+- [x] Listener added before initialize works once events flow
+- [x] Clicked: with a listener the click is delivered, not buffered; after the last remove, a click is buffered and `takeInitialClick()` returns it once, then null
+- [x] `requestPermission`: callback once on main; before initialize `false` with no dialog; two concurrent calls each called once
 
 **Tests**: unit (Robolectric)
 **Gate**: Quick + `apiCheck`
