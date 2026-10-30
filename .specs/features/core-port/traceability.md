@@ -14,7 +14,7 @@ Test names below are exact (`Class#method`; backtick names as written). `C#` = `
 | --- | --- | --- | --- |
 | CORE-01 | Core ported, internal, no RN symbols | T2-T6, T9, T13 | Ported files under `com.zeeplabs.notti`, all `internal` (`notti/api/notti.api` empty, `apiCheck`); `scripts/check-no-react-native.sh` |
 | CORE-02 | All dependencies injectable | T6, T7, T8 | `NottiCore` constructor unchanged from RN; `NottiAndroidProviders` seams; `NottiRuntime` internal constructor |
-| CORE-03 | Container replaces companion statics | T8, T9 | `R#getIsLazySingleInstanceAcrossThreads`, `R#stopIsIdentityGuarded`, `R#replacingCoreShutsTheOldExecutorDown`, `R#observersReachTheRuntimeThroughPeek`, `FO#` (3) |
+| CORE-03 | Container replaces companion statics | T8, T9 | `R#getIsLazySingleInstanceAcrossThreads`, `R#stopIsIdentityGuarded`, `R#secondStartKeepsTheCoreAndRegistersOnlyForADifferentConfig` (was `replacingCoreShutsTheOldExecutorDown`, rewritten by public-api T1, AD-014), `R#observersReachTheRuntimeThroughPeek`, `FO#` (3) |
 | CORE-04 | Pre-core events persisted and flushed | T8 | `R#enqueueWithoutCorePersists`, `R#eventEnqueuedBeforeAnyCoreIsFlushedAfterStartAndRegistration` |
 | CORE-05 | Native `sdk_version` | T8 | `R#registrationSyncSendsTheSdkVersionConstant` (profile-field PATCH after registration, as RN) |
 | CORE-06 | Providers keep RN 0.8.0 behavior | T7 | `P#` success cases (27 tests) |

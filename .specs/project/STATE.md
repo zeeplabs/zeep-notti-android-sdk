@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-10-30
-**Current Work:** `public-api` Tasks (branch `feat/public-api`, local): `spec.md` (API-01..15) and `design.md` approved by Julio 2026-10-30; `tasks.md` (T1..T11) drafted, awaiting approval. `push-integration` merged (PR #3, `d5ab683`, admin, 2026-10-29); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
+**Current Work:** `public-api` Execute done (branch `feat/public-api`, local, 2026-10-30): T1..T11 committed, 444 tests, full gate green; awaiting Julio's review and OK to push/open the PR. Next feature on the roadmap after merge. `push-integration` merged (PR #3, `d5ab683`, admin, 2026-10-29); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
 
 ---
 

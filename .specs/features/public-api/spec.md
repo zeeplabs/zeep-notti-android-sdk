@@ -6,11 +6,11 @@ After `core-port` and `push-integration`, the SDK runs on Android but a host app
 
 ## Goals
 
-- [ ] Every RN 0.8.0 public method outside In-App (`trackEvent`, `InAppMessages`) has a documented Kotlin equivalent, each covered by at least one passing JUnit test that goes through the facade, not through `NottiCore`.
-- [ ] The facade adds no business logic (AD-001, AD-002). New behavior is limited to what only a facade can own and the iOS SDK already decided (AD-008): listener multiplexing, main-thread delivery, initialize idempotency, log level, default `baseUrl`.
-- [ ] The SDK works when the host removes `NottiInitProvider`: `initialize` installs the process hooks the provider would have installed (closes the push-integration open item).
-- [ ] The public surface is exactly what this spec lists, guarded by `apiCheck` (AD-010), and callable from Java (a Java test compiles against it).
-- [ ] No PII in any log line produced by the facade, at any log level (AD-011).
+- [x] Every RN 0.8.0 public method outside In-App (`trackEvent`, `InAppMessages`) has a documented Kotlin equivalent, each covered by at least one passing JUnit test that goes through the facade, not through `NottiCore`.
+- [x] The facade adds no business logic (AD-001, AD-002). New behavior is limited to what only a facade can own and the iOS SDK already decided (AD-008): listener multiplexing, main-thread delivery, initialize idempotency, log level, default `baseUrl`.
+- [x] The SDK works when the host removes `NottiInitProvider`: `initialize` installs the process hooks the provider would have installed (closes the push-integration open item).
+- [x] The public surface is exactly what this spec lists, guarded by `apiCheck` (AD-010), and callable from Java (a Java test compiles against it).
+- [x] No PII in any log line produced by the facade, at any log level (AD-011).
 
 ## Out of Scope
 
@@ -195,31 +195,31 @@ Open questions: none. Proposed rows confirmed by Julio on 2026-10-30.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| API-01 | P1: Initialize and identify (initialize, default baseUrl, no throw) | Tasks | Pending |
-| API-02 | P1: Initialize and identify (idempotency) | Tasks | Pending |
-| API-03 | P1: Initialize and identify (production runtime on `notti_prefs`) | Tasks | Pending |
-| API-04 | P1: Initialize and identify (login/logout) | Tasks | Pending |
-| API-05 | P1: Initialize and identify (device id accessor and listener) | Tasks | Pending |
-| API-06 | P1: User profile (tags) | Tasks | Pending |
-| API-07 | P1: User profile (email, phone) | Tasks | Pending |
-| API-08 | P1: User profile (subscription, location sharing) | Tasks | Pending |
-| API-09 | P1: Notifications (requestPermission) | Tasks | Pending |
-| API-10 | P1: Notifications (listeners, payload, isolation) | Tasks | Pending |
-| API-11 | P1: Notifications / identify (main-thread delivery, relay detach) | Tasks | Pending |
-| API-12 | P1: Notifications (initial click) | Tasks | Pending |
-| API-13 | P1: Works without the process hook | Tasks | Pending |
-| API-14 | P1: Public surface hygiene (ABI, Java, no internal types) | Tasks | Pending |
-| API-15 | P2: Log level (+ no PII at all levels) | Tasks | Pending |
+| API-01 | P1: Initialize and identify (initialize, default baseUrl, no throw) | Execute | Done |
+| API-02 | P1: Initialize and identify (idempotency) | Execute | Done |
+| API-03 | P1: Initialize and identify (production runtime on `notti_prefs`) | Execute | Done |
+| API-04 | P1: Initialize and identify (login/logout) | Execute | Done |
+| API-05 | P1: Initialize and identify (device id accessor and listener) | Execute | Done |
+| API-06 | P1: User profile (tags) | Execute | Done |
+| API-07 | P1: User profile (email, phone) | Execute | Done |
+| API-08 | P1: User profile (subscription, location sharing) | Execute | Done |
+| API-09 | P1: Notifications (requestPermission) | Execute | Done |
+| API-10 | P1: Notifications (listeners, payload, isolation) | Execute | Done |
+| API-11 | P1: Notifications / identify (main-thread delivery, relay detach) | Execute | Done |
+| API-12 | P1: Notifications (initial click) | Execute | Done |
+| API-13 | P1: Works without the process hook | Execute | Done |
+| API-14 | P1: Public surface hygiene (ABI, Java, no internal types) | Execute | Done |
+| API-15 | P2: Log level (+ no PII at all levels) | Execute | Done |
 
 Inherited behavior (facade part only; core part verified in `core-port`/`push-integration`): RN `sdk-core-v1` SDK-17..19 (API-05, API-10, API-12), `opened-event-reporting` SDKOPEN-10 (API-10), `device-profile-fields` DPF-17..21 (API-07).
 
-**Coverage:** 15 total, 15 mapped to a story, 15 mapped to tasks (`tasks.md`).
+**Coverage:** 15 total, 15 mapped to a story, 15 mapped to tasks (`tasks.md`), 15 mapped to tests (`traceability.md`).
 
 ---
 
 ## Success Criteria
 
-- [ ] Every RN 0.8.0 public method outside In-App has a facade equivalent, listed with its test in `traceability.md`.
-- [ ] `apiCheck` green with the new dump; the Java call test green.
-- [ ] Privacy sentinel test green at `VERBOSE` through the facade.
-- [ ] Test count does not drop below 390; full gate (tests, `spotlessCheck`, `lintRelease`, `apiCheck`, guard scripts, publish + example build) green.
+- [x] Every RN 0.8.0 public method outside In-App has a facade equivalent, listed with its test in `traceability.md`.
+- [x] `apiCheck` green with the new dump; the Java call test green.
+- [x] Privacy sentinel test green at `VERBOSE` through the facade.
+- [x] Test count does not drop below 390; full gate (tests, `spotlessCheck`, `lintRelease`, `apiCheck`, guard scripts, publish + example build) green.

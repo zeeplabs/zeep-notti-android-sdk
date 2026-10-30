@@ -34,6 +34,8 @@ JDK 17 (`export JAVA_HOME=/opt/homebrew/opt/openjdk@17` on macOS with Homebrew).
 
 Coverage (2026-10-28, `core-port`): 318 unit tests. 257 ported 1:1 from RN v0.8.0 (eight classes, counts equal to RN), 58 new (providers, runtime, continuity fixture, log privacy sentinel, RN validation gaps, logger), 3 smoke. RN requirement ID → test map, counts per class and the deferred list: `.specs/features/core-port/traceability.md`. Ported test files keep RN's names and `@Config`; ktlint findings on them are suppressed per file, not reformatted.
 
+Coverage (2026-10-30, `public-api`): 444 unit tests (390 after `push-integration`, +54). New: facade (`NottiFacadeTest`, `NottiUserFacadeTest`, `NottiNotificationsFacadeTest`, `NottiPermissionFacadeTest`), `NottiListenersTest`, `NottiPublicTypesTest`, `NottiProcessHooksTest`, the first Java test (`NottiJavaInteropTest.java`, compiled by `compileDebugUnitTestJavaWithJavac`), plus runtime, lifecycle-listener and log-privacy cases. Map: `.specs/features/public-api/traceability.md`.
+
 ## Parallelism Assessment
 
 | Test Type | Parallel-Safe | Why |

@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/public-api/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Execute (approved by Julio 2026-10-30; T1-T10 done)
+**Status**: Execute done (2026-10-30, T1-T11, local; awaiting review/PR)
 
 ---
 
@@ -257,8 +257,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] 15/15 requirements mapped to tests; test count ≥ 390 recorded
-- [ ] Full gate green
+- [x] 15/15 requirements mapped to tests; test count ≥ 390 recorded
+- [x] Full gate green
 
 **Tests**: none
 **Gate**: Full
