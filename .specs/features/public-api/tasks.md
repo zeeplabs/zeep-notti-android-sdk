@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/public-api/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Execute (approved by Julio 2026-10-30; T1-T4 done)
+**Status**: Execute (approved by Julio 2026-10-30; T1-T5 done)
 
 ---
 
@@ -133,11 +133,11 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Two listeners get every event, in order, on the main looper, also when dispatched from a background thread
-- [ ] `remove()` stops delivery; second `remove()` no-op; removed subscription holds no listener
-- [ ] Add/remove inside a callback: no throw, applies from the next event
-- [ ] Throwing listener: others still called; the log line has the class name, not the message
-- [ ] `onFirstAdded` once on 0→1, `onLastRemoved` once on 1→0
+- [x] Two listeners get every event, in order, on the main looper, also when dispatched from a background thread
+- [x] `remove()` stops delivery; second `remove()` no-op; removed subscription holds no listener
+- [x] Add/remove inside a callback: no throw, applies from the next event
+- [x] Throwing listener: others still called; the log line has the class name, not the message
+- [x] `onFirstAdded` once on 0→1, `onLastRemoved` once on 1→0
 
 **Tests**: unit (Robolectric)
 **Gate**: Quick
