@@ -60,6 +60,25 @@ object Notti {
         core("logout")?.logout()
     }
 
+    /**
+     * Turns push delivery to this device on or off on the backend. Turning it off records when the
+     * user opted out. Ignored before [initialize] (logged).
+     */
+    @JvmStatic
+    fun setSubscription(enabled: Boolean) {
+        core("setSubscription")?.setSubscription(enabled)
+    }
+
+    /**
+     * Opt-in for country-based targeting; default off. Saved at once on the calling thread. The SDK
+     * never asks for the location permission: with it already granted by the app, the country is
+     * read at the next session start. Turning it off also clears the country on the backend.
+     */
+    @JvmStatic
+    fun setLocationSharingEnabled(enabled: Boolean) {
+        core("setLocationSharingEnabled")?.setLocationSharingEnabled(enabled)
+    }
+
     /** The Notti device id, or null until the first registration (or with no runtime yet). */
     @JvmStatic
     val deviceId: String?
@@ -79,6 +98,59 @@ object Notti {
         set(value) {
             NottiLogger.level = value.toLoggerLevel()
         }
+
+    /**
+     * The user's tags, email and phone. Tags are ignored before [initialize] (logged); email and
+     * phone are saved and sent at the first registration.
+     */
+    object User {
+        /** Sets one tag. */
+        @JvmStatic
+        fun addTag(
+            key: String,
+            value: String,
+        ) {
+            core("User.addTag")?.mutateTags(add = mapOf(key to value), remove = null)
+        }
+
+        /** Sets several tags in one request. */
+        @JvmStatic
+        fun addTags(tags: Map<String, String>) {
+            core("User.addTags")?.mutateTags(add = tags.toMap(), remove = null)
+        }
+
+        /** Removes one tag. */
+        @JvmStatic
+        fun removeTag(key: String) {
+            core("User.removeTag")?.mutateTags(add = null, remove = listOf(key))
+        }
+
+        /** Removes several tags in one request. */
+        @JvmStatic
+        fun removeTags(keys: List<String>) {
+            core("User.removeTags")?.mutateTags(add = null, remove = keys.toList())
+        }
+
+        @JvmStatic
+        fun setEmail(email: String) {
+            core("User.setEmail")?.setEmail(email)
+        }
+
+        @JvmStatic
+        fun clearEmail() {
+            core("User.clearEmail")?.clearEmail()
+        }
+
+        @JvmStatic
+        fun setPhone(phone: String) {
+            core("User.setPhone")?.setPhone(phone)
+        }
+
+        @JvmStatic
+        fun clearPhone() {
+            core("User.clearPhone")?.clearPhone()
+        }
+    }
 
     /** The core of the process runtime (built lazily, RN parity), or null with a warn line. */
     internal fun core(method: String): NottiCore? = runtimeOrWarn(method)?.ensureCore()

@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/public-api/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Execute (approved by Julio 2026-10-30; T1-T6 done)
+**Status**: Execute (approved by Julio 2026-10-30; T1-T7 done)
 
 ---
 
@@ -179,10 +179,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] One test per method after initialize asserting the PATCH body fields
-- [ ] One test per method before initialize: no throw, persisted, converges at registration
-- [ ] `setLocationSharingEnabled` writes on the caller's thread; default `false`
-- [ ] `setSubscription(false)` keeps the `last_unsubscribed_at` rule
+- [x] One test per method after initialize asserting the PATCH body fields
+- [x] One test per method before initialize: no throw, the core's rule (tags and `setSubscription` ignored with an error line; email, phone and location sharing persisted and converged at registration)
+- [x] `setLocationSharingEnabled` writes on the caller's thread; default `false`
+- [x] `setSubscription(false)` keeps the `last_unsubscribed_at` rule
 
 **Tests**: unit (Robolectric, MockWebServer)
 **Gate**: Quick + `apiCheck`

@@ -8,7 +8,21 @@ public final class com/zeeplabs/notti/Notti {
 	public static synthetic fun initialize$default (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Lcom/zeeplabs/notti/NottiOptions;ILjava/lang/Object;)V
 	public static final fun login (Ljava/lang/String;)V
 	public static final fun logout ()V
+	public static final fun setLocationSharingEnabled (Z)V
 	public static final fun setLogLevel (Lcom/zeeplabs/notti/NottiLogLevel;)V
+	public static final fun setSubscription (Z)V
+}
+
+public final class com/zeeplabs/notti/Notti$User {
+	public static final field INSTANCE Lcom/zeeplabs/notti/Notti$User;
+	public static final fun addTag (Ljava/lang/String;Ljava/lang/String;)V
+	public static final fun addTags (Ljava/util/Map;)V
+	public static final fun clearEmail ()V
+	public static final fun clearPhone ()V
+	public static final fun removeTag (Ljava/lang/String;)V
+	public static final fun removeTags (Ljava/util/List;)V
+	public static final fun setEmail (Ljava/lang/String;)V
+	public static final fun setPhone (Ljava/lang/String;)V
 }
 
 public final class com/zeeplabs/notti/NottiBridge {
