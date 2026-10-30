@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/public-api/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Execute (approved by Julio 2026-10-30; T1-T5 done)
+**Status**: Execute (approved by Julio 2026-10-30; T1-T6 done)
 
 ---
 
@@ -154,15 +154,15 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Default `baseUrl` used when `options.baseUrl` is null; one `POST /devices`
-- [ ] Blank `appId`/`clientKey` or invalid `baseUrl`: no throw, no registration, an initialized core keeps its config
-- [ ] Same config again: 0 registrations; different config: 1
-- [ ] Facade path reads/writes `notti_prefs`
-- [ ] `login`/`logout` reach the core (PATCH asserted); before initialize they follow the core's pending queue; with no runtime: warn line with the method name only
-- [ ] `deviceId` before initialize returns the persisted id or null; device-id listeners called once on main per change, not on same-id re-registration
-- [ ] `initialize` from a background thread equals a main-thread call; an Activity context is not retained
-- [ ] Without the provider, `initialize` installs hooks once; with it, none again
-- [ ] `logLevel` set/get maps to `NottiLogger.level`; default `ERROR`
+- [x] Default `baseUrl` used when `options.baseUrl` is null; one `POST /devices`
+- [x] Blank `appId`/`clientKey` or invalid `baseUrl`: no throw, no registration, an initialized core keeps its config
+- [x] Same config again: 0 registrations; different config: 1
+- [x] Facade path reads/writes `notti_prefs`
+- [x] `login`/`logout` reach the core (PATCH asserted); before initialize they follow the core's rule (`login` ignored with an error line, `logout` clear persisted and sent at registration); with no runtime: warn line with the method name only
+- [x] `deviceId` before initialize returns the persisted id or null; device-id listeners called once on main per change, not on same-id re-registration
+- [x] `initialize` from a background thread equals a main-thread call; an Activity context is not retained
+- [x] Without the provider, `initialize` installs hooks once; with it, none again
+- [x] `logLevel` set/get maps to `NottiLogger.level`; default `ERROR`
 
 **Tests**: unit (Robolectric, MockWebServer)
 **Gate**: Quick + `apiCheck`

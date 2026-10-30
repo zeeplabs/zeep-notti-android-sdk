@@ -56,6 +56,14 @@ internal class NottiListeners<T>(
         }
     }
 
+    /** Test-only: drops every listener without running the hooks. */
+    internal fun clearForTest() {
+        synchronized(lock) {
+            entries.forEach { it.listener = null }
+            entries.clear()
+        }
+    }
+
     fun dispatch(value: T) {
         val snapshot = entries.toList()
         if (snapshot.isEmpty()) return

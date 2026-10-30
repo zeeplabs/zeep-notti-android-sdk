@@ -1,3 +1,16 @@
+public final class com/zeeplabs/notti/Notti {
+	public static final field INSTANCE Lcom/zeeplabs/notti/Notti;
+	public static final fun addDeviceIdChangedListener (Lcom/zeeplabs/notti/NottiDeviceIdListener;)Lcom/zeeplabs/notti/NottiSubscription;
+	public static final fun getDeviceId ()Ljava/lang/String;
+	public static final fun getLogLevel ()Lcom/zeeplabs/notti/NottiLogLevel;
+	public static final fun initialize (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)V
+	public static final fun initialize (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Lcom/zeeplabs/notti/NottiOptions;)V
+	public static synthetic fun initialize$default (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Lcom/zeeplabs/notti/NottiOptions;ILjava/lang/Object;)V
+	public static final fun login (Ljava/lang/String;)V
+	public static final fun logout ()V
+	public static final fun setLogLevel (Lcom/zeeplabs/notti/NottiLogLevel;)V
+}
+
 public final class com/zeeplabs/notti/NottiBridge {
 	public static final field INSTANCE Lcom/zeeplabs/notti/NottiBridge;
 	public static final fun onMessageReceived (Lcom/google/firebase/messaging/RemoteMessage;)V

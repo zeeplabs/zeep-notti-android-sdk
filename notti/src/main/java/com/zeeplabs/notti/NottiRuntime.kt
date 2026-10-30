@@ -23,6 +23,8 @@ internal class NottiRuntime internal constructor(
     private val executorFactory: () -> ExecutorService = { newDaemonExecutor("notti-io") },
     private val clock: () -> Long = { System.currentTimeMillis() },
     permissionRequester: ((callback: (Boolean) -> Unit) -> Unit)? = null,
+    private val apiClientFactory: (appId: String, clientKey: String, baseUrl: String) -> NottiApiClient =
+        { id, key, url -> NottiApiClient(OkHttpClient(), url, id, key) },
 ) {
     private val appContext: Context = context.applicationContext ?: context
 
@@ -104,7 +106,7 @@ internal class NottiRuntime internal constructor(
             NottiCore(
                 deviceStore = deviceStore,
                 eventStore = eventStore,
-                apiClientFactory = { id, key, url -> NottiApiClient(OkHttpClient(), url, id, key) },
+                apiClientFactory = apiClientFactory,
                 tokenProvider = { callback -> providers.fcmToken(io, callback) },
                 permissionRequester = corePermissionRequester,
                 logger = { message -> NottiLogger.error(message) },
