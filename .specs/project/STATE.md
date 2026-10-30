@@ -156,7 +156,7 @@ Carried from `zeep-notti-ios-sdk` (`.specs/LESSONS.md`, candidates there), to ap
 
 ## Todos
 
-- [Provável] Inherited RN 0.8.0 bug: `NottiActivityLifecycleListener.onActivityCreated` skips a restored (`savedInstanceState != null`) or Recents (`FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY`) launch intent but does not mark it handled, so the `onActivityResumed` right after reports a phantom `opened` + `clicked`. RN tests call only `onActivityCreated`. Prove with a created+resumed test, then fix in both repos (found 2026-10-30, public-api design D2)
+- [Provável] Inherited RN 0.8.0 bug: `NottiActivityLifecycleListener.onActivityCreated` skips a restored (`savedInstanceState != null`) or Recents (`FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY`) launch intent but does not mark it handled, so the `onActivityResumed` right after reports a phantom `opened` + `clicked`. RN tests call only `onActivityCreated`. Recents half fixed here by public-api T3 (resumed path skips the history flag; created+resumed test `a Recents reopen seen by onActivityCreated then onActivityResumed emits nothing`). Open: the restore half here (not detectable on resume: mark the intent handled in `onActivityCreated`?) and both halves in RN (found 2026-10-30, public-api design D2)
 
 - Flaky ported test: `NottiCoreTest` "logout clears the external user id server-side and clears email and phone" failed once (expected 5 requests, saw 4) in 1 of 5 full-suite runs on 2026-10-29, passes alone; ported verbatim from RN (AD-002). Watch it in CI; if it recurs, fix the wait in both repos
 

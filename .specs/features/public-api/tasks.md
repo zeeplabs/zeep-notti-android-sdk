@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/public-api/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Execute (approved by Julio 2026-10-30; T1-T2 done)
+**Status**: Execute (approved by Julio 2026-10-30; T1-T3 done)
 
 ---
 
@@ -93,9 +93,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Late install (no `onActivityCreated`): a tap intent on resume emits `opened` + `clicked` once
-- [ ] Same with `FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY`: nothing emitted
-- [ ] Ported 20 cases green; `port-diff` shows only the added check
+- [x] Late install (no `onActivityCreated`): a tap intent on resume emits `opened` + `clicked` once
+- [x] Same with `FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY`: nothing emitted
+- [x] Ported 20 cases green; `port-diff` shows only the added check
 
 **Tests**: unit (Robolectric)
 **Gate**: Quick (`NottiActivityLifecycleListenerTest`)

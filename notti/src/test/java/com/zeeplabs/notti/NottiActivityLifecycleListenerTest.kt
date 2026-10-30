@@ -447,6 +447,70 @@ class NottiActivityLifecycleListenerTest {
         assertEquals(1, delivered.size)
         assertEquals(listOf("opened", "clicked"), store.all().map { it.type })
     }
+
+    // public-api T3 (not in RN): a late install sees the launch only through onActivityResumed.
+
+    @Test
+    fun `a late install catches the launch tap on resume once`() {
+        val delivered = mutableListOf<ParsedNotification>()
+        NottiNotificationClickRelay.attach { delivered.add(it) }
+
+        val intent = Intent().apply {
+            putExtra("google.message_id", "msg-1")
+            putExtra("notification_id", "notif-1")
+            putExtra("delivery_id", "delivery-1")
+        }
+        val activity = Robolectric.buildActivity(Activity::class.java, intent).create().get()
+        val listener = NottiActivityLifecycleListener()
+
+        listener.onActivityResumed(activity)
+        listener.onActivityResumed(activity)
+
+        assertEquals(1, delivered.size)
+        assertEquals(listOf("opened", "clicked"), store.all().map { it.type })
+    }
+
+    @Test
+    fun `a late install ignores a Recents reopen on resume`() {
+        val delivered = mutableListOf<ParsedNotification>()
+        NottiNotificationClickRelay.attach { delivered.add(it) }
+
+        val intent = Intent().apply {
+            putExtra("google.message_id", "msg-1")
+            putExtra("notification_id", "notif-1")
+            putExtra("delivery_id", "delivery-1")
+            addFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY)
+        }
+        val activity = Robolectric.buildActivity(Activity::class.java, intent).create().get()
+
+        NottiActivityLifecycleListener().onActivityResumed(activity)
+
+        assertTrue(delivered.isEmpty())
+        assertTrue(store.all().isEmpty())
+        assertNull(NottiNotificationClickRelay.takePending())
+    }
+
+    @Test
+    fun `a Recents reopen seen by onActivityCreated then onActivityResumed emits nothing`() {
+        val delivered = mutableListOf<ParsedNotification>()
+        NottiNotificationClickRelay.attach { delivered.add(it) }
+
+        val intent = Intent().apply {
+            putExtra("google.message_id", "msg-1")
+            putExtra("notification_id", "notif-1")
+            putExtra("delivery_id", "delivery-1")
+            addFlags(Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY)
+        }
+        val activity = Robolectric.buildActivity(Activity::class.java, intent).create().get()
+        val listener = NottiActivityLifecycleListener()
+
+        // RN 0.8.0 reported a phantom pair here: onActivityCreated skipped, onActivityResumed handled.
+        listener.onActivityCreated(activity, null)
+        listener.onActivityResumed(activity)
+
+        assertTrue(delivered.isEmpty())
+        assertTrue(store.all().isEmpty())
+    }
 }
 
 /**
