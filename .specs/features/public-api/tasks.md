@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/public-api/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Execute (approved by Julio 2026-10-30; T1 done)
+**Status**: Execute (approved by Julio 2026-10-30; T1-T2 done)
 
 ---
 
@@ -74,9 +74,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Two `installOnce` calls register each hook once
-- [ ] `NottiInitProviderTest` green unchanged
-- [ ] Provider keeps its provenance header; commit body lists the relocation as the only change
+- [x] Two `installOnce` calls register each hook once
+- [x] `NottiInitProviderTest` green unchanged
+- [x] Provider keeps its provenance header; commit body lists the relocation as the only change
 
 **Tests**: unit (Robolectric)
 **Gate**: Quick (`NottiProcessHooksTest`, `NottiInitProviderTest`)
