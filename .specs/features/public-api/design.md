@@ -1,7 +1,7 @@
 # Public API Design
 
 **Spec**: `.specs/features/public-api/spec.md`
-**Status**: Draft
+**Status**: Approved (Julio, 2026-10-30)
 
 ---
 

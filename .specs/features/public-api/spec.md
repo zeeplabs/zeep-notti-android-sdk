@@ -195,25 +195,25 @@ Open questions: none. Proposed rows confirmed by Julio on 2026-10-30.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| API-01 | P1: Initialize and identify (initialize, default baseUrl, no throw) | Specify | Pending |
-| API-02 | P1: Initialize and identify (idempotency) | Specify | Pending |
-| API-03 | P1: Initialize and identify (production runtime on `notti_prefs`) | Specify | Pending |
-| API-04 | P1: Initialize and identify (login/logout) | Specify | Pending |
-| API-05 | P1: Initialize and identify (device id accessor and listener) | Specify | Pending |
-| API-06 | P1: User profile (tags) | Specify | Pending |
-| API-07 | P1: User profile (email, phone) | Specify | Pending |
-| API-08 | P1: User profile (subscription, location sharing) | Specify | Pending |
-| API-09 | P1: Notifications (requestPermission) | Specify | Pending |
-| API-10 | P1: Notifications (listeners, payload, isolation) | Specify | Pending |
-| API-11 | P1: Notifications / identify (main-thread delivery, relay detach) | Specify | Pending |
-| API-12 | P1: Notifications (initial click) | Specify | Pending |
-| API-13 | P1: Works without the process hook | Specify | Pending |
-| API-14 | P1: Public surface hygiene (ABI, Java, no internal types) | Specify | Pending |
-| API-15 | P2: Log level (+ no PII at all levels) | Specify | Pending |
+| API-01 | P1: Initialize and identify (initialize, default baseUrl, no throw) | Tasks | Pending |
+| API-02 | P1: Initialize and identify (idempotency) | Tasks | Pending |
+| API-03 | P1: Initialize and identify (production runtime on `notti_prefs`) | Tasks | Pending |
+| API-04 | P1: Initialize and identify (login/logout) | Tasks | Pending |
+| API-05 | P1: Initialize and identify (device id accessor and listener) | Tasks | Pending |
+| API-06 | P1: User profile (tags) | Tasks | Pending |
+| API-07 | P1: User profile (email, phone) | Tasks | Pending |
+| API-08 | P1: User profile (subscription, location sharing) | Tasks | Pending |
+| API-09 | P1: Notifications (requestPermission) | Tasks | Pending |
+| API-10 | P1: Notifications (listeners, payload, isolation) | Tasks | Pending |
+| API-11 | P1: Notifications / identify (main-thread delivery, relay detach) | Tasks | Pending |
+| API-12 | P1: Notifications (initial click) | Tasks | Pending |
+| API-13 | P1: Works without the process hook | Tasks | Pending |
+| API-14 | P1: Public surface hygiene (ABI, Java, no internal types) | Tasks | Pending |
+| API-15 | P2: Log level (+ no PII at all levels) | Tasks | Pending |
 
 Inherited behavior (facade part only; core part verified in `core-port`/`push-integration`): RN `sdk-core-v1` SDK-17..19 (API-05, API-10, API-12), `opened-event-reporting` SDKOPEN-10 (API-10), `device-profile-fields` DPF-17..21 (API-07).
 
-**Coverage:** 15 total, 15 mapped to a story, 0 mapped to tasks yet.
+**Coverage:** 15 total, 15 mapped to a story, 15 mapped to tasks (`tasks.md`).
 
 ---
 
