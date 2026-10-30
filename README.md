@@ -4,9 +4,82 @@ Native Android SDK (Kotlin) for [Notti](https://app.zeepnotti.app) push notifica
 
 > **Status: pre-release.** Nothing is published yet. The first release, `0.1.0`, targets behavior parity with `react-native-notti` 0.8.0 on Android. Plans live in [`.specs/`](.specs/project/ROADMAP.md).
 
+## Usage
+
+> Draft from `public-api`; the final wording and the device checklist come with `example-and-release`.
+
+### Initialize
+
+Call `Notti.initialize` once, as early as possible, ideally in `Application.onCreate`:
+
+```kotlin
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        Notti.initialize(this, "YOUR_APP_ID", "YOUR_CLIENT_KEY")
+        // Self-hosted Notti: Notti.initialize(this, appId, clientKey, NottiOptions(baseUrl = "https://push.example.invalid"))
+    }
+}
+```
+
+The SDK keeps only the application context. Calling `initialize` again with the same values does nothing; with different values the device registers again. Blank ids or an invalid base URL are logged and ignored. No SDK call throws.
+
+### Identify the user
+
+```kotlin
+Notti.login("user-123")
+Notti.User.addTag("plan", "premium")
+Notti.User.addTags(mapOf("tier" to "gold", "region" to "south"))
+Notti.User.removeTag("plan")
+Notti.User.setEmail("user@example.invalid")
+Notti.User.setPhone("+5511900000000")
+Notti.setSubscription(false)            // stop push delivery to this device
+Notti.setLocationSharingEnabled(true)   // opt-in country targeting, default off
+Notti.logout()                          // unlinks the user and clears email and phone on the backend
+```
+
+Call these after `initialize`. Before it, `login`, tags and `setSubscription` are ignored (an error line is logged), while email, phone, location sharing and `logout` are kept and sent at the first registration. The SDK never asks for the location permission: with location sharing on and the permission already granted by your app, it reads the country at the next session start. Turning it off also clears the country on the backend.
+
+### Notifications
+
+```kotlin
+// Android 13+: shows the system dialog from the Activity in front.
+Notti.Notifications.requestPermission { granted -> /* ... */ }
+
+val received = Notti.Notifications.addReceivedListener { notification ->
+    // Foreground pushes: notification.title, notification.body, notification.data
+}
+val clicked = Notti.Notifications.addClickedListener { notification ->
+    // Taps: route with notification.data
+}
+received.remove() // when the listener is no longer needed
+```
+
+Every listener and callback runs on the main thread. A received push with no listener is not replayed. While no clicked listener exists, the SDK keeps the last tap and `Notti.Notifications.takeInitialClick()` returns it once. Add the clicked listener in `Application.onCreate` to get the tap that launched the app as an event; `takeInitialClick()` then returns null.
+
+### Device id
+
+`Notti.deviceId` is the Notti device id, or null until the first registration. `Notti.addDeviceIdChangedListener { id -> }` is called each time the backend assigns a new one.
+
+### Logging
+
+`Notti.logLevel = NottiLogLevel.DEBUG` (default `ERROR`, `NONE` silences the SDK). Logs go to logcat under the tag `Notti` and never contain email, phone, push token, user id, country, tag values or URLs.
+
+### Java
+
+Every member is static:
+
+```java
+Notti.initialize(this, "YOUR_APP_ID", "YOUR_CLIENT_KEY", new NottiOptions());
+Notti.User.addTag("plan", "premium");
+NottiSubscription clicked = Notti.Notifications.addClickedListener(notification -> { });
+Notti.Notifications.requestPermission(granted -> { });
+Notti.setLogLevel(NottiLogLevel.DEBUG);
+```
+
 ## Android integration (draft)
 
-> Draft from `push-integration`; the final wording, the public `Notti` API and the device checklist come with `example-and-release`.
+> Draft from `push-integration`; the final wording and the device checklist come with `example-and-release`.
 
 ### Automatic setup
 
@@ -48,13 +121,13 @@ class MyMessagingService : FirebaseMessagingService() {
 
 ### Removing the process-start hook
 
-You can remove `com.zeeplabs.notti.NottiInitProvider` with `tools:node="remove"`, but in this pre-release nothing else installs its hooks, so you lose:
+You can remove `com.zeeplabs.notti.NottiInitProvider` with `tools:node="remove"`. `Notti.initialize` then installs the same hooks (tap detection, foreground and network observers), once per process. Where you call it decides whether the tap that launched the app is seen:
 
-- notification tap detection (no `opened`/`clicked` events, no initial click), including the tap that launches the app;
-- foreground/background tracking: sessions after the first, and the registration retry when the app returns to the foreground;
-- the flush of queued events when the network comes back (queued events are still sent after the device registers).
+- In `Application.onCreate`: same as with the provider.
+- In the launch Activity's `onCreate`: the launch tap is detected when the Activity resumes, and reopening the app from Recents is not reported as a tap.
+- Later (after the first Activity resumed): the launch tap is lost; later taps are detected.
 
-The SDK still creates its runtime lazily on initialization and from the FCM service, so `received` events are kept.
+Limitation without the provider: when Android restores an Activity after killing the process, its launch tap cannot be told apart from a new one when the Activity resumes, so it is reported again (`opened` + `clicked`). Keep the provider, or call `initialize` in `Application.onCreate`, to avoid it.
 
 ### `singleTop` / `singleTask` Activities
 

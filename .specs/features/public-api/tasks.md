@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/public-api/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Execute (approved by Julio 2026-10-30; T1-T9 done)
+**Status**: Execute (approved by Julio 2026-10-30; T1-T10 done)
 
 ---
 
@@ -237,10 +237,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] README snippets match the dump (names and signatures)
-- [ ] No PII or real keys in snippets (`example.invalid`, placeholders)
-- [ ] Example builds against the published AAR
-- [ ] Full gate green
+- [x] README snippets match the dump (names and signatures)
+- [x] No PII or real keys in snippets (`example.invalid`, placeholders)
+- [x] Example builds against the published AAR
+- [x] Full gate green
 
 **Tests**: none
 **Gate**: Full
