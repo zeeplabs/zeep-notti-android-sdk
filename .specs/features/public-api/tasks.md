@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/public-api/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Draft (2026-10-30)
+**Status**: Execute (approved by Julio 2026-10-30; T1 done)
 
 ---
 
@@ -53,11 +53,11 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `ensureCore` twice returns the same core; no `initialize`, no `POST /devices`
-- [ ] Second `start` with the same config returns the same core and sends no registration; a different config sends one (test rewritten from "replaces the core", count kept)
-- [ ] Device-id change reaches the runtime slot; null slot is safe
-- [ ] Two concurrent `start` calls leave one core, no leaked executor
-- [ ] All 390 tests still pass
+- [x] `ensureCore` twice returns the same core; no `initialize`, no `POST /devices`
+- [x] Second `start` with the same config returns the same core and sends no registration; a different config sends one (test rewritten from "replaces the core", count kept)
+- [x] Device-id change reaches the runtime slot; null slot is safe
+- [x] Two concurrent `start` calls leave one core, no leaked executor
+- [x] All tests pass (390 → 393)
 
 **Tests**: unit (Robolectric)
 **Gate**: Quick (`NottiRuntimeTest`, then all tests since callers change)

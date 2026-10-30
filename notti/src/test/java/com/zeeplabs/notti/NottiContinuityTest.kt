@@ -136,11 +136,11 @@ class NottiContinuityTest {
         )
 
     private fun start(runtime: NottiRuntime) {
+        runtime.onDeviceIdChanged = { deviceIdChanges += it }
         runtime.start(
             appId = "app-fixture",
             clientKey = "key-fixture",
             baseUrl = server.url("/").toString().trimEnd('/'),
-            onDeviceIdChanged = { deviceIdChanges += it },
         )
     }
 
