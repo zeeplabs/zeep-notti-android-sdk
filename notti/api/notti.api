@@ -4,3 +4,50 @@ public final class com/zeeplabs/notti/NottiBridge {
 	public static final fun onNewToken (Ljava/lang/String;)V
 }
 
+public abstract interface class com/zeeplabs/notti/NottiDeviceIdListener {
+	public abstract fun onDeviceIdChanged (Ljava/lang/String;)V
+}
+
+public final class com/zeeplabs/notti/NottiLogLevel : java/lang/Enum {
+	public static final field DEBUG Lcom/zeeplabs/notti/NottiLogLevel;
+	public static final field ERROR Lcom/zeeplabs/notti/NottiLogLevel;
+	public static final field INFO Lcom/zeeplabs/notti/NottiLogLevel;
+	public static final field NONE Lcom/zeeplabs/notti/NottiLogLevel;
+	public static final field VERBOSE Lcom/zeeplabs/notti/NottiLogLevel;
+	public static final field WARN Lcom/zeeplabs/notti/NottiLogLevel;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/zeeplabs/notti/NottiLogLevel;
+	public static fun values ()[Lcom/zeeplabs/notti/NottiLogLevel;
+}
+
+public final class com/zeeplabs/notti/NottiNotification {
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBody ()Ljava/lang/String;
+	public final fun getData ()Ljava/util/Map;
+	public final fun getTitle ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/zeeplabs/notti/NottiNotificationListener {
+	public abstract fun onNotification (Lcom/zeeplabs/notti/NottiNotification;)V
+}
+
+public final class com/zeeplabs/notti/NottiOptions {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBaseUrl ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/zeeplabs/notti/NottiPermissionCallback {
+	public abstract fun onResult (Z)V
+}
+
+public final class com/zeeplabs/notti/NottiSubscription {
+	public final fun remove ()V
+}
+

@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/public-api/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Execute (approved by Julio 2026-10-30; T1-T3 done)
+**Status**: Execute (approved by Julio 2026-10-30; T1-T4 done)
 
 ---
 
@@ -112,11 +112,11 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `NottiNotification.toString` prints `data` keys only (no values, no title/body text); `equals`/`hashCode` by value
-- [ ] `toPublic` keeps `data` exactly
-- [ ] `NottiLogLevel` maps all six values both ways
-- [ ] `NottiOptions()` has `baseUrl == null`
-- [ ] Dump lists only these types plus `NottiBridge`; no internal type in a signature
+- [x] `NottiNotification.toString` prints `data` keys only (no values, no title/body text); `equals`/`hashCode` by value
+- [x] `toPublic` keeps `data` exactly
+- [x] `NottiLogLevel` maps all six values both ways
+- [x] `NottiOptions()` has `baseUrl == null`
+- [x] Dump lists only these types plus `NottiBridge`; no internal type in a signature
 
 **Tests**: unit
 **Gate**: Quick + `apiCheck`
