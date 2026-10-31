@@ -137,6 +137,8 @@ internal class NottiInAppCoordinator(
     var clickSink: InAppClickSink? = InAppClickSink { NottiInAppClicks.deliver(it) }
     /** Null until the platform action is wired; a `push_permission` tap then only reports and closes. */
     var pushPermissionPort: InAppPushPermissionPort? = null
+    /** Null until the setup wires it; a `url` tap then only reaches the listeners (AD-006). */
+    var urlOpener: InAppUrlOpener? = null
 
     private var client: NottiApiClient? = null
 
@@ -214,8 +216,11 @@ internal class NottiInAppCoordinator(
         } catch (e: Exception) {
             false
         }
-        if (!delivered && !runsPushPermission) logger(NO_LISTENER_WARNING)
+        // AD-006: an accepted http/https `url` is opened by the SDK itself, after the listeners and the close.
+        val url = if (action?.type == "url" && urlOpener?.willOpen(action.value) == true) action.value else null
+        if (!delivered && !runsPushPermission && url == null) logger(NO_LISTENER_WARNING)
         presenter?.close(displayId)
+        if (url != null) urlOpener?.open(url)
         if (runsPushPermission) runPushPermission()
         requestFlush()
     }

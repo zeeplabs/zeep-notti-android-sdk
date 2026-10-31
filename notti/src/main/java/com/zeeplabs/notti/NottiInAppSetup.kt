@@ -52,6 +52,7 @@ internal object NottiInAppSetup {
         val images = NottiInAppImageLoader()
         val tracker = NottiInAppActivityTracker()
         coordinator.presenter = NottiInAppOverlayPresenter(tracker, coordinator, images)
+        coordinator.urlOpener = NottiInAppUrlOpener(application) { NottiRuntime.peek()?.currentActivity?.invoke() }
         application.registerActivityLifecycleCallbacks(tracker)
         application.registerComponentCallbacks(ImageCacheTrimmer(images))
         return coordinator

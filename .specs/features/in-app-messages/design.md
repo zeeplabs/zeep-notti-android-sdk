@@ -50,26 +50,30 @@ RN's sink is called inside the coordinator's main-thread block and returns wheth
 New file `NottiInAppUrlOpener.kt`, the only file the guard allowlists:
 
 ```kotlin
-internal fun interface InAppUrlOpener { fun open(value: String): Boolean }
+internal interface InAppUrlOpener {
+    var enabled: Boolean                 // NottiOptions.opensInAppUrls
+    fun willOpen(value: String): Boolean // enabled && accepts(value); refused while enabled: one debug line
+    fun open(value: String)              // one ACTION_VIEW; failure: one warn line
+}
 
 internal class NottiInAppUrlOpener(
     private val context: Context,                 // application context
     private val currentActivity: () -> Activity?, // NottiRuntime.currentActivity
 ) : InAppUrlOpener {
-    @Volatile var enabled: Boolean = true
-    fun accepts(value: String): Boolean            // http/https, host, no whitespace/control chars, pre-parse
-    override fun open(value: String): Boolean      // true if startActivity was called
+    companion object { fun accepts(value: String): Boolean } // http/https, host, no whitespace/control chars, pre-parse
 }
 ```
+
+The coordinator holds it as `var urlOpener: InAppUrlOpener? = null` (next to `pushPermissionPort`); Setup sets it. (Amended during T8: the port carries `enabled` and `willOpen` so the coordinator asks one question and the facade reaches the option through `NottiInApp.get()?.urlOpener`.)
 
 Coordinator change in `onDisplayClicked` (listed change to ported code):
 
 1. `enqueue click` (unchanged).
 2. `delivered = clickSink.deliver(...)` (unchanged, now synchronous host listeners, D2).
-3. `opens = action?.type == URL && opener?.enabled == true && opener.accepts(action.value)` computed before the warn.
-4. Warn when `!delivered && !runsPushPermission && !opens` (INAPP-11, iOS IOU-05).
+3. `url = action.value` when `action?.type == "url" && urlOpener?.willOpen(action.value) == true`, else null, computed before the warn.
+4. Warn when `!delivered && !runsPushPermission && url == null` (INAPP-11, iOS IOU-05).
 5. `presenter.close` (unchanged).
-6. If `opens`: `opener.open(value)`; failure logged inside the opener with one fixed line, no retry (INAPP-16).
+6. If `url != null`: `urlOpener.open(url)`; failure logged inside the opener with one fixed line, no retry (INAPP-16).
 7. `runPushPermission()` / `requestFlush()` (unchanged).
 
 Refused value with the option on: one fixed `NottiLogger.debug("Notti.inapp: url action not opened")` (INAPP-14). Option off: nothing (INAPP-15). `deeplink`: never reaches the opener.
@@ -94,7 +98,7 @@ The settings intent uses `Settings` actions, not `ACTION_VIEW`, so it does not m
 
 `Notti.initialize`, after `installOnce` and before `runtime.start` (RN `NottiModule.kt:213-225`):
 
-1. `normalized = NottiCore.normalizeBaseUrl(baseUrl)`; if `appId`, `clientKey` not blank and `normalized != null`: `NottiInApp.get()?.onInitialized(appId, clientKey, normalized)` and `NottiInAppSetup.urlOpener?.enabled = options.opensInAppUrls` (every valid initialize applies the value it carries, also an identical config: no re-registration since the core's SDK-07 early return is untouched, INAPP-17).
+1. `normalized = NottiCore.normalizeBaseUrl(baseUrl)`; if `appId`, `clientKey` not blank and `normalized != null`: `NottiInApp.get()?.onInitialized(appId, clientKey, normalized)` and `NottiInApp.get()?.urlOpener?.enabled = options.opensInAppUrls` (every valid initialize applies the value it carries, also an identical config: no re-registration since the core's SDK-07 early return is untouched, INAPP-17).
 2. Wire the push-permission port (D4).
 3. `runtime.start(...)` (unchanged).
 

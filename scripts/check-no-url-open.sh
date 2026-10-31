@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 # Fails when SDK code opens a URL outside the allowlist (PUSH-12): a tapped push's data reaches the host
 # untouched and the SDK never opens it. Only the files listed in ALLOWLIST (exact paths, relative to the repo
-# root) may open a URL; in-app-messages adds the push-permission settings action and the AD-006 URL opener.
+# root) may open a URL: the In-App URL opener (AD-006). The push-permission settings jump uses Settings actions
+# and does not match the pattern. A text check cannot see every indirection (an Intent action held in a
+# variable, a startActivity with a Uri built elsewhere); review covers those.
 #
 # Usage: scripts/check-no-url-open.sh [repo-root]
 set -euo pipefail
 
 root="${1:-$(cd "$(dirname "$0")/.." && pwd)}"
 src="$root/notti/src/main"
-ALLOWLIST=()
+ALLOWLIST=(notti/src/main/java/com/zeeplabs/notti/NottiInAppUrlOpener.kt)
 
 if [[ ! -d "$src" ]]; then
   echo "error: $src not found" >&2
@@ -18,7 +20,7 @@ fi
 # grep exits 0 on a match, 1 on none and 2 on an error; only 1 is a pass.
 set +e
 hits="$(grep -rnE --include='*.kt' --include='*.java' \
-  'ACTION_VIEW|CustomTabsIntent|\.openUri\(|launchUrl\(' "$src")"
+  'ACTION_VIEW|CustomTabsIntent|\.openUri\(|launchUrl\(|Intent\.parseUri' "$src")"
 status=$?
 set -e
 

@@ -176,12 +176,12 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 **Done when**:
 
-- [ ] Accept table: http/https any case with host opens; `tel:`, `mailto:`, custom, `javascript:`, no host, whitespace/control chars, empty refused
-- [ ] Order: listeners → close → one `ACTION_VIEW`; from Activity, else app context + `NEW_TASK`; failure → one fixed warn, no retry
-- [ ] `deeplink` never opened; refused → one debug line without value; disabled → nothing
-- [ ] Warn only when not delivered, not `push_permission` and not opened
-- [ ] `NottiInAppCoordinatorTest` still 54 and unchanged
-- [ ] Guard passes on the tree; self-test shows a non-allowlisted `ACTION_VIEW` fails
+- [x] Accept table: http/https any case with host opens; `tel:`, `mailto:`, custom, `javascript:`, no host, whitespace/control chars, empty refused
+- [x] Order: listeners → close → one `ACTION_VIEW`; from Activity, else app context + `NEW_TASK`; failure → one fixed warn, no retry
+- [x] `deeplink` never opened; refused → one debug line without value; disabled → nothing
+- [x] Warn only when not delivered, not `push_permission` and not opened
+- [x] `NottiInAppCoordinatorTest` still 54 and unchanged
+- [x] Guard passes on the tree; self-test shows a non-allowlisted `ACTION_VIEW` fails (705 tests: +6 opener, +7 coordinator URL)
 
 **Tests**: unit (Robolectric `ShadowApplication`) + script **Gate**: Quick + `scripts/tests/run.sh`
 **Commit**: `feat(inapp): open http/https url actions after the listeners (AD-006)`
