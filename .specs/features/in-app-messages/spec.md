@@ -6,11 +6,11 @@ The Android SDK has the In-App data layer (models, event queue, API calls, core 
 
 ## Goals
 
-- [ ] Every RN 0.8.0 Android In-App behavior works in this SDK, proved by the RN In-App tests ported 1:1 (227 still to port + 9 `NottiPushPermissionActionTest`, same count per class) plus the RN `NottiModuleTest` In-App wiring cases re-expressed against the facade.
-- [ ] Public surface: `Notti.trackEvent`, `Notti.InAppMessages.addClickListener`, `NottiInAppClick`, `NottiInAppAction`, and the `opensInAppUrls` option on `NottiOptions`; usable from Java, guarded by `apiCheck`.
-- [ ] `url` actions with http/https open in the browser after the listeners run (AD-006); everything else is never opened. Enforced by `scripts/check-no-url-open.sh` with exactly one allowlisted file.
-- [ ] No PII in any log line of the engine at any level (AD-011): no message id, event name, URL, device id or token.
-- [ ] The engine works with and without `NottiInitProvider` (hooks installed lazily by `initialize`, as in `public-api`).
+- [x] Every RN 0.8.0 Android In-App behavior works in this SDK, proved by the RN In-App tests ported 1:1 (227 still to port + 9 `NottiPushPermissionActionTest`, same count per class) plus the RN `NottiModuleTest` In-App wiring cases re-expressed against the facade.
+- [x] Public surface: `Notti.trackEvent`, `Notti.InAppMessages.addClickListener`, `NottiInAppClick`, `NottiInAppAction`, and the `opensInAppUrls` option on `NottiOptions`; usable from Java, guarded by `apiCheck`.
+- [x] `url` actions with http/https open in the browser after the listeners run (AD-006); everything else is never opened. Enforced by `scripts/check-no-url-open.sh` with exactly one allowlisted file.
+- [x] No PII in any log line of the engine at any level (AD-011): no message id, event name, URL, device id or token.
+- [x] The engine works with and without `NottiInitProvider` (hooks installed lazily by `initialize`, as in `public-api`).
 
 ## Out of Scope
 
@@ -142,18 +142,18 @@ The Android SDK has the In-App data layer (models, event queue, API calls, core 
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| INAPP-01..08 | P1: Messages shown per session | Design | Pending |
-| INAPP-09..12 | P1: Host events and clicks | Design | Pending |
-| INAPP-13..18 | P1: URL actions | Design | Pending |
-| INAPP-19 | P1: Push-permission button | Design | Pending |
-| INAPP-20 | P2: Documentation | Design | Pending |
+| INAPP-01..08 | P1: Messages shown per session | Execute | Done (T1-T6) |
+| INAPP-09..12 | P1: Host events and clicks | Execute | Done (T7, T9) |
+| INAPP-13..18 | P1: URL actions | Execute | Done (T8, T9) |
+| INAPP-19 | P1: Push-permission button | Execute | Done (T4, T5, T9) |
+| INAPP-20 | P2: Documentation | Execute | Done (T11) |
 
-**Coverage:** 20 total, 0 mapped to tasks.
+**Coverage:** 20 total, 20 mapped to tasks and tests (`traceability.md`).
 
 ---
 
 ## Success Criteria
 
-- [ ] Ported In-App test counts equal RN per class (276 In-App + 9 push-permission), plus new facade/URL tests; total test count only grows.
-- [ ] Full gate green: spotless, lint, tests, `apiCheck`, publish, example against the published AAR, scripts (with the URL guard allowlist).
-- [ ] `scripts/port-diff.sh` shows only listed changes for each ported file.
+- [x] Ported In-App test counts equal RN per class (276 In-App + 9 push-permission), plus new facade/URL tests; total test count only grows.
+- [x] Full gate green: spotless, lint, tests, `apiCheck`, publish, example against the published AAR, scripts (with the URL guard allowlist).
+- [x] `scripts/port-diff.sh` shows only listed changes for each ported file.

@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/in-app-messages/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: In progress
+**Status**: Done 2026-10-31 (T1-T12, local branch `feat/in-app-messages`, 718 tests, Full gate green)
 
 ---
 
@@ -250,7 +250,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 **Done when**:
 
-- [ ] 20/20 mapped; Full gate green
+- [x] 20/20 mapped; Full gate green
 
 **Tests**: none **Gate**: Full
 **Commit**: `docs(specs): in-app-messages traceability`

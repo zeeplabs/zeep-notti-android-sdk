@@ -36,6 +36,8 @@ Coverage (2026-10-28, `core-port`): 318 unit tests. 257 ported 1:1 from RN v0.8.
 
 Coverage (2026-10-30, `public-api`): 444 unit tests (390 after `push-integration`, +54). New: facade (`NottiFacadeTest`, `NottiUserFacadeTest`, `NottiNotificationsFacadeTest`, `NottiPermissionFacadeTest`), `NottiListenersTest`, `NottiPublicTypesTest`, `NottiProcessHooksTest`, the first Java test (`NottiJavaInteropTest.java`, compiled by `compileDebugUnitTestJavaWithJavac`), plus runtime, lifecycle-listener and log-privacy cases. Map: `.specs/features/public-api/traceability.md`.
 
+Coverage (2026-10-31, `in-app-messages`): 718 unit tests (+274). 236 ported 1:1 from RN v0.8.0 in eleven classes (In-App session, display clock, style, image loader, coordinator, presenter + lifecycle, view factory, push-permission action + settings intent, end-to-end), counts equal to RN. New: `NottiInAppClicksTest`, `NottiInAppUrlOpenerTest`, `NottiInAppCoordinatorUrlTest` (the coordinator's URL change, kept out of the ported class), `NottiInAppFacadeTest` (RN `NottiModuleTest` In-App cases), plus listener, public-type, process-hook, runtime and log-privacy cases. The URL guard has self-tests for its real allowlist. Map: `.specs/features/in-app-messages/traceability.md`.
+
 ## Parallelism Assessment
 
 | Test Type | Parallel-Safe | Why |

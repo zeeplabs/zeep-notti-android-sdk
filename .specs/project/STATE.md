@@ -1,7 +1,7 @@
 # State
 
-**Last Updated:** 2026-10-30
-**Current Work:** `public-api` Execute done (branch `feat/public-api`, local, 2026-10-30): T1..T11 committed, 444 tests, full gate green; awaiting Julio's review and OK to push/open the PR. Next feature on the roadmap after merge. `push-integration` merged (PR #3, `d5ab683`, admin, 2026-10-29); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
+**Last Updated:** 2026-10-31
+**Current Work:** `in-app-messages` Execute done (branch `feat/in-app-messages`, local, 2026-10-31): T1..T12 committed, 718 tests, Full gate green; awaiting Julio's review and OK to push/open the PR. Next on the roadmap: `example-and-release`. `public-api` merged (PR #4, `8abc0d9`, admin); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
 
 ---
 
@@ -134,6 +134,11 @@ Carried from `zeep-notti-ios-sdk` (`.specs/LESSONS.md`, candidates there), to ap
 - An architectural invariant needs a CI check that fails on the forbidden edge (e.g. no `com.notti` package, no URL open outside the allowlist); build success does not prove it.
 - Guard scripts fail on missing inputs, distinguish grep exit 1 from 2, and run on the CI's own OS.
 - Persistence identifiers used only by production wiring (the `notti_prefs` file name) need their own golden test; per-test stores never exercise them.
+
+From this repo:
+
+- Never run `spotlessApply` while a ported file is uncommitted and has no `@file:Suppress` block yet: it reformats RN code and breaks the port diff. Add the suppressions first (or commit), then apply; check which files it touched (in-app-messages T6, 2026-10-31).
+- A ported file's dependencies decide the task order, not the file size: map each file's references before splitting port tasks (`NottiInAppAccessibility` needed the view factory, in-app-messages T2).
 
 ---
 

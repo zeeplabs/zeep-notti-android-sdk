@@ -26,7 +26,7 @@
 - `sdk_version` becomes a native constant; package `com.notti` becomes `com.zeeplabs.notti`
 - Port the JUnit suite 1:1, traceable to the RN requirement IDs (SDK-, SDKCTR-, SDKOPEN-, SEGTEL-, DPF-)
 
-**public-api** - Execute done (2026-10-30, local branch `feat/public-api`, T1..T11; 444 tests, full gate green; awaiting review/PR)
+**public-api** - Done (PR #4, `8abc0d9`, 2026-10-31; 444 tests)
 
 - Kotlin facade: `Notti.initialize`, `login`/`logout`, `Notti.User` (tags, email, phone), subscription, location sharing, `Notti.Notifications` (requestPermission, listeners, initial click), device id accessor and observer (`trackEvent` moved to `in-app-messages`, as on iOS)
 - `initialize` installs the process hooks when the host removed `NottiInitProvider`
@@ -39,12 +39,12 @@
 - `NottiBridge` manual forwarding for hosts with their own FCM service; documented manifest opt-out
 - `POST_NOTIFICATIONS` flow on API 33+; a tapped push's `data` reaches the host untouched, the SDK never opens it
 
-**in-app-messages** - PLANNED
+**in-app-messages** - Execute done (2026-10-31, local branch `feat/in-app-messages`, T1..T12; 718 tests, full gate green; awaiting review/PR)
 
 - `Notti.trackEvent`, `Notti.InAppMessages.addClickListener` and the URL-open initialize option (moved from `public-api`)
 - Port the RN In-App engine (session, coordinator, presenter, view factory, style, image loader, event store, accessibility)
 - `push_permission` button; `url` actions opened in the browser with the iOS AD-020 allowlist and an option to turn it off (AD-006)
-- Guard script: no URL open outside the two allowlisted files
+- Guard script: no URL open outside the one allowlisted file (AD-006 amended)
 
 **example-and-release** - PLANNED
 

@@ -207,7 +207,7 @@ No RN test of a ported class was dropped.
 
 | Item | Owner | Note |
 | --- | --- | --- |
-| `NottiForegroundObserverTest` `onStop with no live core still ends the In-App session`: coordinator-backed version (`session.isOpen`) | in-app-messages | Here it uses a recording `NottiInAppLifecycle` and asserts `onSessionEnded` + `onAppBackgrounded` |
+| ~~`NottiForegroundObserverTest` `onStop with no live core still ends the In-App session`: coordinator-backed version (`session.isOpen`)~~ | in-app-messages | Closed 2026-10-31 (in-app-messages T6): RN's coordinator-backed version restored, reached through the runtime's default `inAppLifecycle` |
 | SDK-04 build-time `google-services.json` resolution and host-facing error wording | push-integration / public-api | Core runtime path covered by `G#sdk04…` |
 | SDK-08 real OS dialog; SDK-11 below-33 auto-grant (`permissionRequester`) | push-integration | Runtime default requester answers `false` without prompting |
 | SDK-12/13 `Notti.User` tag facade | public-api | Core merge covered |
