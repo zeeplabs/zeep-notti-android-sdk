@@ -25,6 +25,10 @@ internal object NottiProcessHooks {
      */
     private var installedOn: WeakReference<Application>? = null
 
+    /** Installs the In-App engine. Test seam; production never reassigns it. */
+    @Volatile
+    internal var inAppInstaller: (Application) -> Unit = { NottiInAppSetup.install(it) }
+
     /** Installs every hook once per [application]; each step fails alone, logged by class (SDK-03). */
     @Synchronized
     fun installOnce(application: Application) {
@@ -46,7 +50,13 @@ internal object NottiProcessHooks {
             NottiLogger.error("Notti: could not create the runtime - ${t.javaClass.simpleName}")
         }
 
-        // In-App: `in-app-messages` installs NottiInAppSetup here.
+        // In-App: installed before any Activity so the tracker sees the first
+        // resume. Process-wide, it outlives every core.
+        try {
+            inAppInstaller(application)
+        } catch (t: Throwable) {
+            NottiLogger.error("Notti: could not set up In-App messages - ${t.javaClass.simpleName}")
+        }
 
         // Flush the queued event store when connectivity returns - the reporting
         // path for events enqueued while offline (T4). Registered once per

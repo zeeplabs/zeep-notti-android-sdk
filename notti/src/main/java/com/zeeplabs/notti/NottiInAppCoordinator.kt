@@ -593,6 +593,25 @@ internal object NottiInApp {
         }
     }
 
+    /** The runtime's default [NottiRuntime.inAppLifecycle]; forwards to whichever coordinator is installed. */
+    val lifecycle: NottiInAppLifecycle = object : NottiInAppLifecycle {
+        override fun onAppForegrounded() {
+            get()?.onAppForegrounded()
+        }
+
+        override fun onSessionEnded() {
+            get()?.onSessionEnded()
+        }
+
+        override fun onAppBackgrounded() {
+            get()?.onAppBackgrounded()
+        }
+
+        override fun onNetworkAvailable() {
+            get()?.onNetworkAvailable()
+        }
+    }
+
     @Synchronized
     internal fun resetForTests() {
         instance = null

@@ -137,11 +137,11 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 **Done when**:
 
-- [ ] Provider path and lazy `initialize` path both install exactly one coordinator
-- [ ] Core `onSessionStarted`/`onRegistered` reach the coordinator; foreground/background/network reach it through the runtime
-- [ ] onStop with no live core ends the In-App session
-- [ ] Setup throwing does not break the other hooks
-- [ ] 3 ported + new tests pass (→ ~683)
+- [x] Provider path and lazy `initialize` path both install exactly one coordinator
+- [x] Core `onSessionStarted`/`onRegistered` reach the coordinator; foreground/background/network reach it through the runtime
+- [x] onStop with no live core ends the In-App session (RN's coordinator-backed case restored in place of the core-port recording version)
+- [x] Setup throwing does not break the other hooks
+- [x] 3 ported + new tests pass (→ 683: +3 EndToEnd, +1 ProcessHooks, +2 Runtime; `IP#aThrowingStepDoesNotStopTheOthersNorCrash` now expects 4 failed steps, `R#observersReachTheRuntimeThroughPeek` the forwarder)
 
 **Tests**: unit (Robolectric, MockWebServer) **Gate**: Quick, then all tests
 **Commit**: `feat(inapp): install the In-App engine with the process hooks`

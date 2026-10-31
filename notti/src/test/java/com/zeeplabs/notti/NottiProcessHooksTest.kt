@@ -9,6 +9,8 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,6 +39,7 @@ class NottiProcessHooksTest {
 
     @After
     fun tearDown() {
+        NottiProcessHooks.inAppInstaller = { NottiInAppSetup.install(it) }
         NottiLogger.sink = NottiLogger.defaultSink
         processLifecycle.removeObserver(NottiForegroundObserver)
         NottiActivityLifecycleListener.resetRegistrationForTest()
@@ -54,10 +57,13 @@ class NottiProcessHooksTest {
         val observersBefore = processLifecycle.observerCount
 
         NottiProcessHooks.installOnce(app)
+        val inApp = NottiInApp.get()
         NottiProcessHooks.installOnce(app)
         shadowOf(Looper.getMainLooper()).idle()
 
         assertNotNull(NottiRuntime.peek())
+        assertNotNull(inApp)
+        assertSame(inApp, NottiInApp.get())
         assertEquals(callbacksBefore + 1, connectivityCallbacks())
         assertEquals(observersBefore + 1, processLifecycle.observerCount)
         assertEquals(emptyList<String>(), logged)
@@ -69,11 +75,30 @@ class NottiProcessHooksTest {
         val observersBefore = processLifecycle.observerCount
 
         Robolectric.buildContentProvider(NottiInitProvider::class.java).create()
+        val inApp = NottiInApp.get()
         NottiProcessHooks.installOnce(app)
         shadowOf(Looper.getMainLooper()).idle()
 
+        assertNotNull(inApp)
+        assertSame(inApp, NottiInApp.get())
         assertEquals(callbacksBefore + 1, connectivityCallbacks())
         assertEquals(observersBefore + 1, processLifecycle.observerCount)
         assertEquals(emptyList<String>(), logged)
+    }
+
+    @Test
+    fun aFailingInAppSetupDoesNotBreakTheOtherHooks() {
+        val callbacksBefore = connectivityCallbacks()
+        val observersBefore = processLifecycle.observerCount
+        NottiProcessHooks.inAppInstaller = { throw IllegalStateException("sentinel-detail") }
+
+        NottiProcessHooks.installOnce(app)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertNotNull(NottiRuntime.peek())
+        assertEquals(callbacksBefore + 1, connectivityCallbacks())
+        assertEquals(observersBefore + 1, processLifecycle.observerCount)
+        assertEquals(listOf("Notti: could not set up In-App messages - IllegalStateException"), logged)
+        assertTrue(logged.none { it.contains("sentinel-detail") })
     }
 }
