@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/example-and-release/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: In progress (T1-T3 done)
+**Status**: In progress (T1-T4 done)
 
 ---
 
@@ -111,11 +111,12 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Self-test cases of D3 pass; exit 1 vs exit 2 distinguished
-- [ ] Passes on the repo; removing one call from the example makes it fail naming the member (checked, then reverted)
+- [x] Self-test cases of D3 pass; exit 1 vs exit 2 distinguished
+- [x] Passes on the repo; removing one call from the example makes it fail naming the member (checked, then reverted)
 
 **Tests**: script self-test **Gate**: Example
 **Commit**: `ci: fail when the example does not call a public method`
+**Status**: Done. Fixtures are built inline in the self-test's temp dirs (as the other self-tests do), not under `scripts/tests/fixtures/`. A getter/setter name also covers its property (Java sources). Removing `Notti.User.clearPhone()` failed naming it; reverted.
 
 ---
 

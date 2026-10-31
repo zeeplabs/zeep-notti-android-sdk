@@ -36,6 +36,10 @@ jobs:
       - name: No URL opening (PUSH-12)
         run: scripts/check-no-url-open.sh
 
+      # The example apps reference every public member in notti/api/notti.api (EXR-02).
+      - name: Example covers the public API (EXR-02)
+        run: scripts/check-example-coverage.sh
+
       # google-services.json and notti.properties hold an integrator's ids and keys; they stay local (EXR-06).
       - name: No tracked app config (EXR-06)
         run: scripts/check-no-tracked-config.sh
