@@ -150,28 +150,28 @@ All M1 SDK code is merged (`package-foundation`, `core-port`, `push-integration`
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| EXR-01 | Example app | Design | Pending |
-| EXR-02 | Example app | Design | Pending |
-| EXR-03 | Example app | Design | Pending |
-| EXR-04 | Example app | Design | Pending |
-| EXR-05 | Example app | Design | Pending |
-| EXR-06 | Example app | Design | Pending |
-| EXR-07 | README | Design | Pending |
-| EXR-08 | README | Design | Pending |
-| EXR-09 | README | Design | Pending |
-| EXR-10 | README | Design | Pending |
-| EXR-11 | README | Design | Pending |
-| EXR-12 | Device checklist | Design | Pending |
-| EXR-13 | Device checklist | Design | Pending |
-| EXR-14 | Release preparation | Design | Pending |
-| EXR-15 | Release preparation | Design | Pending |
-| EXR-16 | Release preparation | Design | Pending |
-| EXR-17 | Release preparation | Design | Pending |
-| EXR-18 | Release preparation | Design | Pending |
-| EXR-19 | Release preparation | Design | Pending |
-| EXR-20 | CI | Design | Pending |
+| EXR-01 | Example app | Tasks | In Tasks |
+| EXR-02 | Example app | Tasks | In Tasks |
+| EXR-03 | Example app | Tasks | In Tasks |
+| EXR-04 | Example app | Tasks | In Tasks |
+| EXR-05 | Example app | Tasks | In Tasks |
+| EXR-06 | Example app | Tasks | In Tasks |
+| EXR-07 | README | Tasks | In Tasks |
+| EXR-08 | README | Tasks | In Tasks |
+| EXR-09 | README | Tasks | In Tasks |
+| EXR-10 | README | Tasks | In Tasks |
+| EXR-11 | README | Tasks | In Tasks |
+| EXR-12 | Device checklist | Tasks | In Tasks |
+| EXR-13 | Device checklist | Tasks | In Tasks |
+| EXR-14 | Release preparation | Tasks | In Tasks |
+| EXR-15 | Release preparation | Tasks | In Tasks |
+| EXR-16 | Release preparation | Tasks | In Tasks |
+| EXR-17 | Release preparation | Tasks | In Tasks |
+| EXR-18 | Release preparation | Tasks | In Tasks |
+| EXR-19 | Release preparation | Tasks | In Tasks |
+| EXR-20 | CI | Tasks | In Tasks |
 
-**Coverage:** 20 total, 0 mapped to tasks.
+**Coverage:** 20 total, 20 mapped to tasks (see `tasks.md`).
 
 Carried in from earlier features: SDKOPEN-11 and DLOG-22 docs (core-port), PUSH-08 final wording and the device checks (push-integration), `google-services.json` guidance and the final README (public-api), the In-App device checks (in-app-messages), the upgrade-path check (core-port SDK device id story).
 

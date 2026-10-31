@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-10-31
-**Current Work:** `example-and-release` Specify (branch `feat/example-and-release`, 2026-10-31): spec written, awaiting Julio's approval. `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
+**Current Work:** `example-and-release` design and tasks written (branch `feat/example-and-release`, 2026-10-31; spec approved by Julio), awaiting approval to execute T1..T11. `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
 
 ---
 
