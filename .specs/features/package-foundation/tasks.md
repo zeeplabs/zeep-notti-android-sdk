@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/package-foundation/design.md`
 **Testing**: `.specs/codebase/TESTING.md` (created by T13; until then the matrix below is authoritative)
-**Status**: In Progress (T1-T11, T13 done 2026-10-28; T12 CI proof waits for the remote and a PR)
+**Status**: Done (T1-T11, T13 2026-10-28; T12 CI proof 2026-10-31)
 
 ---
 
@@ -288,7 +288,7 @@ T12 → T13
 **Done when**:
 
 - [x] `actionlint` clean; Full gate passes locally (2026-10-28, including the AAR/POM step run as a script)
-- [ ] After Julio OKs creating the remote and opening a PR: one green run, and red runs proven (2026-10-31, PR #6: green run and failing-test red done; lint, ABI, version drift and `com.notti` left) for a failing test, a lint error, an ABI change without dump, a version drift and a `com.notti` package (throwaway commits, then dropped)
+- [x] After Julio OKs creating the remote and opening a PR: one green run, and red runs proven (2026-10-31). Green and failing-test red: PR #6 (runs 41226597871, 41217003666). Throwaway draft PRs closed unmerged: lint #7 ("Style and lint"), ABI #8 ("Public API dump"), version drift #9 ("Version drift"), `com.notti` #10 ("No com.notti package", and "AAR and POM contents" also failed) for a failing test, a lint error, an ABI change without dump, a version drift and a `com.notti` package (throwaway commits, then dropped)
 
 **Tests**: none
 **Gate**: Full + CI run

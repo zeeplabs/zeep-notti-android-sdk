@@ -12,7 +12,7 @@
 
 ### Features
 
-**package-foundation** - DONE except the CI proof (2026-10-28: PR #1 merged with `--admin`, full gate green locally; open: T12 red proofs for lint, ABI, version drift and `com.notti`; CI runs since 2026-10-31, green and failing-test red proven on PR #6)
+**package-foundation** - DONE (2026-10-28: PR #1 merged with `--admin`; T12 CI green/red proof done 2026-10-31 on PRs #6..#10)
 
 - Gradle (KTS) project, version catalog, library module `:notti` (namespace `com.zeeplabs.notti`, AAR), example module placeholder
 - `minSdk 24`, `compileSdk 36`, Java 17, Kotlin 2.0.x; consumer R8 rules; manifest skeleton

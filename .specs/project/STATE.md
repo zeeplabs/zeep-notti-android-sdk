@@ -139,7 +139,7 @@
 
 **Discovered:** 2026-10-28, PR #1 run 40792894429
 **Resolved:** 2026-10-31. CI ran on PR #6: the first run went red on a racy test (`NottiRuntimeTest.registrationSyncSendsTheSdkVersionConstant`, fixed in `191b8df`), the second went green (run 41226597871).
-**Left over:** `package-foundation` T12 red proofs for a lint error, an ABI change without dump, a version drift and a `com.notti` package (the failing-test proof happened on PR #6).
+**Follow-up:** `package-foundation` T12 closed the same day: red proofs for lint, ABI, version drift and `com.notti` on throwaway PRs #7..#10, closed unmerged.
 **Note:** PRs #1..#5 were merged with `--admin` without CI on Julio's decision, after the full gate passed locally.
 
 ---
