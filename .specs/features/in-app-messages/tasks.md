@@ -96,16 +96,16 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 ### T4: Port coordinator, presenter and view factory
 
-**What**: Port `NottiInAppCoordinator.kt` (coordinator, `InAppTiming`, `NottiInAppScheduler`, `NottiInApp` holder, ports), `NottiInAppPresenter.kt`, `NottiInAppViewFactory.kt`, `NottiInAppAccessibility.kt` (moved from T2; RN-public `NottiInAppAccessibility` and `InAppSiblingRestore` become `internal`; no RN test of its own, covered by the ViewFactory/Presenter tests) and their tests. Listed changes: the coordinator's default `clickSink` is `null` (RN pointed at `NottiModule.emitInAppClick`); `NottiInAppHooks` stays in its existing file (remove the duplicate declaration from the ported coordinator, D7). No behavior change.
+**What**: Port `NottiInAppCoordinator.kt` (coordinator, `InAppTiming`, `NottiInAppScheduler`, `NottiInApp` holder, ports), `NottiInAppPresenter.kt`, `NottiInAppViewFactory.kt`, `NottiInAppAccessibility.kt` (moved from T2; RN-public `NottiInAppAccessibility` and `InAppSiblingRestore` become `internal`; no RN test of its own, covered by the ViewFactory/Presenter tests) and their tests. Listed changes: the coordinator's default `clickSink` is `InAppClickSink { false }` until T7 points it at `NottiInAppClicks` (RN pointed at `NottiModule.emitInAppClick`, which returns false with no live module; the ported test `the default click sink reports no listener when no module is live` needs a non-null default); `NottiInAppHooks` stays in its existing file (remove the duplicate declaration from the ported coordinator, D7). No behavior change.
 **Where**: the four files + `NottiInAppCoordinatorTest.kt`, `NottiInAppPresenterTest.kt` (both classes), `NottiInAppViewFactoryTest.kt`
 **Depends on**: T3
 **Requirement**: INAPP-01..06, INAPP-10 (RN order)
 
 **Done when**:
 
-- [ ] Port diff shows only the listed changes
-- [ ] 54 + 22 + 6 + 53 ported tests pass (→ 668)
-- [ ] Lint findings RN has suppressed per file, not fixed
+- [x] Port diff shows only the listed changes
+- [x] 54 + 22 + 6 + 53 ported tests pass (→ 668)
+- [x] Lint findings RN has suppressed per file, not fixed (ViewFactory: `NewApi` (the `DisplayCutout` reads are behind `SDK_INT >= 28` and a null cutout), `RtlHardcoded` (server `left`/`right` alignment), `UseKtx`, `ViewConstructor`; Accessibility: `UseKtx`)
 
 **Tests**: unit (Robolectric) **Gate**: Quick (the three classes, then all tests)
 **Commit**: `feat(inapp): port the In-App coordinator, presenter and view factory`
