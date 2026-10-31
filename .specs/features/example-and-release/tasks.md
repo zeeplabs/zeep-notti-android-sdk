@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/example-and-release/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: In progress (T1-T5 done)
+**Status**: In progress (T1-T6 done)
 
 ---
 
@@ -149,11 +149,12 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Every EXR-12 item present; every `STATE.md` todo and traceability gap it closes cited
-- [ ] Steps use only example controls, `adb` and the Notti dashboard
+- [x] Every EXR-12 item present; every `STATE.md` todo and traceability gap it closes cited
+- [x] Steps use only example controls, `adb` and the Notti dashboard
 
 **Tests**: review **Gate**: none
 **Commit**: `docs: device checklist for 0.1.0`
+**Status**: Done. 25 items (DC-01..DC-25), plus DC-02 (not-configured state). Some items need a temporary, uncommitted change (provider removal, `singleTop`, `opensInAppUrls = false`, RN upgrade `applicationId`). DC-05 (location) has a Not run box: the example declares no location permission.
 
 ---
 
