@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/example-and-release/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: In progress (T1-T7 done)
+**Status**: In progress (T1-T8 done)
 
 ---
 
@@ -187,12 +187,13 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `actionlint` clean if available, else both files parse as YAML and the job graph is reviewed
-- [ ] No secret echoed; env vars passed only to the upload step
-- [ ] The tag pattern rejects `v0.1.0` and accepts `0.1.0`
+- [x] `actionlint` clean if available, else both files parse as YAML and the job graph is reviewed
+- [x] No secret echoed; env vars passed only to the upload step
+- [x] The tag pattern rejects `v0.1.0` and accepts `0.1.0`
 
 **Tests**: static **Gate**: none (cannot run before B-001/B-002)
 **Commit**: `ci: release workflow uploads a signed 0.1.0 to the Central Portal on tag`
+**Status**: Done (static only: `actionlint` not installed, both files parse; tag pattern checked as a regex: `0.1.0` yes, `v0.1.0`/`0.1.0-rc1` no). Deviation from D8: the release concurrency group is `release-upload-<ref>`, because GitHub concurrency groups are case-insensitive and the called CI's group `Release-<ref>` would collide with `release-<ref>`.
 
 ---
 

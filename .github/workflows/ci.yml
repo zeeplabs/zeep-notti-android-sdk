@@ -4,7 +4,8 @@ on:
   pull_request:
   push:
     branches: [main]
-    tags: ['*']
+  # Tags run CI once, through release.yml.
+  workflow_call:
 
 permissions:
   contents: read
