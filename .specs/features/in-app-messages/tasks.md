@@ -61,19 +61,19 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 ---
 
-### T2: Port `NottiInAppStyle` and `NottiInAppAccessibility`
+### T2: Port `NottiInAppStyle`
 
-**What**: Port both files (RN-public `NottiInAppAccessibility` and `InAppSiblingRestore` become `internal`) and `NottiInAppStyleTest`.
-**Where**: `NottiInAppStyle.kt`, `NottiInAppAccessibility.kt`, `NottiInAppStyleTest.kt`
+**What**: Port `NottiInAppStyle.kt` and `NottiInAppStyleTest`. (Planned with `NottiInAppAccessibility`; that file reads `InAppMessageViews` from the view factory, so it moved to T4: SPEC_DEVIATION, plan order only.)
+**Where**: `NottiInAppStyle.kt`, `NottiInAppStyleTest.kt`
 **Depends on**: T1
 **Requirement**: INAPP-03
 
 **Done when**:
 
-- [ ] Port diff clean; 19 tests pass (→ 513). Accessibility has no RN test of its own; it is covered by T4's ViewFactory/Presenter tests
+- [x] Port diff clean; 19 tests pass (→ 513)
 
 **Tests**: unit (JUnit) **Gate**: Quick
-**Commit**: `feat(inapp): port the In-App style and accessibility helpers`
+**Commit**: `feat(inapp): port the In-App style helpers`
 
 ---
 
@@ -96,8 +96,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 ### T4: Port coordinator, presenter and view factory
 
-**What**: Port `NottiInAppCoordinator.kt` (coordinator, `InAppTiming`, `NottiInAppScheduler`, `NottiInApp` holder, ports), `NottiInAppPresenter.kt`, `NottiInAppViewFactory.kt` and their tests. Listed changes: the coordinator's default `clickSink` is `null` (RN pointed at `NottiModule.emitInAppClick`); `NottiInAppHooks` stays in its existing file (remove the duplicate declaration from the ported coordinator, D7). No behavior change.
-**Where**: the three files + `NottiInAppCoordinatorTest.kt`, `NottiInAppPresenterTest.kt` (both classes), `NottiInAppViewFactoryTest.kt`
+**What**: Port `NottiInAppCoordinator.kt` (coordinator, `InAppTiming`, `NottiInAppScheduler`, `NottiInApp` holder, ports), `NottiInAppPresenter.kt`, `NottiInAppViewFactory.kt`, `NottiInAppAccessibility.kt` (moved from T2; RN-public `NottiInAppAccessibility` and `InAppSiblingRestore` become `internal`; no RN test of its own, covered by the ViewFactory/Presenter tests) and their tests. Listed changes: the coordinator's default `clickSink` is `null` (RN pointed at `NottiModule.emitInAppClick`); `NottiInAppHooks` stays in its existing file (remove the duplicate declaration from the ported coordinator, D7). No behavior change.
+**Where**: the four files + `NottiInAppCoordinatorTest.kt`, `NottiInAppPresenterTest.kt` (both classes), `NottiInAppViewFactoryTest.kt`
 **Depends on**: T3
 **Requirement**: INAPP-01..06, INAPP-10 (RN order)
 
