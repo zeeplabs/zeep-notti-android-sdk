@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-10-31
-**Current Work:** `example-and-release` executed (T1..T11, local branch `feat/example-and-release`, 2026-10-31), awaiting push/PR by Julio. Release 0.1.0 waits on the device checklist (`docs/DEVICE_CHECKLIST.md`), Data safety confirmation (AD-011), B-001 and a release path (CI or the local fallback in `docs/RELEASING.md` while B-002 is open). `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
+**Current Work:** M1 code complete. `example-and-release` merged (PR #6, `d1f1cad`, admin, CI green, 2026-10-31). Release 0.1.0 waits on the device checklist (`docs/DEVICE_CHECKLIST.md`), Data safety confirmation (AD-011) and B-001; Julio picks the release path (CI or the local fallback in `docs/RELEASING.md`). `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI runs since PR #6 (B-002 resolved).
 
 ---
 
@@ -131,13 +131,16 @@
 **Workaround:** Local Maven repository / `mavenLocal()` for the example app and RN M2 experiments.
 **Resolution:** Confirm the domain that owns `com.zeeplabs`, add the Central Portal DNS TXT record, generate the signing key.
 
-### B-002: GitHub Actions does not start jobs (billing)
+---
+
+## Resolved Blockers
+
+### B-002: GitHub Actions did not start jobs (billing)
 
 **Discovered:** 2026-10-28, PR #1 run 40792894429
-**Impact:** Blocks `package-foundation` T12 (CI green/red proof) and every CI gate until resolved. Same block the iOS repo had.
-**Workaround:** the full gate runs locally (TESTING.md "Full"), including the CI AAR/POM step as a script.
-**Resolution:** fix the payment method or spending limit in the `zeeplabs` organization's Billing & plans, then run CI on `main` and do the T12 red/green proof on a throwaway PR.
-**Note:** PR #1 was merged with `--admin` without CI on Julio's decision (2026-10-28), after the full gate passed locally.
+**Resolved:** 2026-10-31. CI ran on PR #6: the first run went red on a racy test (`NottiRuntimeTest.registrationSyncSendsTheSdkVersionConstant`, fixed in `191b8df`), the second went green (run 41226597871).
+**Follow-up:** `package-foundation` T12 closed the same day: red proofs for lint, ABI, version drift and `com.notti` on throwaway PRs #7..#10, closed unmerged.
+**Note:** PRs #1..#5 were merged with `--admin` without CI on Julio's decision, after the full gate passed locally.
 
 ---
 

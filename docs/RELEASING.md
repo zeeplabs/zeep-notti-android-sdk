@@ -5,7 +5,7 @@ How Julio releases `com.zeeplabs:notti-android` to Maven Central (AD-015). The a
 Two equivalent upload paths:
 
 - **CI:** pushing a `X.Y.Z` tag runs `.github/workflows/release.yml` (full CI, then the upload).
-- **Local fallback:** the same Gradle task from Julio's machine, while GitHub Actions is blocked (B-002).
+- **Local fallback:** the same Gradle task from Julio's machine, when the CI path is not available.
 
 Both upload a signed deployment **without releasing it** (`publishToMavenCentral`, never `publishAndReleaseToMavenCentral`).
 
@@ -77,7 +77,7 @@ The key is not stored there: it is exported into the shell for the upload only (
 
 1. The [device checklist](DEVICE_CHECKLIST.md) is run and recorded; every Fail is fixed or listed in the README's known limitations.
 2. Play Data safety wording in the README confirmed (AD-011). Proposed ADs confirmed (AD-005, AD-008..AD-011).
-3. B-001 closed (namespace verified). Release path chosen: CI, or the local fallback while B-002 is open.
+3. B-001 closed (namespace verified). Release path chosen: CI or the local fallback.
 4. In the release PR: date the CHANGELOG section (`## [0.1.0] - YYYY-MM-DD`) and drop the README banner's "Until the release is published" sentence. `scripts/check-version.sh` checks both on the tag build.
 5. Run the Full gate (`.specs/codebase/TESTING.md`), including `scripts/check-release-artifacts.sh`. Merge the PR into `main`.
 
