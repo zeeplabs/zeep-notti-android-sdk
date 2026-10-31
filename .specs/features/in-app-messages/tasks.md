@@ -150,17 +150,17 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 ### T7: Public click types and synchronous delivery (D2, D6)
 
-**What**: `NottiListeners.dispatchNow(value): Boolean`; `NottiInAppClicks` (listeners + `deliver(InAppClick): Boolean`, internal→public mapping); public `NottiInAppClick`, `NottiInAppAction` (+ `Type`), `NottiInAppClickListener`. Setup sets `coordinator.clickSink`.
-**Where**: `NottiListeners.kt`, `NottiInAppClicks.kt`, `NottiInAppClick.kt`, `NottiInAppAction.kt`, `NottiInAppClickListener.kt`, `NottiInAppSetup.kt`, tests, `notti.api`
+**What**: `NottiListeners.dispatchNow(value): Boolean`; `NottiInAppClicks` (listeners + `deliver(InAppClick): Boolean`, internal→public mapping); public `NottiInAppClick`, `NottiInAppAction` (+ `Type`), `NottiInAppClickListener`. The coordinator's default `clickSink` becomes `InAppClickSink { NottiInAppClicks.deliver(it) }` (RN's default shape, `NottiModule.emitInAppClick`; replaces T4's `{ false }`), so Setup is unchanged.
+**Where**: `NottiListeners.kt`, `NottiInAppClicks.kt`, `NottiInAppClick.kt`, `NottiInAppAction.kt`, `NottiInAppClickListener.kt`, `NottiInAppCoordinator.kt` (default sink), tests, `notti.api`
 **Depends on**: T6
 **Requirement**: INAPP-10, INAPP-12
 
 **Done when**:
 
-- [ ] `dispatchNow` calls entries on the current thread, isolates a throwing one, returns false with none
-- [ ] A click reaches every listener before `presenter.close`; payload maps `push_permission` to `action == null`
-- [ ] `toString` has no `messageId` or action value
-- [ ] `apiDump` reviewed
+- [x] `dispatchNow` calls entries on the current thread, isolates a throwing one, returns false with none
+- [x] A click reaches every listener before `presenter.close`; payload maps `push_permission` to `action == null`
+- [x] `toString` has no `messageId` or action value
+- [x] `apiDump` reviewed (additive: the three public types, no public constructor)
 
 **Tests**: unit **Gate**: Quick + `apiCheck`
 **Commit**: `feat(inapp): deliver In-App clicks to host listeners`

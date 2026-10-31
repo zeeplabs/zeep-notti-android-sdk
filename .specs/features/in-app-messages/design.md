@@ -14,7 +14,7 @@ graph TD
     Hooks[NottiProcessHooks.installOnce] --> Setup[NottiInAppSetup.install]
     Setup --> Coord[NottiInAppCoordinator via NottiInApp]
     Setup --> Presenter[NottiInAppOverlayPresenter + ActivityTracker + ImageLoader]
-    Setup -->|clickSink| Clicks[NottiInAppClicks listeners]
+    Coord -->|default clickSink| Clicks[NottiInAppClicks listeners]
     Setup -->|urlOpener| Opener[NottiInAppUrlOpener]
     Notti[Notti.initialize / trackEvent] -->|onInitialized, trackEvent| Coord
     Notti -->|pushPermissionPort| Perm[NottiPushPermissionAction]
@@ -42,7 +42,7 @@ graph TD
 RN's sink is called inside the coordinator's main-thread block and returns whether someone got it, before `presenter.close`. `NottiListeners.dispatch` always posts, which would run listeners after the close and the URL open, and would make "delivered" unknowable at that point.
 
 - `NottiListeners` gets `dispatchNow(value): Boolean`: calls each entry on the current thread, same per-entry `try/catch` and log line as `dispatch`, returns `true` when at least one entry was called. Only the In-App sink uses it, always from main.
-- New internal `object NottiInAppClicks { val listeners; fun deliver(click: InAppClick): Boolean }` converts the internal `InAppClick` to the public `NottiInAppClick` and calls `dispatchNow`. Setup sets `coordinator.clickSink = InAppClickSink(NottiInAppClicks::deliver)` (RN default pointed at `NottiModule.emitInAppClick`).
+- New internal `object NottiInAppClicks { val listeners; fun deliver(click: InAppClick): Boolean }` converts the internal `InAppClick` to the public `NottiInAppClick` and calls `dispatchNow`. The coordinator's default `clickSink` is `InAppClickSink { NottiInAppClicks.deliver(it) }`, the same shape as RN's default `NottiModule.emitInAppClick` (amended during T7: one changed line in the ported file instead of a Setup assignment; the ported default-sink test keeps passing with no listener).
 - A listener added before `initialize` or before the engine exists is kept (the object outlives the coordinator).
 
 ### D3: URL opener (AD-006) as a third port
@@ -113,7 +113,7 @@ The settings intent uses `Settings` actions, not `ACTION_VIEW`, so it does not m
 ### D7: Port rules
 
 - Every ported file starts with its provenance comment, is re-indented to 4 spaces, made `internal` (RN's public `NottiInAppAccessibility`, `InAppSiblingRestore`, `InAppTiming`, `NottiInAppScheduler`, presenter types become `internal`), `package com.zeeplabs.notti`.
-- Listed changes per file only: Setup (D1 logger/prefs, opener, sink), Coordinator (D3 steps, default `clickSink = null` instead of `NottiModule.emitInAppClick`, `Log` → port logger already injected), others: package/visibility only. `scripts/port-diff.sh` proves it.
+- Listed changes per file only: Setup (D1 logger/prefs, opener), Coordinator (D3 steps, default `clickSink` pointing at `NottiInAppClicks` instead of `NottiModule.emitInAppClick`, duplicate `NottiInAppHooks` dropped; `Log` was already an injected logger), others: package/visibility only. `scripts/port-diff.sh` proves it.
 - Lint findings RN already has are suppressed per file.
 - Tests ported 1:1 with the same `@Config(sdk = [34])` / `@GraphicsMode(NATIVE)`; RN `NottiModuleTest` In-App cases (wiring, emit payload, push-permission wiring) re-expressed as `NottiInAppFacadeTest` with the same scenarios.
 

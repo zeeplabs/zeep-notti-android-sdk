@@ -133,8 +133,8 @@ internal class NottiInAppCoordinator(
 
     /** Set by the module/presentation layer; read on main only. */
     var presenter: InAppPresenter? = null
-    /** Defaults to a sink that reports no listener. */
-    var clickSink: InAppClickSink? = InAppClickSink { false }
+    /** Defaults to the host's click listeners ([NottiInAppClicks]). */
+    var clickSink: InAppClickSink? = InAppClickSink { NottiInAppClicks.deliver(it) }
     /** Null until the platform action is wired; a `push_permission` tap then only reports and closes. */
     var pushPermissionPort: InAppPushPermissionPort? = null
 

@@ -64,6 +64,25 @@ internal class NottiListeners<T>(
         }
     }
 
+    /**
+     * Calls every listener on the current thread before returning, with the same per-listener isolation
+     * as [dispatch]; for a caller that must know the listeners ran (In-App clicks, design D2). True when
+     * at least one listener was called.
+     */
+    fun dispatchNow(value: T): Boolean {
+        var called = false
+        for (entry in entries) {
+            val listener = entry.listener ?: continue
+            called = true
+            try {
+                listener(value)
+            } catch (t: Throwable) {
+                NottiLogger.error("Notti: $name listener failed - ${t.javaClass.simpleName}")
+            }
+        }
+        return called
+    }
+
     fun dispatch(value: T) {
         val snapshot = entries.toList()
         if (snapshot.isEmpty()) return
