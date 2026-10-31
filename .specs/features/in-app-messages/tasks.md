@@ -121,7 +121,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 **Done when**:
 
-- [ ] Port diff clean; 9 tests pass (→ 677)
+- [x] Port diff clean; 9 tests pass (→ 677)
 
 **Tests**: unit (JUnit) **Gate**: Quick
 **Commit**: `feat(inapp): port the push-permission button action`
