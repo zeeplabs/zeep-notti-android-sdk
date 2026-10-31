@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-10-31
-**Current Work:** `in-app-messages` Execute done (branch `feat/in-app-messages`, local, 2026-10-31): T1..T12 committed, 718 tests, Full gate green; awaiting Julio's review and OK to push/open the PR. Next on the roadmap: `example-and-release`. `public-api` merged (PR #4, `8abc0d9`, admin); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
+**Current Work:** `example-and-release` Specify (branch `feat/example-and-release`, 2026-10-31): spec written, awaiting Julio's approval. `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
 
 ---
 
@@ -105,6 +105,20 @@
 **Reason:** Same observable result as iOS (0 / 1 extra registration) with the RN code already proven; no executor hand-off or in-flight mutation questions.
 **Trade-off:** Internal difference between the native SDKs; specs compare outcomes, not mechanisms.
 **Impact:** `NottiRuntime.start` built on `ensureCore`; `NottiRuntimeTest` replace-core case rewritten.
+
+### AD-015: Release 0.1.0 through a tag workflow with a local fallback; Julio tags and publishes (2026-10-31, Julio, example-and-release spec)
+
+**Decision:** `.github/workflows/release.yml` runs on a `X.Y.Z` tag: version check, full gate, then a signed upload to the Central Portal without automatic release. `docs/RELEASING.md` documents the same upload from Julio's machine while B-002 blocks CI. In both paths Julio checks the deployment in the Portal and presses Publish. The agent prepares the release PR, CHANGELOG, runbook and device checklist; Julio creates and pushes the tag, runs or watches the upload and publishes.
+**Reason:** Central releases are immutable, so the Portal review is the last gate; CI may stay blocked; same split as iOS (tag and `pod trunk push` by Julio).
+**Trade-off:** Two upload paths to keep equivalent; the local path depends on Julio's machine having the key and token.
+**Impact:** Refines AD-004 ("publishing done only in example-and-release after explicit confirmation"): the agent never runs the upload. `example-and-release` EXR-14..EXR-19.
+
+### AD-016: Example config from untracked files; Google Services plugin only when its file exists (2026-10-31, Julio, example-and-release spec)
+
+**Decision:** `example/notti.properties` (git-ignored; tracked `.sample` with placeholders) feeds `BuildConfig` with the app id, client key and optional base URL. `:example` and `:example-manual-fcm` apply the Google Services plugin only when the module has a `google-services.json`. Without them the apps build and show "not configured" without calling `Notti.initialize`.
+**Reason:** No secret in git; CI builds with nothing; same Firebase path the README teaches integrators.
+**Trade-off:** A conditional plugin in the example build scripts.
+**Impact:** `example-and-release` EXR-01, EXR-04..EXR-06; `.gitignore`; a tracked-secrets CI check.
 
 ---
 
