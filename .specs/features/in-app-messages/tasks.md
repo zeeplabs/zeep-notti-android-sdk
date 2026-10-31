@@ -86,8 +86,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 **Done when**:
 
-- [ ] Port diff clean; no URL in any log line
-- [ ] 20 tests pass (→ 533)
+- [x] Port diff clean; no URL in any log line
+- [x] 20 tests pass (→ 533)
 
 **Tests**: unit (Robolectric, `GraphicsMode(NATIVE)`, MockWebServer/okhttp-tls) **Gate**: Quick
 **Commit**: `feat(inapp): port the In-App image loader`
