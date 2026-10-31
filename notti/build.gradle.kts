@@ -138,6 +138,10 @@ mavenPublishing {
     )
     coordinates("com.zeeplabs", "notti-android", nottiVersion)
 
+    // Central Portal upload without automatic release: Julio reviews the deployment and presses Publish
+    // (AD-015). Credentials are read only by the upload task, so local and PR builds need none.
+    publishToMavenCentral()
+
     pom {
         name.set("Notti Android SDK")
         description.set("Native Android SDK for Notti push notifications and In-App Messages.")
@@ -166,6 +170,18 @@ mavenPublishing {
     // Signed only when the release job provides the in-memory key; local and PR publishes stay unsigned.
     if (providers.gradleProperty("signingInMemoryKey").isPresent) {
         signAllPublications()
+    }
+}
+
+// Central rejects unsigned artifacts; fail in seconds and name the cause (D6). Attached to the plugin's
+// prepare task, which every Central upload runs first: a doFirst on publishToMavenCentral (a lifecycle task)
+// would run only after the upload.
+val signingKeyPresent = providers.gradleProperty("signingInMemoryKey").map { it.isNotBlank() }.orElse(false)
+tasks.matching { it.name == "prepareMavenCentralPublishing" }.configureEach {
+    doFirst {
+        if (!signingKeyPresent.get()) {
+            throw GradleException("signingInMemoryKey is not set; refusing an unsigned upload")
+        }
     }
 }
 

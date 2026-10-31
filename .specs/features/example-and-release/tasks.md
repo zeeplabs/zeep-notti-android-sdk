@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/example-and-release/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: In progress (T1-T6 done)
+**Status**: In progress (T1-T7 done)
 
 ---
 
@@ -167,13 +167,14 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `publishAllPublicationsToBuildRepository` still runs with no credentials and no key
-- [ ] `./gradlew :notti:publishToMavenCentral` without a key fails at the guard, before any network call (run with no credentials set)
-- [ ] `check-release-artifacts.sh` passes where `gpg` exists (CI); locally, if `gpg` is absent, its exit 2 and hint are shown and reported as not run
-- [ ] Full gate green
+- [x] `publishAllPublicationsToBuildRepository` still runs with no credentials and no key
+- [x] `./gradlew :notti:publishToMavenCentral` without a key fails at the guard, before any network call (run with no credentials set)
+- [x] `check-release-artifacts.sh` passes (run locally by Julio after `brew install gnupg`: 5 signatures and 6 POM fields ok; before that, exit 2 with the hint) where `gpg` exists (CI); locally, if `gpg` is absent, its exit 2 and hint are shown and reported as not run
+- [x] Full gate green
 
 **Tests**: end-to-end script **Gate**: Full
 **Commit**: `build: wire the Maven Central upload and check signed artifacts`
+**Status**: Done. Deviation from D6: the guard is a `doFirst` on the plugin's `prepareMavenCentralPublishing`, not on `publishToMavenCentral`: the latter is a lifecycle task whose actions run after the upload. Proven with `--offline`, with and without fake Portal credentials: fails at the guard first. The POM field parser was checked against the real POM and an emptied field; the signed run passed locally (in-memory key without passphrase works with vanniktech 0.37.0).
 
 ---
 

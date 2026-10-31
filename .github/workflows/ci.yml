@@ -103,6 +103,11 @@ jobs:
           fi
           echo "artifact ok: com.zeeplabs:notti-android:$version"
 
+      # Signed dry run with a throwaway key: every artifact verifies and the POM has what Central requires.
+      # Nothing is uploaded (EXR-17). gpg ships with the runner image.
+      - name: Signed release artifacts (EXR-17)
+        run: scripts/check-release-artifacts.sh
+
       # Separate invocation: the apps resolve the artifact published above, not the project (PKG-03). The
       # :example release build is minified (R8); :example-manual-fcm removes the SDK's FCM service (PUSH-15).
       - name: Example apps consume the published AAR (PKG-03, PUSH-15)
