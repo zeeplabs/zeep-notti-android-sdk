@@ -1,12 +1,16 @@
 package com.zeeplabs.notti
 
 import android.app.Application
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
 import android.os.Bundle
 import android.os.Looper
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.messaging.RemoteMessage
+import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -51,6 +55,8 @@ class NottiLogPrivacyTest {
                 override fun dispatch(request: RecordedRequest): MockResponse =
                     if (request.method == "POST" && request.path!!.endsWith("/devices")) {
                         MockResponse().setResponseCode(200).setBody("""{"id":"$DEVICE_ID","tags":{"$TAG_KEY":"$TAG_VALUE"}}""")
+                    } else if (request.path!!.endsWith("/in-app-messages/eligible")) {
+                        MockResponse().setResponseCode(200).setBody(ELIGIBLE_BODY)
                     } else {
                         // Terminal failure whose body carries a sentinel: the body must not be logged.
                         MockResponse().setResponseCode(400).setBody("""{"error":"$BODY_SENTINEL $EMAIL"}""")
@@ -188,6 +194,77 @@ class NottiLogPrivacyTest {
         assertNoSentinel()
     }
 
+    /**
+     * In-App (AD-011, design D3): event name, message id, button link and listener exception through the
+     * facade, the coordinator (logging through [NottiLogger] as the setup wires it), a URL open that fails
+     * and events the server rejects with a sentinel body.
+     */
+    @Test
+    fun inAppFlowAtVerboseLogsNoSentinel() {
+        val runtime = runtime { Tasks.forResult(TOKEN) }
+        NottiRuntime.setForTest(runtime)
+        val presented = mutableListOf<InAppDisplay>()
+        val coordinator =
+            NottiInAppCoordinator(
+                store = NottiInAppEventStore(app.getSharedPreferences("notti_log_privacy_inapp", Context.MODE_PRIVATE)),
+                clientFactory = { config -> NottiApiClient(OkHttpClient(), config.baseUrl, config.appId, config.clientKey) },
+                identity = { InAppIdentity(DEVICE_ID, TOKEN) },
+                executor =
+                    object : InAppExecutor {
+                        override fun execute(task: () -> Unit) = task()
+
+                        override fun schedule(
+                            delayMs: Long,
+                            task: () -> Unit,
+                        ) = Unit
+                    },
+                postToMain = { it() },
+                logger = { message -> NottiLogger.warn(message) },
+            )
+        coordinator.presenter =
+            object : InAppPresenter {
+                override fun present(display: InAppDisplay) {
+                    presented += display
+                }
+
+                override fun close(displayId: String) = Unit
+
+                override fun teardown(display: InAppDisplay) = Unit
+            }
+        val noBrowser =
+            object : ContextWrapper(app) {
+                override fun startActivity(intent: Intent): Unit = throw ActivityNotFoundException("$EXCEPTION_SENTINEL $URL")
+            }
+        coordinator.urlOpener = NottiInAppUrlOpener(noBrowser) { null }
+        NottiInApp.install(coordinator)
+
+        Notti.InAppMessages.addClickListener { throw IllegalStateException(EXCEPTION_SENTINEL) }
+        Notti.trackEvent(EVENT_NAME)
+        Notti.initialize(app, APP_ID, CLIENT_KEY, NottiOptions(baseUrl))
+        awaitUntil { runtime.deviceStore.getDeviceId() == DEVICE_ID }
+        awaitExecutorsIdle()
+        requireNotNull(runtime.core).onAppForegrounded()
+        awaitExecutorsIdle()
+        Notti.trackEvent(EVENT_NAME)
+        Notti.trackEvent("$EVENT_NAME-unknown")
+
+        val display = presented.single()
+        coordinator.onDisplayAttached(display.displayId, true)
+        coordinator.onDisplayVisible(display.displayId)
+        coordinator.onDisplayClicked(
+            display.displayId,
+            "b1",
+            display.message.buttons
+                .single()
+                .action,
+        )
+        awaitExecutorsIdle()
+
+        assertTrue(lines.any { it.contains("in-app click listener failed - IllegalStateException") })
+        assertTrue(lines.any { it.contains("url open failed - ActivityNotFoundException") })
+        assertNoSentinel()
+    }
+
     private companion object {
         const val APP_ID = "sntl-app-7f3"
         const val CLIENT_KEY = "sntl-key-7f3"
@@ -203,6 +280,14 @@ class NottiLogPrivacyTest {
         const val BASE_PATH = "sntl-base-7f3"
         const val BODY_SENTINEL = "sntl-body-7f3"
         const val EXCEPTION_SENTINEL = "sntl-exc-7f3"
+        const val MESSAGE_ID = "sntl-message-7f3"
+        const val EVENT_NAME = "sntl-event-7f3"
+        const val URL_HOST = "sntl-host-7f3"
+        const val URL_QUERY = "sntl-query-7f3"
+        const val URL = "https://$URL_HOST.example.invalid/p?u=$URL_QUERY"
+        const val ELIGIBLE_BODY =
+            """{"messages":[{"id":"$MESSAGE_ID","title":"T","trigger":{"type":"event","name":"$EVENT_NAME"},""" +
+                """"buttons":[{"id":"b1","label":"Go","action":{"type":"url","value":"$URL"}}]}]}"""
         val SENTINELS =
             listOf(
                 APP_ID,
@@ -219,6 +304,10 @@ class NottiLogPrivacyTest {
                 BASE_PATH,
                 BODY_SENTINEL,
                 EXCEPTION_SENTINEL,
+                MESSAGE_ID,
+                EVENT_NAME,
+                URL_HOST,
+                URL_QUERY,
             )
     }
 }
