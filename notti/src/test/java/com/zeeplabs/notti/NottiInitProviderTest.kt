@@ -102,14 +102,15 @@ class NottiInitProviderTest {
             }
         val observersBefore = processLifecycle.observerCount
 
-        // attachInfo runs onCreate: listener registration, runtime (no base context: prefs throw) and
-        // the network observer (getSystemService throws) all fail; the foreground post still runs.
+        // attachInfo runs onCreate: listener registration, runtime and In-App setup (no base context: prefs
+        // throw) and the network observer (getSystemService throws) all fail; the foreground post still runs.
         NottiInitProvider().attachInfo(context, ProviderInfo())
         shadowOf(Looper.getMainLooper()).idle()
 
         assertNull(NottiRuntime.peek())
         assertEquals(observersBefore + 1, processLifecycle.observerCount)
-        assertEquals(3, logged.size)
+        assertEquals(4, logged.size)
+        assertTrue(logged.toString(), "Notti: could not set up In-App messages - NullPointerException" in logged)
         assertTrue(logged.toString(), logged.all { it.startsWith("Notti: could not ") })
     }
 

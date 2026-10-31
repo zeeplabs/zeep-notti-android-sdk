@@ -1,6 +1,8 @@
 // Ported from react-native-notti v0.8.0 (291d5a7): android/src/test/java/com/notti/NottiForegroundObserverTest.kt
 @file:Suppress(
+    "ktlint:standard:blank-line-before-declaration",
     "ktlint:standard:chain-method-continuation",
+    "ktlint:standard:function-signature",
     "ktlint:standard:multiline-expression-wrapping",
     "ktlint:standard:no-empty-first-line-in-class-body",
     "ktlint:standard:trailing-comma-on-call-site",
@@ -80,35 +82,31 @@ class NottiForegroundObserverTest {
         )
     }
 
-    /** Records the lifecycle calls; the coordinator-backed version is re-added by in-app-messages. */
-    private class RecordingInAppLifecycle : NottiInAppLifecycle {
-        val calls = mutableListOf<String>()
-
-        override fun onAppForegrounded() {
-            calls += "foregrounded"
-        }
-
-        override fun onSessionEnded() {
-            calls += "sessionEnded"
-        }
-
-        override fun onAppBackgrounded() {
-            calls += "backgrounded"
-        }
-
-        override fun onNetworkAvailable() {
-            calls += "network"
-        }
+    private fun newCoordinator(): NottiInAppCoordinator {
+        val prefs = RuntimeEnvironment.getApplication()
+            .getSharedPreferences("notti_observer_test", Context.MODE_PRIVATE)
+        return NottiInAppCoordinator(
+            store = NottiInAppEventStore(prefs),
+            clientFactory = { throw AssertionError("no network in this test") },
+            identity = { null },
+            executor = object : InAppExecutor {
+                override fun execute(task: () -> Unit) = Unit
+                override fun schedule(delayMs: Long, task: () -> Unit) = Unit
+            },
+            postToMain = { it() }
+        )
     }
 
     @Test
     fun `onStop with no live core still ends the In-App session`() {
-        val coordinator = RecordingInAppLifecycle()
-        NottiForegroundObserver.inAppProvider = { coordinator }
+        // Reached through the default provider: the runtime's In-App lifecycle forwards to the installed coordinator.
+        val coordinator = NottiInApp.install(newCoordinator())
         NottiForegroundObserver.coreProvider = { null }
+        coordinator.onSessionStarted()
+        assertTrue(coordinator.session.isOpen)
 
         NottiForegroundObserver.onStop(owner)
-        assertEquals(listOf("sessionEnded", "backgrounded"), coordinator.calls)
+        assertFalse(coordinator.session.isOpen)
     }
 
     @Test

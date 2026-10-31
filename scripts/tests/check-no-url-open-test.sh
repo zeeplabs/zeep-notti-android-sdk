@@ -24,11 +24,19 @@ expect 0 "clean tree passes" "$script" "$(fixture ok notti/src/main/java/A.kt 'v
 expect 1 "ACTION_VIEW fails" "$script" "$(fixture view notti/src/main/java/B.kt 'Intent(Intent.ACTION_VIEW, uri)')"
 expect 1 "CustomTabsIntent fails" "$script" "$(fixture tabs notti/src/main/java/C.kt 'CustomTabsIntent.Builder().build()')"
 expect 1 "openUri fails" "$script" "$(fixture uri notti/src/main/java/D.kt 'handler.openUri(value)')"
+expect 1 "Intent.parseUri fails" "$script" "$(fixture parse notti/src/main/java/F.kt 'Intent.parseUri(value, 0)')"
+
+# The real allowlist: the In-App URL opener may open a URL; the same line in any other file fails.
+opener="$(fixture opener notti/src/main/java/com/zeeplabs/notti/NottiInAppUrlOpener.kt 'Intent(Intent.ACTION_VIEW, uri)')"
+expect 0 "the URL opener is allowlisted" "$script" "$opener"
+printf '%s\n' 'Intent(Intent.ACTION_VIEW, uri)' >"$opener/notti/src/main/java/com/zeeplabs/notti/NottiInAppPresenter.kt"
+expect 1 "ACTION_VIEW next to the opener fails" "$script" "$opener"
+expect 0 "the repository tree passes" "$script"
 
 # An allowlisted exact path passes; the same content elsewhere fails.
 allowed="$(fixture allowed notti/src/main/java/Allowed.kt 'Intent(Intent.ACTION_VIEW, uri)')"
 patched="$tmp/patched-check.sh"
-sed 's|^ALLOWLIST=()$|ALLOWLIST=("notti/src/main/java/Allowed.kt")|' "$script" >"$patched"
+sed 's|^ALLOWLIST=(.*)$|ALLOWLIST=("notti/src/main/java/Allowed.kt")|' "$script" >"$patched"
 chmod +x "$patched"
 expect 0 "allowlisted exact path passes" "$patched" "$allowed"
 other="$(fixture other notti/src/main/java/Other.kt 'Intent(Intent.ACTION_VIEW, uri)')"

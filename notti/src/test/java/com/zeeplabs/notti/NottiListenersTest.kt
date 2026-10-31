@@ -16,7 +16,7 @@ import org.robolectric.annotation.Config
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 
-/** [NottiListeners]: fan-out, main-thread delivery, removal, isolation (API-10, API-11). */
+/** [NottiListeners]: fan-out, main-thread delivery, removal, isolation (API-10, API-11), synchronous delivery (In-App D2). */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 class NottiListenersTest {
@@ -138,5 +138,44 @@ class NottiListenersTest {
         listeners.add {}
         listeners.dispatch("2")
         assertNotNull(posted)
+    }
+
+    @Test
+    fun dispatchNowCallsEveryListenerOnTheCallingThreadAndPostsNothing() {
+        var posted: Runnable? = null
+        val listeners = NottiListeners<String>("in-app click", post = { posted = it })
+        val calls = mutableListOf<String>()
+        val threads = mutableSetOf<Thread>()
+        listeners.add {
+            calls += "a:$it"
+            threads += Thread.currentThread()
+        }
+        listeners.add { throw IllegalStateException("sentinel-message") }
+        listeners.add {
+            calls += "c:$it"
+            threads += Thread.currentThread()
+        }
+
+        var delivered = false
+        val worker = thread { delivered = listeners.dispatchNow("1") }
+        worker.join()
+
+        assertTrue(delivered)
+        assertEquals(listOf("a:1", "c:1"), calls)
+        assertEquals(setOf(worker), threads)
+        assertNull(posted)
+        assertEquals(listOf("Notti: in-app click listener failed - IllegalStateException"), logged)
+    }
+
+    @Test
+    fun dispatchNowReportsNoDeliveryWithNoLiveListener() {
+        val listeners = NottiListeners<String>("in-app click")
+        assertFalse(listeners.dispatchNow("1"))
+
+        var calls = 0
+        listeners.add { calls++ }.remove()
+
+        assertFalse(listeners.dispatchNow("2"))
+        assertEquals(0, calls)
     }
 }

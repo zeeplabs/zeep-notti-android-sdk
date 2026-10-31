@@ -171,6 +171,53 @@ class NottiRuntimeTest {
         assertFalse(executors[0].isShutdown)
     }
 
+    private fun inAppCoordinator(): NottiInAppCoordinator =
+        NottiInAppCoordinator(
+            store = NottiInAppEventStore(app.getSharedPreferences("notti_runtime_inapp_test", Context.MODE_PRIVATE)),
+            clientFactory = { throw AssertionError("no network in this test") },
+            identity = { null },
+            executor =
+                object : InAppExecutor {
+                    override fun execute(task: () -> Unit) = Unit
+
+                    override fun schedule(
+                        delayMs: Long,
+                        task: () -> Unit,
+                    ) = Unit
+                },
+            postToMain = { it() },
+        )
+
+    /** D1: the core the runtime builds tells the installed In-App coordinator about each session start. */
+    @Test
+    fun theCoreSessionStartReachesTheInstalledInAppCoordinator() {
+        val runtime = testRuntime()
+        val coordinator = NottiInApp.install(inAppCoordinator())
+
+        runtime.ensureCore().onAppForegrounded()
+        awaitIdle()
+
+        assertTrue(coordinator.session.isOpen)
+    }
+
+    /** D1: the runtime's In-App lifecycle forwards to the installed coordinator and is a no-op with none. */
+    @Test
+    fun theInAppLifecycleForwardsToTheInstalledCoordinator() {
+        val runtime = testRuntime()
+        val lifecycle = runtime.inAppLifecycle!!
+        lifecycle.onAppForegrounded()
+        lifecycle.onSessionEnded()
+        lifecycle.onAppBackgrounded()
+        lifecycle.onNetworkAvailable()
+
+        val coordinator = NottiInApp.install(inAppCoordinator())
+        coordinator.onSessionStarted()
+        assertTrue(coordinator.session.isOpen)
+        lifecycle.onSessionEnded()
+
+        assertFalse(coordinator.session.isOpen)
+    }
+
     @Test
     fun ensureCoreIsLazyAndDoesNotRegister() {
         val runtime = testRuntime()
@@ -276,7 +323,7 @@ class NottiRuntimeTest {
 
         val runtime = NottiRuntime.get(app)
         assertSame(runtime.sessionGate, NottiForegroundObserver.gateProvider())
-        assertNull(NottiForegroundObserver.inAppProvider())
+        assertSame(NottiInApp.lifecycle, NottiForegroundObserver.inAppProvider())
 
         val core = runtime.start("app-fixture", "key-fixture", baseUrl)
         assertNotNull(core)

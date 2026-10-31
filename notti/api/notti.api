@@ -11,6 +11,12 @@ public final class com/zeeplabs/notti/Notti {
 	public static final fun setLocationSharingEnabled (Z)V
 	public static final fun setLogLevel (Lcom/zeeplabs/notti/NottiLogLevel;)V
 	public static final fun setSubscription (Z)V
+	public static final fun trackEvent (Ljava/lang/String;)V
+}
+
+public final class com/zeeplabs/notti/Notti$InAppMessages {
+	public static final field INSTANCE Lcom/zeeplabs/notti/Notti$InAppMessages;
+	public static final fun addClickListener (Lcom/zeeplabs/notti/NottiInAppClickListener;)Lcom/zeeplabs/notti/NottiSubscription;
 }
 
 public final class com/zeeplabs/notti/Notti$Notifications {
@@ -43,6 +49,35 @@ public abstract interface class com/zeeplabs/notti/NottiDeviceIdListener {
 	public abstract fun onDeviceIdChanged (Ljava/lang/String;)V
 }
 
+public final class com/zeeplabs/notti/NottiInAppAction {
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getType ()Lcom/zeeplabs/notti/NottiInAppAction$Type;
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/zeeplabs/notti/NottiInAppAction$Type : java/lang/Enum {
+	public static final field DEEPLINK Lcom/zeeplabs/notti/NottiInAppAction$Type;
+	public static final field URL Lcom/zeeplabs/notti/NottiInAppAction$Type;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/zeeplabs/notti/NottiInAppAction$Type;
+	public static fun values ()[Lcom/zeeplabs/notti/NottiInAppAction$Type;
+}
+
+public final class com/zeeplabs/notti/NottiInAppClick {
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAction ()Lcom/zeeplabs/notti/NottiInAppAction;
+	public final fun getButtonId ()Ljava/lang/String;
+	public final fun getMessageId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/zeeplabs/notti/NottiInAppClickListener {
+	public abstract fun onClick (Lcom/zeeplabs/notti/NottiInAppClick;)V
+}
+
 public final class com/zeeplabs/notti/NottiLogLevel : java/lang/Enum {
 	public static final field DEBUG Lcom/zeeplabs/notti/NottiLogLevel;
 	public static final field ERROR Lcom/zeeplabs/notti/NottiLogLevel;
@@ -71,9 +106,11 @@ public abstract interface class com/zeeplabs/notti/NottiNotificationListener {
 public final class com/zeeplabs/notti/NottiOptions {
 	public fun <init> ()V
 	public fun <init> (Ljava/lang/String;)V
-	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Z)V
+	public synthetic fun <init> (Ljava/lang/String;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBaseUrl ()Ljava/lang/String;
+	public final fun getOpensInAppUrls ()Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

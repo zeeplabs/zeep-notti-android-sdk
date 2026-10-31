@@ -1,6 +1,8 @@
 package com.zeeplabs.notti;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.robolectric.Shadows.shadowOf;
 
@@ -33,6 +35,9 @@ public class NottiJavaInteropTest {
             Notti.initialize(app, "app-fixture", "key-fixture");
             Notti.initialize(app, "app-fixture", "key-fixture", new NottiOptions());
             Notti.initialize(app, "app-fixture", "key-fixture", new NottiOptions("https://push.example.invalid"));
+            NottiOptions noUrlOpening = new NottiOptions("https://push.example.invalid", false);
+            assertFalse(noUrlOpening.getOpensInAppUrls());
+            Notti.initialize(app, "app-fixture", "key-fixture", noUrlOpening);
 
             Notti.login("user-fixture");
             Notti.logout();
@@ -65,6 +70,16 @@ public class NottiJavaInteropTest {
 
             NottiNotification initial = Notti.Notifications.takeInitialClick();
             assertNull(initial);
+
+            Notti.trackEvent("fixture-event");
+            List<String> clickedButtons = new ArrayList<>();
+            NottiSubscription inAppSubscription = Notti.InAppMessages.addClickListener(click -> {
+                NottiInAppAction action = click.getAction();
+                boolean isLink = action != null && action.getType() == NottiInAppAction.Type.URL;
+                clickedButtons.add(click.getMessageId() + ":" + click.getButtonId() + ":" + isLink);
+            });
+            inAppSubscription.remove();
+            assertTrue(clickedButtons.isEmpty());
 
             receivedSubscription.remove();
             clickedSubscription.remove();

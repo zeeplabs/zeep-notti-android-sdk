@@ -4,9 +4,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** The public value types (API-10, API-12, API-14, API-15). */
+/** The public value types (API-10, API-12, API-14, API-15; In-App design D6). */
 class NottiPublicTypesTest {
     private val sentinelData = mapOf("email" to "sentinel@example.invalid", "plan" to "sentinel-plan")
 
@@ -59,6 +60,16 @@ class NottiPublicTypesTest {
     }
 
     @Test
+    fun optionsOpenInAppUrlsByDefaultAndCompareByEveryField() {
+        assertTrue(NottiOptions().opensInAppUrls)
+        assertTrue(NottiOptions("https://push.example.invalid").opensInAppUrls)
+        assertFalse(NottiOptions(null, false).opensInAppUrls)
+        assertNotEquals(NottiOptions(), NottiOptions(null, false))
+        assertEquals(NottiOptions(null, false).hashCode(), NottiOptions(null, false).hashCode())
+        assertEquals("NottiOptions(baseUrl=null, opensInAppUrls=false)", NottiOptions(null, false).toString())
+    }
+
+    @Test
     fun subscriptionRemoveRunsOnce() {
         var removals = 0
         val subscription = NottiSubscription { removals++ }
@@ -67,5 +78,48 @@ class NottiPublicTypesTest {
         subscription.remove()
 
         assertEquals(1, removals)
+    }
+
+    @Test
+    fun inAppClickToStringHidesTheMessageIdAndTheLink() {
+        val click =
+            NottiInAppClick(
+                "sentinel-message",
+                "b1",
+                NottiInAppAction(NottiInAppAction.Type.URL, "https://sentinel.example.invalid/?email=sentinel"),
+            )
+
+        val text = click.toString() + click.action.toString()
+
+        assertEquals("NottiInAppClick(buttonId=b1, actionType=URL)", click.toString())
+        assertEquals("NottiInAppAction(type=URL)", click.action.toString())
+        assertFalse(text.contains("sentinel", ignoreCase = true))
+        assertEquals("NottiInAppClick(buttonId=image, actionType=null)", NottiInAppClick("m", "image", null).toString())
+    }
+
+    @Test
+    fun inAppClickEqualityIsByValue() {
+        val action = NottiInAppAction(NottiInAppAction.Type.DEEPLINK, "app://fixture")
+        val a = NottiInAppClick("m", "b1", action)
+
+        assertEquals(a, NottiInAppClick("m", "b1", NottiInAppAction(NottiInAppAction.Type.DEEPLINK, "app://fixture")))
+        assertEquals(a.hashCode(), NottiInAppClick("m", "b1", action).hashCode())
+        assertNotEquals(a, NottiInAppClick("m", "b2", action))
+        assertNotEquals(a, NottiInAppClick("m", "b1", null))
+        assertNotEquals(action, NottiInAppAction(NottiInAppAction.Type.URL, "app://fixture"))
+    }
+
+    @Test
+    fun inAppToPublicMapsUrlAndDeeplinkAndDropsPushPermission() {
+        assertEquals(
+            NottiInAppClick("m", "b1", NottiInAppAction(NottiInAppAction.Type.URL, "https://example.invalid")),
+            InAppClick("m", "b1", InAppAction("url", "https://example.invalid")).toPublic(),
+        )
+        assertEquals(
+            NottiInAppAction(NottiInAppAction.Type.DEEPLINK, "app://fixture"),
+            InAppAction("deeplink", "app://fixture").toPublic(),
+        )
+        assertNull(InAppAction(InAppAction.PUSH_PERMISSION, "").toPublic())
+        assertNull(InAppClick("m", "image", null).toPublic().action)
     }
 }

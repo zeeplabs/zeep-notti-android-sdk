@@ -69,9 +69,9 @@ internal class NottiRuntime internal constructor(
     @Volatile
     var onDeviceIdChanged: ((String) -> Unit)? = null
 
-    /** The In-App engine's lifecycle hooks; null until `in-app-messages` sets them. */
+    /** The In-App engine's lifecycle hooks; forwards to the installed coordinator, if any. */
     @Volatile
-    var inAppLifecycle: NottiInAppLifecycle? = null
+    var inAppLifecycle: NottiInAppLifecycle? = NottiInApp.lifecycle
 
     /** The live core, if [ensureCore] ran and no [stop] cleared it. */
     @Volatile
@@ -122,7 +122,7 @@ internal class NottiRuntime internal constructor(
                 onDeviceIdChanged = { id -> onDeviceIdChanged?.invoke(id) },
                 clock = clock,
                 sessionGate = sessionGate,
-                inApp = NottiInAppHooks.None,
+                inApp = NottiInApp.coreHooks,
             )
         core = newCore
         coreExecutor = io
@@ -203,6 +203,7 @@ internal class NottiRuntime internal constructor(
                 instance?.onDeviceIdChanged = null
                 instance?.shutdown()
                 instance = null
+                NottiInApp.resetForTests()
             }
         }
 
