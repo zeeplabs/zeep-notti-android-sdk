@@ -11,6 +11,12 @@ public final class com/zeeplabs/notti/Notti {
 	public static final fun setLocationSharingEnabled (Z)V
 	public static final fun setLogLevel (Lcom/zeeplabs/notti/NottiLogLevel;)V
 	public static final fun setSubscription (Z)V
+	public static final fun trackEvent (Ljava/lang/String;)V
+}
+
+public final class com/zeeplabs/notti/Notti$InAppMessages {
+	public static final field INSTANCE Lcom/zeeplabs/notti/Notti$InAppMessages;
+	public static final fun addClickListener (Lcom/zeeplabs/notti/NottiInAppClickListener;)Lcom/zeeplabs/notti/NottiSubscription;
 }
 
 public final class com/zeeplabs/notti/Notti$Notifications {
@@ -100,9 +106,11 @@ public abstract interface class com/zeeplabs/notti/NottiNotificationListener {
 public final class com/zeeplabs/notti/NottiOptions {
 	public fun <init> ()V
 	public fun <init> (Ljava/lang/String;)V
-	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Z)V
+	public synthetic fun <init> (Ljava/lang/String;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getBaseUrl ()Ljava/lang/String;
+	public final fun getOpensInAppUrls ()Z
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

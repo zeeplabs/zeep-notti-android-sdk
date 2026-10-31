@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /** The public value types (API-10, API-12, API-14, API-15; In-App design D6). */
@@ -56,6 +57,16 @@ class NottiPublicTypesTest {
         assertNull(NottiOptions().baseUrl)
         assertEquals("https://push.example.invalid", NottiOptions("https://push.example.invalid").baseUrl)
         assertEquals(NottiOptions(), NottiOptions(null))
+    }
+
+    @Test
+    fun optionsOpenInAppUrlsByDefaultAndCompareByEveryField() {
+        assertTrue(NottiOptions().opensInAppUrls)
+        assertTrue(NottiOptions("https://push.example.invalid").opensInAppUrls)
+        assertFalse(NottiOptions(null, false).opensInAppUrls)
+        assertNotEquals(NottiOptions(), NottiOptions(null, false))
+        assertEquals(NottiOptions(null, false).hashCode(), NottiOptions(null, false).hashCode())
+        assertEquals("NottiOptions(baseUrl=null, opensInAppUrls=false)", NottiOptions(null, false).toString())
     }
 
     @Test

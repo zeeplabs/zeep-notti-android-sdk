@@ -2,9 +2,11 @@ package com.zeeplabs.notti
 
 import android.app.Application
 import android.content.Context
+import android.os.Build
+import androidx.core.app.NotificationManagerCompat
 
 /**
- * The Notti SDK: push registration, user identity and profile, notification events.
+ * The Notti SDK: push registration, user identity and profile, notification events, In-App messages.
  *
  * Call [initialize] once, as early as possible (ideally in `Application.onCreate`). Every other call
  * is safe before it: the SDK keeps what it can and sends it after the first registration. Nothing
@@ -23,7 +25,8 @@ object Notti {
      * Starts the SDK and registers the device. Only the application context of [context] is kept.
      * Calling again with the same [appId], [clientKey] and base URL does nothing; with a different one
      * the device registers again with the new values. Blank ids or an invalid base URL are logged and
-     * ignored, and a previous valid configuration stays in effect.
+     * ignored, and a previous valid configuration stays in effect. Each valid call applies
+     * [NottiOptions.opensInAppUrls], also when nothing else changed.
      */
     @JvmStatic
     @JvmOverloads
@@ -42,7 +45,12 @@ object Notti {
             }
             val runtime = NottiRuntime.get(app)
             wire(runtime)
-            runtime.start(appId, clientKey, options.baseUrl ?: DEFAULT_BASE_URL)
+            val baseUrl = options.baseUrl ?: DEFAULT_BASE_URL
+            // RN order: In-App gets the config before the core exists, so the session start that the
+            // core's creation replays finds it (same main-thread FIFO as trackEvent).
+            initializeInApp(appId, clientKey, baseUrl, options)
+            wirePushPermissionPort(app, runtime)
+            runtime.start(appId, clientKey, baseUrl)
         } catch (t: Throwable) {
             NottiLogger.error("Notti.initialize: failed - ${t.javaClass.simpleName}")
         }
@@ -77,6 +85,20 @@ object Notti {
     @JvmStatic
     fun setLocationSharingEnabled(enabled: Boolean) {
         core("setLocationSharingEnabled")?.setLocationSharingEnabled(enabled)
+    }
+
+    /**
+     * Reports an app event by [name], for In-App messages triggered by that event. Kept from right after
+     * [initialize] until the messages are known; ignored before [initialize] and when blank. Any thread.
+     * The name is never logged or stored.
+     */
+    @JvmStatic
+    fun trackEvent(name: String) {
+        try {
+            NottiInApp.get()?.trackEvent(name)
+        } catch (t: Throwable) {
+            NottiLogger.error("Notti.trackEvent: failed - ${t.javaClass.simpleName}")
+        }
     }
 
     /** The Notti device id, or null until the first registration (or with no runtime yet). */
@@ -212,6 +234,56 @@ object Notti {
         }
     }
 
+    /** In-App messages, shown by the SDK over the current Activity. */
+    object InAppMessages {
+        /**
+         * Calls [listener] on the main thread for each tap on an In-App message button or image, before
+         * the message closes. Listeners added before [initialize] are kept.
+         */
+        @JvmStatic
+        fun addClickListener(listener: NottiInAppClickListener): NottiSubscription = NottiInAppClicks.listeners.add { listener.onClick(it) }
+    }
+
+    /** RN `NottiModule.initialize`: a valid config reaches In-App, with the URL option (design D5). */
+    private fun initializeInApp(
+        appId: String,
+        clientKey: String,
+        baseUrl: String,
+        options: NottiOptions,
+    ) {
+        val coordinator = NottiInApp.get() ?: return
+        val normalizedBaseUrl = NottiCore.normalizeBaseUrl(baseUrl)
+        if (appId.isBlank() || clientKey.isBlank() || normalizedBaseUrl == null) return
+        coordinator.onInitialized(appId, clientKey, normalizedBaseUrl)
+        coordinator.urlOpener?.enabled = options.opensInAppUrls
+    }
+
+    /**
+     * RN `wirePushPermissionPort` (design D4): the OS side of the `push_permission` button. The prompt goes
+     * through [NottiCore.requestPermission], which sets the asked flag only when the prompt is shown.
+     */
+    private fun wirePushPermissionPort(
+        app: Context,
+        runtime: NottiRuntime,
+    ) {
+        val coordinator = NottiInApp.get() ?: return
+        coordinator.pushPermissionPort =
+            NottiPushPermissionAction(
+                sdkInt = Build.VERSION.SDK_INT,
+                notificationsEnabled = { NotificationManagerCompat.from(app).areNotificationsEnabled() },
+                promptAlreadyShown = { runtime.deviceStore.getPermissionRequested() },
+                hasActivity = { runtime.currentActivity() != null },
+                showPrompt = { runtime.ensureCore().requestPermission { } },
+                // A missing settings activity throws here and is caught by NottiPushPermissionAction.run.
+                openNotificationSettings = {
+                    runtime.currentActivity()?.let { activity ->
+                        activity.startActivity(appNotificationSettingsIntent(Build.VERSION.SDK_INT, activity.packageName))
+                    }
+                },
+                logger = { message -> NottiLogger.error(message) },
+            )
+    }
+
     /** The core of the process runtime (built lazily, RN parity), or null with a warn line. */
     internal fun core(method: String): NottiCore? = runtimeOrWarn(method)?.ensureCore()
 
@@ -234,9 +306,10 @@ object Notti {
         runtime.onNotificationReceived = Notifications.receivedSlot
     }
 
-    /** Test-only: drops every listener the facade holds and detaches the click relay. */
+    /** Test-only: drops every listener the facade holds (In-App clicks too) and detaches the click relay. */
     internal fun resetForTest() {
         deviceIdListeners.clearForTest()
         Notifications.resetForTest()
+        NottiInAppClicks.listeners.clearForTest()
     }
 }

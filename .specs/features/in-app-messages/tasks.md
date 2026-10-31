@@ -197,12 +197,12 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 **Done when**:
 
-- [ ] `trackEvent` before `initialize` no-op; blank name no-op; any thread
-- [ ] Listener added before `initialize` gets later clicks
-- [ ] Re-initialize with only the option changed: new value applies, no `POST /devices`
-- [ ] Invalid config: `onInitialized` not called (RN)
-- [ ] Push-permission port uses the current Activity, `NottiPermissionRequester` through the core, settings intent otherwise
-- [ ] `NottiOptions()` and `NottiOptions(String?)` constructors still in the dump; `(String?, Boolean)` added
+- [x] `trackEvent` before `initialize` no-op; blank name no-op; any thread
+- [x] Listener added before `initialize` gets later clicks
+- [x] Re-initialize with only the option changed: new value applies, no `POST /devices`
+- [x] Invalid config: `onInitialized` not called (RN)
+- [x] Push-permission port uses the current Activity, `NottiPermissionRequester` through the core, settings intent otherwise
+- [x] `NottiOptions()` and `NottiOptions(String?)` constructors still in the dump; `(String?, Boolean)` added (only the Kotlin `synthetic` default-args constructor changed; nothing released yet) (717 tests: +11 facade, +1 public types)
 
 **Tests**: unit (Robolectric, MockWebServer) **Gate**: Quick + `apiCheck`
 **Commit**: `feat(api): add trackEvent, In-App click listeners and opensInAppUrls`
