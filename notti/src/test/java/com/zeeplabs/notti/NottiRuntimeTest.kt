@@ -125,12 +125,23 @@ class NottiRuntimeTest {
         assertEquals("device-fixture", golden.getString("notti_device_id", null))
     }
 
+    private fun registrations(): Int =
+        synchronized(requests) { requests.count { it.method == "POST" && it.path == "/v1/apps/app-fixture/devices" } }
+
+    /** Waits until every queued task of the live executors ran (the core's work is serial on one). */
+    private fun awaitIdle() {
+        executors.filterNot { it.isShutdown }.forEach { it.submit {}.get(10, TimeUnit.SECONDS) }
+    }
+
     @Test
     fun stopIsIdentityGuarded() {
         val runtime = testRuntime()
         val first = runtime.start("app-fixture", "key-fixture", baseUrl)
-        val second = runtime.start("app-fixture", "key-fixture", baseUrl)
+        runtime.stop(first)
+        assertNull(runtime.core)
+        assertTrue(executors[0].isShutdown)
 
+        val second = runtime.start("app-fixture", "key-fixture", baseUrl)
         runtime.stop(first)
         assertSame(second, runtime.core)
 
@@ -139,16 +150,79 @@ class NottiRuntimeTest {
         assertTrue(executors[1].isShutdown)
     }
 
+    /** API-02 (AD-014): one core per runtime, re-initialized in place, as RN's lazy core. */
     @Test
-    fun replacingCoreShutsTheOldExecutorDown() {
+    fun secondStartKeepsTheCoreAndRegistersOnlyForADifferentConfig() {
         val runtime = testRuntime()
-        runtime.start("app-fixture", "key-fixture", baseUrl)
+        val first = runtime.start("app-fixture", "key-fixture", baseUrl)
+        awaitUntil { runtime.deviceStore.getDeviceId() == "device-fixture" }
+        awaitIdle()
+        assertEquals(1, registrations())
+
+        val same = runtime.start("app-fixture", "key-fixture", baseUrl)
+        awaitIdle()
+        assertSame(first, same)
+        assertEquals(1, registrations())
+
+        val other = runtime.start("app-fixture", "key-other", baseUrl)
+        awaitUntil { registrations() == 2 }
+        assertSame(first, other)
+        assertEquals(1, executors.size)
         assertFalse(executors[0].isShutdown)
+    }
+
+    @Test
+    fun ensureCoreIsLazyAndDoesNotRegister() {
+        val runtime = testRuntime()
+        assertNull(runtime.core)
+
+        val first = runtime.ensureCore()
+        val second = runtime.ensureCore()
+        awaitIdle()
+
+        assertSame(first, second)
+        assertSame(first, runtime.core)
+        assertEquals(1, executors.size)
+        assertEquals(0, server.requestCount)
+    }
+
+    /**
+     * API-05: the core's device-id callback reaches the runtime slot. The slot is null in every other
+     * test here, and registration goes on to the profile sync (`registrationSyncSendsTheSdkVersionConstant`).
+     */
+    @Test
+    fun deviceIdChangeReachesTheRuntimeSlot() {
+        val runtime = testRuntime()
+        val changes = Collections.synchronizedList(mutableListOf<String>())
+        runtime.onDeviceIdChanged = { changes += it }
 
         runtime.start("app-fixture", "key-fixture", baseUrl)
 
-        assertTrue(executors[0].isShutdown)
-        assertFalse(executors[1].isShutdown)
+        awaitUntil { changes.isNotEmpty() }
+        assertEquals(listOf("device-fixture"), changes.toList())
+    }
+
+    @Test
+    fun concurrentStartsLeaveOneCoreAndOneExecutor() {
+        val runtime = testRuntime()
+        val go = CountDownLatch(1)
+        val cores = Collections.synchronizedSet(mutableSetOf<Int>())
+        val pool = Executors.newFixedThreadPool(8)
+        repeat(8) {
+            pool.execute {
+                go.await()
+                cores += System.identityHashCode(runtime.start("app-fixture", "key-fixture", baseUrl))
+            }
+        }
+        go.countDown()
+        pool.shutdown()
+        assertTrue(pool.awaitTermination(10, TimeUnit.SECONDS))
+
+        awaitUntil { runtime.deviceStore.getDeviceId() == "device-fixture" }
+        awaitIdle()
+        assertEquals(1, cores.size)
+        assertEquals(1, executors.size)
+        assertEquals(1, registrations())
     }
 
     @Test

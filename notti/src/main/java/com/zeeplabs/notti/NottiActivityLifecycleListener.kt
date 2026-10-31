@@ -117,6 +117,10 @@ internal class NottiActivityLifecycleListener : Application.ActivityLifecycleCal
     override fun onActivityResumed(activity: Activity) {
         // Current-Activity tracking (not in RN, which read ReactContext.currentActivity).
         NottiRuntime.get(activity.applicationContext).activityResumed(activity)
+        // Not in RN (public-api D2): with the provider removed and `Notti.initialize` in the launch
+        // Activity, the tap is seen only here; a Recents reopen redelivers the old tap with this flag.
+        val intent = activity.intent
+        if (intent != null && (intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) return
         handle(activity)
     }
     override fun onActivityPaused(activity: Activity) = Unit

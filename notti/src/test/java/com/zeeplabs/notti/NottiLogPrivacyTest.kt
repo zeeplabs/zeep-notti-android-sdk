@@ -2,8 +2,11 @@ package com.zeeplabs.notti
 
 import android.app.Application
 import android.content.Context
+import android.os.Bundle
+import android.os.Looper
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
+import com.google.firebase.messaging.RemoteMessage
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -16,6 +19,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import java.io.IOException
 import java.util.Collections
@@ -59,6 +63,9 @@ class NottiLogPrivacyTest {
     fun tearDown() {
         NottiLogger.level = NottiLogger.Level.ERROR
         NottiLogger.sink = NottiLogger.defaultSink
+        Notti.resetForTest()
+        NottiNotificationClickRelay.reset()
+        NottiActivityLifecycleListener.resetRegistrationForTest()
         NottiRuntime.resetForTest()
         executors.forEach { it.shutdownNow() }
         server.shutdown()
@@ -135,6 +142,49 @@ class NottiLogPrivacyTest {
         awaitExecutorsIdle()
 
         assertTrue(lines.any { it.contains("IOException") })
+        assertNoSentinel()
+    }
+
+    /** API-15: the same flow through the public facade, with the level set through `Notti.logLevel`. */
+    @Test
+    fun facadeFlowAtVerboseLogsNoSentinel() {
+        NottiLogger.level = NottiLogger.Level.ERROR
+        Notti.logLevel = NottiLogLevel.VERBOSE
+        val runtime = runtime { Tasks.forResult(TOKEN) }
+        NottiRuntime.setForTest(runtime)
+
+        Notti.Notifications.addReceivedListener { throw IllegalStateException(EXCEPTION_SENTINEL) }
+        Notti.Notifications.addClickedListener { throw IllegalStateException(EXCEPTION_SENTINEL) }
+        Notti.addDeviceIdChangedListener { throw IllegalStateException(EXCEPTION_SENTINEL) }
+        Notti.User.setEmail(EMAIL)
+        Notti.login(EXTERNAL_USER_ID)
+        Notti.initialize(app, APP_ID, CLIENT_KEY, NottiOptions(baseUrl))
+        awaitUntil { runtime.deviceStore.getDeviceId() == DEVICE_ID }
+
+        Notti.login(EXTERNAL_USER_ID)
+        Notti.User.setPhone(PHONE)
+        Notti.User.addTags(mapOf(TAG_KEY to TAG_VALUE))
+        Notti.User.removeTag(TAG_KEY)
+        Notti.setSubscription(false)
+        Notti.setLocationSharingEnabled(true)
+        Notti.setLocationSharingEnabled(false)
+        Notti.Notifications.requestPermission { }
+        deliverRemoteMessage(
+            runtime,
+            RemoteMessage(
+                Bundle().apply {
+                    putString("notification_id", NOTIFICATION_ID)
+                    putString("delivery_id", DELIVERY_ID)
+                    putString(TAG_KEY, EMAIL)
+                },
+            ),
+        )
+        NottiNotificationClickRelay.emit(ParsedNotification(PHONE, EMAIL, mapOf(TAG_KEY to TAG_VALUE)))
+        awaitUntil { runtime.eventStore.all().isEmpty() }
+        awaitExecutorsIdle()
+        shadowOf(Looper.getMainLooper()).idle()
+
+        assertTrue(lines.any { it.contains("listener failed - IllegalStateException") })
         assertNoSentinel()
     }
 

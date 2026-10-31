@@ -1,7 +1,7 @@
 # State
 
-**Last Updated:** 2026-10-29
-**Current Work:** `push-integration` Execute done T1-T10 (branch `feat/push-integration`, local, not pushed): FCM service, click relay, tap detection + current-Activity tracker, permission Activity/requester, process hook, `NottiBridge` (first public API), manifest test, `:example-manual-fcm`, minified example, CI steps; 390 unit tests green; awaiting review/PR. Next: `public-api`. `core-port` merged (PR #2, admin, 2026-10-29).
+**Last Updated:** 2026-10-30
+**Current Work:** `public-api` Execute done (branch `feat/public-api`, local, 2026-10-30): T1..T11 committed, 444 tests, full gate green; awaiting Julio's review and OK to push/open the PR. Next feature on the roadmap after merge. `push-integration` merged (PR #3, `d5ab683`, admin, 2026-10-29); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
 
 ---
 
@@ -98,6 +98,13 @@
 **Trade-off:** Older floors; a host on newer versions still resolves its own (Gradle picks the highest).
 **Impact:** `package-foundation` T3/T4 catalog; T3 must build with these (fall back to the lowest version that compiles with compileSdk 36 and record it).
 
+### AD-014: Facade re-initializes the one core in place (2026-10-30, public-api design D1)
+
+**Decision:** `NottiRuntime` keeps one core per process (`ensureCore()`, RN's lazy core); `Notti.initialize` calls `core.initialize`, which no-ops on an identical config and re-registers on a different one (RN SDK-07, L2). The iOS SDK rebuilds its core instead.
+**Reason:** Same observable result as iOS (0 / 1 extra registration) with the RN code already proven; no executor hand-off or in-flight mutation questions.
+**Trade-off:** Internal difference between the native SDKs; specs compare outcomes, not mechanisms.
+**Impact:** `NottiRuntime.start` built on `ensureCore`; `NottiRuntimeTest` replace-core case rewritten.
+
 ---
 
 ## Active Blockers
@@ -148,6 +155,8 @@ Carried from `zeep-notti-ios-sdk` (`.specs/LESSONS.md`, candidates there), to ap
 ---
 
 ## Todos
+
+- [Provável] Inherited RN 0.8.0 bug: `NottiActivityLifecycleListener.onActivityCreated` skips a restored (`savedInstanceState != null`) or Recents (`FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY`) launch intent but does not mark it handled, so the `onActivityResumed` right after reports a phantom `opened` + `clicked`. RN tests call only `onActivityCreated`. Recents half fixed here by public-api T3 (resumed path skips the history flag; created+resumed test `a Recents reopen seen by onActivityCreated then onActivityResumed emits nothing`). Open: the restore half here (not detectable on resume: mark the intent handled in `onActivityCreated`?) and both halves in RN (found 2026-10-30, public-api design D2)
 
 - Flaky ported test: `NottiCoreTest` "logout clears the external user id server-side and clears email and phone" failed once (expected 5 requests, saw 4) in 1 of 5 full-suite runs on 2026-10-29, passes alone; ported verbatim from RN (AD-002). Watch it in CI; if it recurs, fix the wait in both repos
 

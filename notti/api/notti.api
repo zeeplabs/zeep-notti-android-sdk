@@ -1,6 +1,88 @@
+public final class com/zeeplabs/notti/Notti {
+	public static final field INSTANCE Lcom/zeeplabs/notti/Notti;
+	public static final fun addDeviceIdChangedListener (Lcom/zeeplabs/notti/NottiDeviceIdListener;)Lcom/zeeplabs/notti/NottiSubscription;
+	public static final fun getDeviceId ()Ljava/lang/String;
+	public static final fun getLogLevel ()Lcom/zeeplabs/notti/NottiLogLevel;
+	public static final fun initialize (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)V
+	public static final fun initialize (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Lcom/zeeplabs/notti/NottiOptions;)V
+	public static synthetic fun initialize$default (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Lcom/zeeplabs/notti/NottiOptions;ILjava/lang/Object;)V
+	public static final fun login (Ljava/lang/String;)V
+	public static final fun logout ()V
+	public static final fun setLocationSharingEnabled (Z)V
+	public static final fun setLogLevel (Lcom/zeeplabs/notti/NottiLogLevel;)V
+	public static final fun setSubscription (Z)V
+}
+
+public final class com/zeeplabs/notti/Notti$Notifications {
+	public static final field INSTANCE Lcom/zeeplabs/notti/Notti$Notifications;
+	public static final fun addClickedListener (Lcom/zeeplabs/notti/NottiNotificationListener;)Lcom/zeeplabs/notti/NottiSubscription;
+	public static final fun addReceivedListener (Lcom/zeeplabs/notti/NottiNotificationListener;)Lcom/zeeplabs/notti/NottiSubscription;
+	public static final fun requestPermission (Lcom/zeeplabs/notti/NottiPermissionCallback;)V
+	public static final fun takeInitialClick ()Lcom/zeeplabs/notti/NottiNotification;
+}
+
+public final class com/zeeplabs/notti/Notti$User {
+	public static final field INSTANCE Lcom/zeeplabs/notti/Notti$User;
+	public static final fun addTag (Ljava/lang/String;Ljava/lang/String;)V
+	public static final fun addTags (Ljava/util/Map;)V
+	public static final fun clearEmail ()V
+	public static final fun clearPhone ()V
+	public static final fun removeTag (Ljava/lang/String;)V
+	public static final fun removeTags (Ljava/util/List;)V
+	public static final fun setEmail (Ljava/lang/String;)V
+	public static final fun setPhone (Ljava/lang/String;)V
+}
+
 public final class com/zeeplabs/notti/NottiBridge {
 	public static final field INSTANCE Lcom/zeeplabs/notti/NottiBridge;
 	public static final fun onMessageReceived (Lcom/google/firebase/messaging/RemoteMessage;)V
 	public static final fun onNewToken (Ljava/lang/String;)V
+}
+
+public abstract interface class com/zeeplabs/notti/NottiDeviceIdListener {
+	public abstract fun onDeviceIdChanged (Ljava/lang/String;)V
+}
+
+public final class com/zeeplabs/notti/NottiLogLevel : java/lang/Enum {
+	public static final field DEBUG Lcom/zeeplabs/notti/NottiLogLevel;
+	public static final field ERROR Lcom/zeeplabs/notti/NottiLogLevel;
+	public static final field INFO Lcom/zeeplabs/notti/NottiLogLevel;
+	public static final field NONE Lcom/zeeplabs/notti/NottiLogLevel;
+	public static final field VERBOSE Lcom/zeeplabs/notti/NottiLogLevel;
+	public static final field WARN Lcom/zeeplabs/notti/NottiLogLevel;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/zeeplabs/notti/NottiLogLevel;
+	public static fun values ()[Lcom/zeeplabs/notti/NottiLogLevel;
+}
+
+public final class com/zeeplabs/notti/NottiNotification {
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBody ()Ljava/lang/String;
+	public final fun getData ()Ljava/util/Map;
+	public final fun getTitle ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/zeeplabs/notti/NottiNotificationListener {
+	public abstract fun onNotification (Lcom/zeeplabs/notti/NottiNotification;)V
+}
+
+public final class com/zeeplabs/notti/NottiOptions {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBaseUrl ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/zeeplabs/notti/NottiPermissionCallback {
+	public abstract fun onResult (Z)V
+}
+
+public final class com/zeeplabs/notti/NottiSubscription {
+	public final fun remove ()V
 }
 

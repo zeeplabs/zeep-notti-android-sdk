@@ -77,7 +77,7 @@ class NottiCoreGapsTest {
     private val baseUrl: String
         get() = server.url("/").toString().trimEnd('/')
 
-    private fun runtime(): NottiRuntime {
+    private fun runtime(permissionRequester: ((callback: (Boolean) -> Unit) -> Unit)? = null): NottiRuntime {
         val prefs = app.getSharedPreferences("notti_gaps_test", Context.MODE_PRIVATE)
         prefs.edit().clear().commit()
         return NottiRuntime(
@@ -93,6 +93,7 @@ class NottiCoreGapsTest {
                 )
             },
             executorFactory = { Executors.newSingleThreadExecutor().also { executors += it } },
+            permissionRequester = permissionRequester,
         )
     }
 
@@ -133,13 +134,13 @@ class NottiCoreGapsTest {
 
     @Test
     fun sdk08RequestPermissionCallsTheInjectedRequesterAndPatchesItsAnswer() {
-        val runtime = runtime()
         var prompts = 0
-        val core =
-            runtime.start("app-fixture", "key-fixture", baseUrl, permissionRequester = { callback ->
+        val runtime =
+            runtime(permissionRequester = { callback ->
                 prompts++
                 callback(true)
             })
+        val core = runtime.start("app-fixture", "key-fixture", baseUrl)
         awaitUntil { runtime.deviceStore.getDeviceId() == "device-fixture" }
 
         var answered: Boolean? = null

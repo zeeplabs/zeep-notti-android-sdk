@@ -12,8 +12,9 @@ import java.util.concurrent.Executors
  * The process container of the core (CORE-02..05): the one owner of what RN kept on the
  * `NottiModule` companion. Created lazily by [get] on the first touch from any side (process hook,
  * FCM service, click detection, `initialize`), so the event store, the session gate and the device
- * store exist before any core (cold-start invariant, CORE-04). [start] builds a core wired to the
- * Android providers; [enqueueEvent] is the detection-site entry.
+ * store exist before any core (cold-start invariant, CORE-04). [ensureCore] builds the one core wired
+ * to the Android providers (RN's lazy core), [start] initializes it; [enqueueEvent] is the
+ * detection-site entry.
  */
 internal class NottiRuntime internal constructor(
     context: Context,
@@ -21,6 +22,9 @@ internal class NottiRuntime internal constructor(
     providersFactory: ((NottiDeviceStore, () -> Activity?) -> NottiAndroidProviders)? = null,
     private val executorFactory: () -> ExecutorService = { newDaemonExecutor("notti-io") },
     private val clock: () -> Long = { System.currentTimeMillis() },
+    permissionRequester: ((callback: (Boolean) -> Unit) -> Unit)? = null,
+    private val apiClientFactory: (appId: String, clientKey: String, baseUrl: String) -> NottiApiClient =
+        { id, key, url -> NottiApiClient(OkHttpClient(), url, id, key) },
 ) {
     private val appContext: Context = context.applicationContext ?: context
 
@@ -61,11 +65,15 @@ internal class NottiRuntime internal constructor(
     @Volatile
     var onNotificationReceived: ((ParsedNotification) -> Unit)? = null
 
+    /** Receives each device id the backend assigns (RN `emitDeviceIdChanged`); null until `public-api` sets it. */
+    @Volatile
+    var onDeviceIdChanged: ((String) -> Unit)? = null
+
     /** The In-App engine's lifecycle hooks; null until `in-app-messages` sets them. */
     @Volatile
     var inAppLifecycle: NottiInAppLifecycle? = null
 
-    /** The live core, if [start] ran and no [stop] cleared it. */
+    /** The live core, if [ensureCore] ran and no [stop] cleared it. */
     @Volatile
     var core: NottiCore? = null
         private set
@@ -82,28 +90,25 @@ internal class NottiRuntime internal constructor(
         providersFactory?.invoke(deviceStore) { currentActivity() }
             ?: NottiAndroidProviders(appContext, deviceStore, { currentActivity() }, geoExecutor)
 
+    private val corePermissionRequester: (callback: (Boolean) -> Unit) -> Unit =
+        permissionRequester ?: defaultPermissionRequester::request
+
     /**
-     * Builds a core with the Android providers, a new `notti-io` executor, the shared gate and
-     * stores, then initializes it with [NottiSdkVersion.CURRENT]. A live core is replaced and its
-     * executor shut down (RN reload semantics). Config comparison and no-op rules belong to
-     * `public-api`.
+     * The live core, or a new one with the Android providers, a new `notti-io` executor, the shared
+     * gate and stores, not initialized (RN's lazy core: calls made before `initialize` are queued by
+     * the core). One core per runtime until [stop].
      */
     @Synchronized
-    fun start(
-        appId: String,
-        clientKey: String,
-        baseUrl: String,
-        permissionRequester: (callback: (Boolean) -> Unit) -> Unit = defaultPermissionRequester::request,
-        onDeviceIdChanged: (String) -> Unit = {},
-    ): NottiCore {
+    fun ensureCore(): NottiCore {
+        core?.let { return it }
         val io = executorFactory()
         val newCore =
             NottiCore(
                 deviceStore = deviceStore,
                 eventStore = eventStore,
-                apiClientFactory = { id, key, url -> NottiApiClient(OkHttpClient(), url, id, key) },
+                apiClientFactory = apiClientFactory,
                 tokenProvider = { callback -> providers.fcmToken(io, callback) },
-                permissionRequester = permissionRequester,
+                permissionRequester = corePermissionRequester,
                 logger = { message -> NottiLogger.error(message) },
                 executor = io,
                 versionProvider = { providers.appVersion() },
@@ -114,20 +119,29 @@ internal class NottiRuntime internal constructor(
                 permissionStatusProvider = { callback -> providers.permissionStatus(callback) },
                 hasLocationPermission = { providers.hasLocationPermission() },
                 countryProvider = { callback -> providers.country(callback) },
-                onDeviceIdChanged = onDeviceIdChanged,
+                onDeviceIdChanged = { id -> onDeviceIdChanged?.invoke(id) },
                 clock = clock,
                 sessionGate = sessionGate,
                 inApp = NottiInAppHooks.None,
             )
-        val oldExecutor = coreExecutor
         core = newCore
         coreExecutor = io
-        oldExecutor?.shutdown()
         // The process onStart for this launch usually fired before the core existed: replay it.
         NottiForegroundObserver.onCoreCreated(newCore)
-        newCore.initialize(appId, clientKey, baseUrl, NottiSdkVersion.CURRENT)
         return newCore
     }
+
+    /**
+     * Initializes the core of [ensureCore] with [NottiSdkVersion.CURRENT] (RN `NottiModule.initialize`
+     * on its lazy core). The core is re-initialized in place: an identical config is a no-op (SDK-07),
+     * a different one registers again (AD-014).
+     */
+    @Synchronized
+    fun start(
+        appId: String,
+        clientKey: String,
+        baseUrl: String,
+    ): NottiCore = ensureCore().also { it.initialize(appId, clientKey, baseUrl, NottiSdkVersion.CURRENT) }
 
     /** Clears [core] and shuts its executor down, only if [core] is still the live one. */
     @Synchronized
@@ -186,6 +200,7 @@ internal class NottiRuntime internal constructor(
         internal fun resetForTest() {
             synchronized(this) {
                 instance?.onNotificationReceived = null
+                instance?.onDeviceIdChanged = null
                 instance?.shutdown()
                 instance = null
             }
