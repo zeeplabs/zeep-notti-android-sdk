@@ -1,0 +1,72 @@
+name: Release
+
+# A X.Y.Z tag (no "v") runs the full CI, then uploads the signed publication to the Central Portal without
+# releasing it. Julio reviews the deployment in the Portal and presses Publish (AD-015, EXR-16). The local
+# fallback is in docs/RELEASING.md.
+on:
+  push:
+    tags: ['[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  contents: read
+
+# Never cancel a release in flight. The called CI uses its own group (workflow name + ref); this one is
+# prefixed so the two never collide (groups are case-insensitive).
+concurrency:
+  group: release-upload-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    # Version drift with the tag checks, guards, style, lint, tests, API dump, examples, signed dry run.
+    uses: ./.github/workflows/ci.yml
+
+  upload:
+    needs: ci
+    runs-on: ubuntu-24.04
+    # Secrets live in this environment, not the repository; a required reviewer can be added there.
+    environment: maven-central
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        with:
+          cache-read-only: true
+
+      # Names an empty secret, never prints a value.
+      - name: Release secrets are set
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          missing=0
+          for name in MAVEN_CENTRAL_USERNAME MAVEN_CENTRAL_PASSWORD SIGNING_KEY SIGNING_KEY_PASSWORD; do
+            if [[ -z "${!name}" ]]; then
+              echo "error: secret $name is empty or not set in the maven-central environment" >&2
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      # Uploads without releasing (publishToMavenCentral, not publishAndReleaseToMavenCentral).
+      - name: Upload to the Central Portal
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: ./gradlew --console=plain :notti:publishToMavenCentral

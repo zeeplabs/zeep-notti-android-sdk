@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".ManualFcmApplication"
         android:allowBackup="false"
         android:label="Notti Manual FCM">
         <!-- Android delivers FCM to one service per app: drop the SDK's and forward from ours. -->

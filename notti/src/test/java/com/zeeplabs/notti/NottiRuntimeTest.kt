@@ -313,6 +313,8 @@ class NottiRuntimeTest {
             }
         awaitUntil { sdkVersionBodies().isNotEmpty() }
         assertEquals(NottiSdkVersion.CURRENT, sdkVersionBodies().single().getString("sdk_version"))
+        // The core records the ack only after the 2xx reaches it, which can be after the server saw the PATCH.
+        awaitUntil { runtime.deviceStore.getLastSyncedSdkVersion() != null }
         assertEquals(NottiSdkVersion.CURRENT, runtime.deviceStore.getLastSyncedSdkVersion())
     }
 

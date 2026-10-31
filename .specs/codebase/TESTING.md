@@ -20,7 +20,7 @@ JDK 17 (`export JAVA_HOME=/opt/homebrew/opt/openjdk@17` on macOS with Homebrew).
 | Style | `./gradlew spotlessCheck` (fix: `spotlessApply`) |
 | Lint (warnings are errors) | `./gradlew :notti:lintRelease` |
 | Public ABI | `./gradlew :notti:apiCheck` (update: `:notti:apiDump`) |
-| Script guards | `scripts/check-version.sh && scripts/check-package-name.sh && scripts/tests/run.sh` |
+| Script guards | `scripts/check-version.sh && scripts/check-package-name.sh && scripts/check-no-url-open.sh && scripts/check-example-coverage.sh && scripts/check-no-tracked-config.sh && scripts/tests/run.sh && scripts/check-release-artifacts.sh` |
 
 ## Test Coverage Matrix
 
@@ -51,6 +51,8 @@ Coverage (2026-10-31, `in-app-messages`): 718 unit tests (+274). 236 ported 1:1 
 | --- | --- | --- |
 | Quick | tasks with unit tests | `./gradlew :notti:testDebugUnitTest --tests '<Class>'` |
 | Build | Gradle config tasks | `./gradlew :notti:assembleRelease` |
-| Full | end of a feature, before a PR | `./gradlew spotlessCheck :notti:lintRelease :notti:testDebugUnitTest :notti:apiCheck :notti:assembleRelease :notti:publishAllPublicationsToBuildRepository && ./gradlew -Pnotti.usePublished=true :example:assembleDebug && scripts/check-version.sh && scripts/check-package-name.sh && scripts/tests/run.sh` |
+| Full | end of a feature, before a PR | `./gradlew spotlessCheck :notti:lintRelease :notti:testDebugUnitTest :notti:apiCheck :notti:assembleRelease :notti:publishAllPublicationsToBuildRepository && ./gradlew -Pnotti.usePublished=true :example:assembleDebug && scripts/check-version.sh && scripts/check-package-name.sh && scripts/check-no-url-open.sh && scripts/check-example-coverage.sh && scripts/check-no-tracked-config.sh && scripts/tests/run.sh && scripts/check-release-artifacts.sh` |
+
+`scripts/check-release-artifacts.sh` needs `gpg` (macOS: `brew install gnupg`, also needed for the real release key, see `docs/RELEASING.md`). Without it the script exits 2 with an install hint: report it as not run, CI runs it on every build.
 
 The CI `build` job also checks the AAR (manifest, `proguard.txt`, no `com/notti/` class) and the POM (coordinates, no React Native).

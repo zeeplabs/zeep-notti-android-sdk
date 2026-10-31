@@ -11,6 +11,8 @@ plugins {
     alias(libs.plugins.vanniktech.publish) apply false
     // Only the BCV task classes are used; :notti wires them by hand (AD-012).
     alias(libs.plugins.kotlinx.bcv) apply false
+    // Applied by the example apps only when their google-services.json exists (AD-016).
+    alias(libs.plugins.google.services) apply false
     alias(libs.plugins.spotless)
 }
 

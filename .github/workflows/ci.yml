@@ -4,7 +4,8 @@ on:
   pull_request:
   push:
     branches: [main]
-    tags: ['*']
+  # Tags run CI once, through release.yml.
+  workflow_call:
 
 permissions:
   contents: read
@@ -35,6 +36,14 @@ jobs:
       # A tapped push's data reaches the host untouched; the SDK never opens a URL (PUSH-12).
       - name: No URL opening (PUSH-12)
         run: scripts/check-no-url-open.sh
+
+      # The example apps reference every public member in notti/api/notti.api (EXR-02).
+      - name: Example covers the public API (EXR-02)
+        run: scripts/check-example-coverage.sh
+
+      # google-services.json and notti.properties hold an integrator's ids and keys; they stay local (EXR-06).
+      - name: No tracked app config (EXR-06)
+        run: scripts/check-no-tracked-config.sh
 
       # The guards are proved on the CI's own OS (GNU), not only on macOS.
       - name: Script self-tests
@@ -95,6 +104,11 @@ jobs:
           fi
           echo "artifact ok: com.zeeplabs:notti-android:$version"
 
+      # Signed dry run with a throwaway key: every artifact verifies and the POM has what Central requires.
+      # Nothing is uploaded (EXR-17). gpg ships with the runner image.
+      - name: Signed release artifacts (EXR-17)
+        run: scripts/check-release-artifacts.sh
+
       # Separate invocation: the apps resolve the artifact published above, not the project (PKG-03). The
       # :example release build is minified (R8); :example-manual-fcm removes the SDK's FCM service (PUSH-15).
       - name: Example apps consume the published AAR (PKG-03, PUSH-15)
@@ -131,6 +145,28 @@ jobs:
             fi
           done
           echo "minified example ok: $apk"
+
+      # The builds above had no google-services.json. With the synthetic fixture the Google Services plugin is
+      # applied and its google_app_id reaches the resources (EXR-05). The copies are removed afterwards.
+      - name: Example apps with Firebase config (EXR-05)
+        run: |
+          set -euo pipefail
+          fixture=scripts/tests/fixtures/google-services.fixture.json
+          trap 'rm -f example/google-services.json example-manual-fcm/google-services.json' EXIT
+          cp "$fixture" example/google-services.json
+          cp "$fixture" example-manual-fcm/google-services.json
+          ./gradlew --console=plain -Pnotti.usePublished=true :example:assembleDebug :example-manual-fcm:assembleDebug
+          for pair in example:com.zeeplabs.notti.example example-manual-fcm:com.zeeplabs.notti.example.manualfcm; do
+            module="${pair%%:*}"
+            package="${pair#*:}"
+            want="$(jq -r --arg p "$package" '.client[] | select(.client_info.android_client_info.package_name == $p) | .client_info.mobilesdk_app_id' "$fixture")"
+            values="$module/build/generated/res/processDebugGoogleServices/values/values.xml"
+            test -f "$values" || { echo "error: $values missing; the Google Services plugin did not run" >&2; exit 1; }
+            grep -qF "<string name=\"google_app_id\" translatable=\"false\">$want</string>" "$values" || {
+              echo "error: $values lacks google_app_id $want" >&2; exit 1
+            }
+            echo "firebase config ok: $module"
+          done
 
       - name: Upload reports on failure
         if: failure()

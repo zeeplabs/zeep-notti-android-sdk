@@ -39,18 +39,18 @@
 - `NottiBridge` manual forwarding for hosts with their own FCM service; documented manifest opt-out
 - `POST_NOTIFICATIONS` flow on API 33+; a tapped push's `data` reaches the host untouched, the SDK never opens it
 
-**in-app-messages** - Execute done (2026-10-31, local branch `feat/in-app-messages`, T1..T12; 718 tests, full gate green; awaiting review/PR)
+**in-app-messages** - DONE except CI and device checks (PR #5 merged with `--admin` 2026-10-31, `da644c3`; 718 tests)
 
 - `Notti.trackEvent`, `Notti.InAppMessages.addClickListener` and the URL-open initialize option (moved from `public-api`)
 - Port the RN In-App engine (session, coordinator, presenter, view factory, style, image loader, event store, accessibility)
 - `push_permission` button; `url` actions opened in the browser with the iOS AD-020 allowlist and an option to turn it off (AD-006)
 - Guard script: no URL open outside the one allowlisted file (AD-006 amended)
 
-**example-and-release** - PLANNED
+**example-and-release** - EXECUTED (2026-10-31, branch `feat/example-and-release`, T1..T11 done; awaiting PR; release pending device checklist, B-001, B-002 or local fallback)
 
 - Example app (one screen per public method), README (setup, FCM, opt-out, data collection, storage keys, Play Data safety, LGPD note, known limitations), CHANGELOG
 - Device checklist (Android counterpart of iOS `DEVICE_CHECKLIST`, plus RN-era open items), image push rendered by the tray in background and killed states
-- Maven Central namespace verification, signed publication of `0.1.0` (outward action, explicit confirmation)
+- Release workflow on tag plus a local fallback runbook; signed dry run checked; Julio tags and publishes `0.1.0` (AD-015)
 
 ---
 
