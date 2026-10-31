@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/example-and-release/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: In progress (T1 done)
+**Status**: In progress (T1-T2 done)
 
 ---
 
@@ -73,11 +73,12 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Self-test covers clean, tracked `google-services.json`, tracked `notti.properties`, tracked `.sample` / `.fixture.json` (pass), not a git checkout (exit 2)
-- [ ] Guard passes on this repo; the CI steps run locally as written (the assertion command)
+- [x] Self-test covers clean, tracked `google-services.json`, tracked `notti.properties`, tracked `.sample` / `.fixture.json` (pass), not a git checkout (exit 2)
+- [x] Guard passes on this repo; the CI steps run locally as written (the assertion command)
 
 **Tests**: script self-test **Gate**: Example
 **Commit**: `ci: guard against tracked app config and build the example with Firebase config`
+**Status**: Done. The CI step builds and asserts both example apps (each against its own fixture client), not only `:example`; self-test also covers a root `google-services.json` and an untracked one.
 
 ---
 
