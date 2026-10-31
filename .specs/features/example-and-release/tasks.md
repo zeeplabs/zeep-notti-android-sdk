@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/example-and-release/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: In progress (T1-T8 done)
+**Status**: In progress (T1-T9 done)
 
 ---
 
@@ -206,11 +206,12 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Every command matches T7/T8 names (task, properties, secrets, environment)
-- [ ] No secret value, key id or token in the file; placeholders only
+- [x] Every command matches T7/T8 names (task, properties, secrets, environment)
+- [x] No secret value, key id or token in the file; placeholders only
 
 **Tests**: review **Gate**: none
 **Commit**: `docs: release runbook`
+**Status**: Done. Names match T7/T8 (`publishToMavenCentral`, `mavenCentralUsername`/`Password`, `signingInMemoryKey`/`KeyPassword`, the four secrets, environment `maven-central`). The local fallback keeps the key out of `gradle.properties` and exports it into the shell for the upload only. [Incerto] Portal menu labels and the `zeeplabs.com` domain are to confirm at setup (B-001).
 
 ---
 
