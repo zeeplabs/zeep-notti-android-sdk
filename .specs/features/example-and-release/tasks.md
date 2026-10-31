@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/example-and-release/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: In progress (T1-T2 done)
+**Status**: In progress (T1-T3 done)
 
 ---
 
@@ -91,13 +91,14 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Every member listed in D3 for `Notti`, `User`, `Notifications`, `InAppMessages` is called or shown
-- [ ] `grep` of the example sources shows no `Log.` call with a typed value, token, data value or URL
-- [ ] "Not configured" state visible without `notti.properties`
-- [ ] Example gate green (debug, minified release, published AAR)
+- [x] Every member listed in D3 for `Notti`, `User`, `Notifications`, `InAppMessages` is called or shown
+- [x] `grep` of the example sources shows no `Log.` call with a typed value, token, data value or URL
+- [x] "Not configured" state visible without `notti.properties`
+- [x] Example gate green (debug, minified release, published AAR)
 
 **Tests**: Gradle builds; device checks in T6 **Gate**: Example
 **Commit**: `feat(example): one screen with every public call and a redacted event log`
+**Status**: Done. Deviations: Status has no SDK version (`NottiSdkVersion` is internal, not in `notti.api`); subscription and location use check boxes that start unchecked (the SDK has no getters); `ExampleEventLog` posts to the main thread when a listener calls it off-main.
 
 ---
 
