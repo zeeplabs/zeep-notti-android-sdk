@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-10-31
-**Current Work:** `example-and-release` design and tasks written (branch `feat/example-and-release`, 2026-10-31; spec approved by Julio), awaiting approval to execute T1..T11. `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
+**Current Work:** `example-and-release` executed (T1..T11, local branch `feat/example-and-release`, 2026-10-31), awaiting push/PR by Julio. Release 0.1.0 waits on the device checklist (`docs/DEVICE_CHECKLIST.md`), Data safety confirmation (AD-011), B-001 and a release path (CI or the local fallback in `docs/RELEASING.md` while B-002 is open). `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI still blocked (B-002).
 
 ---
 
@@ -181,6 +181,8 @@ From this repo:
 - Flaky ported test: `NottiCoreTest` "logout clears the external user id server-side and clears email and phone" failed once (expected 5 requests, saw 4) in 1 of 5 full-suite runs on 2026-10-29, passes alone; ported verbatim from RN (AD-002). Watch it in CI; if it recurs, fix the wait in both repos
 
 - Cross-SDK (RN, iOS N5, here): In-App image loader caps bytes (5 MB) but not decoded pixel dimensions; a small file can still decode to a huge bitmap. Out of scope of `in-app-messages` (ported as RN, Julio 2026-10-31); needs its own spec in all SDKs.
+- Run `docs/DEVICE_CHECKLIST.md` before tagging 0.1.0; tick the todos its items cite only after they pass (example-and-release EXR-13)
+- Confirm the README Play Data safety answers (AD-011; publish gate, not merge gate)
 - Confirm `com.zeeplabs` Central namespace domain (B-001)
 - Confirm AD-005, AD-008..AD-011 (proposed)
 - Evaluate `kotlin.stdlib.default.dependency=false` + stdlib 2.0.x in the POM (AD-012 trade-off)

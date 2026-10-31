@@ -150,26 +150,26 @@ All M1 SDK code is merged (`package-foundation`, `core-port`, `push-integration`
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| EXR-01 | Example app | Tasks | In Tasks |
-| EXR-02 | Example app | Tasks | In Tasks |
-| EXR-03 | Example app | Tasks | In Tasks |
-| EXR-04 | Example app | Tasks | In Tasks |
-| EXR-05 | Example app | Tasks | In Tasks |
-| EXR-06 | Example app | Tasks | In Tasks |
-| EXR-07 | README | Tasks | In Tasks |
-| EXR-08 | README | Tasks | In Tasks |
-| EXR-09 | README | Tasks | In Tasks |
-| EXR-10 | README | Tasks | In Tasks |
-| EXR-11 | README | Tasks | In Tasks |
-| EXR-12 | Device checklist | Tasks | In Tasks |
-| EXR-13 | Device checklist | Tasks | In Tasks |
-| EXR-14 | Release preparation | Tasks | In Tasks |
-| EXR-15 | Release preparation | Tasks | In Tasks |
-| EXR-16 | Release preparation | Tasks | In Tasks |
-| EXR-17 | Release preparation | Tasks | In Tasks |
-| EXR-18 | Release preparation | Tasks | In Tasks |
-| EXR-19 | Release preparation | Tasks | In Tasks |
-| EXR-20 | CI | Tasks | In Tasks |
+| EXR-01 | Example app | T1-T11 | Done (see traceability.md) |
+| EXR-02 | Example app | T1-T11 | Done (see traceability.md) |
+| EXR-03 | Example app | T1-T11 | Done (see traceability.md) |
+| EXR-04 | Example app | T1-T11 | Done (see traceability.md) |
+| EXR-05 | Example app | T1-T11 | Done (see traceability.md) |
+| EXR-06 | Example app | T1-T11 | Done (see traceability.md) |
+| EXR-07 | README | T1-T11 | Done (see traceability.md) |
+| EXR-08 | README | T1-T11 | Done (see traceability.md) |
+| EXR-09 | README | T1-T11 | Done (see traceability.md) |
+| EXR-10 | README | T1-T11 | Done (see traceability.md) |
+| EXR-11 | README | T1-T11 | Done (see traceability.md) |
+| EXR-12 | Device checklist | T1-T11 | Done (see traceability.md) |
+| EXR-13 | Device checklist | T1-T11 | Done (see traceability.md) |
+| EXR-14 | Release preparation | T1-T11 | Done (see traceability.md) |
+| EXR-15 | Release preparation | T1-T11 | Done (see traceability.md) |
+| EXR-16 | Release preparation | T1-T11 | Done (see traceability.md) |
+| EXR-17 | Release preparation | T1-T11 | Done (see traceability.md) |
+| EXR-18 | Release preparation | T1-T11 | Done (see traceability.md) |
+| EXR-19 | Release preparation | T1-T11 | Done (see traceability.md) |
+| EXR-20 | CI | T1-T11 | Done (see traceability.md) |
 
 **Coverage:** 20 total, 20 mapped to tasks (see `tasks.md`).
 

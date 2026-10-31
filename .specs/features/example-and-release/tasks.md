@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/example-and-release/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: In progress (T1-T10 done)
+**Status**: Done (T1-T11, 2026-10-31)
 
 ---
 
@@ -242,8 +242,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] 20/20 EXR mapped
-- [ ] Full gate green; counts reported (718 unit tests, self-tests)
+- [x] 20/20 EXR mapped
+- [x] Full gate green; counts reported (718 unit tests, self-tests)
 
 **Tests**: Full gate **Gate**: Full
 **Commit**: `docs(specs): example-and-release traceability`

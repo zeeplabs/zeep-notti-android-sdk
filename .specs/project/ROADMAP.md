@@ -46,7 +46,7 @@
 - `push_permission` button; `url` actions opened in the browser with the iOS AD-020 allowlist and an option to turn it off (AD-006)
 - Guard script: no URL open outside the one allowlisted file (AD-006 amended)
 
-**example-and-release** - TASKS (2026-10-31, branch `feat/example-and-release`; spec approved, design + T1..T11 awaiting approval)
+**example-and-release** - EXECUTED (2026-10-31, branch `feat/example-and-release`, T1..T11 done; awaiting PR; release pending device checklist, B-001, B-002 or local fallback)
 
 - Example app (one screen per public method), README (setup, FCM, opt-out, data collection, storage keys, Play Data safety, LGPD note, known limitations), CHANGELOG
 - Device checklist (Android counterpart of iOS `DEVICE_CHECKLIST`, plus RN-era open items), image push rendered by the tray in background and killed states
