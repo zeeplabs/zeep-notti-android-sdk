@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/example-and-release/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: In progress (T1-T4 done)
+**Status**: In progress (T1-T5 done)
 
 ---
 
@@ -129,13 +129,14 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Sections in EXR-07 order; no "draft"
-- [ ] Every field in the data section traced to the code that sends or stores it (list in the commit body)
-- [ ] Only placeholders; default host stated once
-- [ ] Every Kotlin snippet matches the current public API (checked against `notti.api`)
+- [x] Sections in EXR-07 order; no "draft"
+- [x] Every field in the data section traced to the code that sends or stores it (list in the commit body)
+- [x] Only placeholders; default host stated once
+- [x] Every Kotlin snippet matches the current public API (checked against `notti.api`)
 
 **Tests**: review **Gate**: `scripts/check-version.sh`
 **Commit**: `docs: integrator README for 0.1.0`
+**Status**: Done. Data section traced in the commit body. `logout` wording follows the code: email and phone are cleared on the device and the clears are also sent (`NottiCore.logout` calls `clearEmail`/`clearPhone`). Requirements state `compileSdk` 36 from the AAR's `minCompileSdk`. Device checklist link points at `docs/DEVICE_CHECKLIST.md` (T6).
 
 ---
 
