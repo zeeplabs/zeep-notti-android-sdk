@@ -48,6 +48,7 @@
 **Reason:** Parity between the native SDKs that become RN's engine; matches OneSignal/Braze.
 **Trade-off:** Diverges from RN 0.8.0 Android (never opens): the RN bridge must pass `false` to keep RN behavior until RN adopts the default. A listener that also opens the link opens it twice (README warns).
 **Impact:** `in-app-messages` spec and its URL-open guard (two allowlisted files: push-permission settings and the URL opener).
+**Amended (2026-10-31, Julio, in-app-messages spec):** the guard allowlists only the URL opener; the push-permission settings jump uses `Settings` intent actions, which the guard pattern does not match.
 
 ### AD-007: M1 / 0.1.0 = parity with RN 0.8.0, In-App included (2026-10-28, Julio)
 
@@ -160,6 +161,7 @@ Carried from `zeep-notti-ios-sdk` (`.specs/LESSONS.md`, candidates there), to ap
 
 - Flaky ported test: `NottiCoreTest` "logout clears the external user id server-side and clears email and phone" failed once (expected 5 requests, saw 4) in 1 of 5 full-suite runs on 2026-10-29, passes alone; ported verbatim from RN (AD-002). Watch it in CI; if it recurs, fix the wait in both repos
 
+- Cross-SDK (RN, iOS N5, here): In-App image loader caps bytes (5 MB) but not decoded pixel dimensions; a small file can still decode to a huge bitmap. Out of scope of `in-app-messages` (ported as RN, Julio 2026-10-31); needs its own spec in all SDKs.
 - Confirm `com.zeeplabs` Central namespace domain (B-001)
 - Confirm AD-005, AD-008..AD-011 (proposed)
 - Evaluate `kotlin.stdlib.default.dependency=false` + stdlib 2.0.x in the POM (AD-012 trade-off)
