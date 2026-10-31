@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/example-and-release/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: Draft
+**Status**: In progress (T1 done)
 
 ---
 
@@ -53,13 +53,14 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] Example gate green with no local files
-- [ ] With the fixture copied to `example/google-services.json` (removed after): `:example:assembleDebug` passes and merged resources have the fixture `google_app_id`; same for `:example-manual-fcm`
-- [ ] With a temp `example/notti.properties` (synthetic values, removed after): `BuildConfig` has them; without it, the fields are empty
-- [ ] `-Pnotti.usePublished=true` builds still pass
+- [x] Example gate green with no local files
+- [x] With the fixture copied to `example/google-services.json` (removed after): `:example:assembleDebug` passes and merged resources have the fixture `google_app_id`; same for `:example-manual-fcm`
+- [x] With a temp `example/notti.properties` (synthetic values, removed after): `BuildConfig` has them; without it, the fields are empty
+- [x] `-Pnotti.usePublished=true` builds still pass
 
 **Tests**: Gradle builds **Gate**: Example
 **Commit**: `build(example): local Notti config and conditional Google Services plugin`
+**Status**: Done. The fixture has one client per example package (`...0000` and `...0001`); `:example-manual-fcm` gets its own `ManualFcmApplication` with an inline config check (it cannot see `ExampleConfig`).
 
 ---
 

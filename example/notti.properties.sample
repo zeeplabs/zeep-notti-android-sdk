@@ -1,0 +1,6 @@
+# Copy to notti.properties (git-ignored) and fill in. Never commit the real file.
+# Read by both example apps (:example and :example-manual-fcm).
+notti.appId=fixture-app-id
+notti.clientKey=fixture-client-key
+# Optional; default https://app.zeepnotti.app
+# notti.baseUrl=https://notti.example.invalid

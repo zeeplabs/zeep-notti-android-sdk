@@ -8,6 +8,8 @@ ktlint = "1.8.0"
 vanniktech = "0.37.0"
 bcv = "0.18.2"
 bcvAsm = "9.6"
+# Examples only (the library never applies it); the react-native-notti example's version.
+googleServices = "4.5.0"
 firebaseMessaging = "25.1.2"
 lifecycle = "2.6.2"
 coreKtx = "1.13.1"
@@ -41,3 +43,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 vanniktech-publish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktech" }
 kotlinx-bcv = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "bcv" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }

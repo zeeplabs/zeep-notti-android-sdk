@@ -21,9 +21,13 @@ class ExampleApplication : Application() {
             // The button id and the action type only: a link may carry personal data.
             Log.i(TAG, "in-app tap, button: ${click.buttonId}, action: ${click.action?.type}")
         }
-        // Placeholders: without a real app id, client key and google-services.json the SDK logs
-        // why it cannot register and the app keeps running.
-        Notti.initialize(this, "YOUR_APP_ID", "YOUR_CLIENT_KEY")
+        // Without example/notti.properties the app shows "not configured" and never initializes. Without
+        // google-services.json the SDK logs why it cannot register and the app keeps running.
+        if (ExampleConfig.isComplete) {
+            Notti.initialize(this, ExampleConfig.appId, ExampleConfig.clientKey, ExampleConfig.options)
+        } else {
+            Log.w(TAG, ExampleConfig.NOT_CONFIGURED)
+        }
     }
 
     companion object {

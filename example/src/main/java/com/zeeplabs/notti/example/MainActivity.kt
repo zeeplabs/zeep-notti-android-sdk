@@ -14,6 +14,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val status =
+            TextView(this).apply {
+                text = if (ExampleConfig.isComplete) "Configured" else ExampleConfig.NOT_CONFIGURED
+            }
         val deviceId = TextView(this)
         val permission = TextView(this)
         val request =
@@ -31,6 +35,7 @@ class MainActivity : ComponentActivity() {
         setContentView(
             LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
+                addView(status)
                 addView(deviceId)
                 addView(request)
                 addView(permission)
