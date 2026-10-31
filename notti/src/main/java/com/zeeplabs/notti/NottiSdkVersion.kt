@@ -6,5 +6,5 @@ package com.zeeplabs.notti
  * and the CHANGELOG. Sent to the backend as `sdk_version`.
  */
 internal object NottiSdkVersion {
-    const val CURRENT = "0.1.0"
+    const val CURRENT = "0.1.1"
 }
