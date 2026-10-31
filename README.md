@@ -2,7 +2,7 @@
 
 Native Android SDK (Kotlin) for Notti push notifications and In-App Messages.
 
-> **Status: pre-release.** Nothing is published yet. The first release, `0.1.0`, targets behavior parity with `react-native-notti` 0.8.0 on Android. Plans live in [`.specs/`](.specs/project/ROADMAP.md).
+> **Status: 0.1.0.** Behavior parity with `react-native-notti` 0.8.0 on Android, plus the SDK opening In-App web links. Until the release is published on Maven Central the dependency below does not resolve; check the [device checklist](docs/DEVICE_CHECKLIST.md) and [known limitations](#known-limitations) before adopting it.
 
 ## Requirements
 

@@ -2,7 +2,7 @@
 
 **Design**: `.specs/features/example-and-release/design.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: In progress (T1-T9 done)
+**Status**: In progress (T1-T10 done)
 
 ---
 
@@ -224,11 +224,12 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11
 
 **Done when**:
 
-- [ ] `scripts/check-version.sh` passes; with `GITHUB_REF=refs/tags/0.1.0` it fails only on the `TBD` date (expected until release day)
-- [ ] Banner no longer says pre-release
+- [x] `scripts/check-version.sh` passes; with `GITHUB_REF=refs/tags/0.1.0` it fails only on the `TBD` date (expected until release day)
+- [x] Banner no longer says pre-release
 
 **Tests**: `check-version.sh` **Gate**: `scripts/tests/run.sh`
 **Commit**: `docs: CHANGELOG and README for 0.1.0`
+**Status**: Done. Tag check with `refs/tags/0.1.0` fails only on `TBD`; on a copy with a date it passes; `v0.1.0` fails. The earlier `[Unreleased]` entries moved into 0.1.0 Added/Fixed. `RELEASING.md` step 4 now says to drop the banner's "Until the release is published" sentence.
 
 ---
 
