@@ -12,14 +12,14 @@
 
 ### Features
 
-**package-foundation** - DONE except the CI proof (2026-10-28: PR #1 merged with `--admin`, full gate green locally; open: T12 CI green/red proof, blocked by GitHub billing B-002)
+**package-foundation** - DONE except the CI proof (2026-10-28: PR #1 merged with `--admin`, full gate green locally; open: T12 red proofs for lint, ABI, version drift and `com.notti`; CI runs since 2026-10-31, green and failing-test red proven on PR #6)
 
 - Gradle (KTS) project, version catalog, library module `:notti` (namespace `com.zeeplabs.notti`, AAR), example module placeholder
 - `minSdk 24`, `compileSdk 36`, Java 17, Kotlin 2.0.x; consumer R8 rules; manifest skeleton
 - Single version source (`NottiSdkVersion.CURRENT`) checked against the Gradle publication version
 - Public API guard (Binary Compatibility Validator `.api` dump), Kotlin lint, CI on PRs, `maven-publish` + signing wired but not run
 
-**core-port** - DONE except CI (318 tests green locally; PR #2 merged with `--admin` 2026-10-29, `b722874`; CI blocked by B-002)
+**core-port** - DONE except CI (318 tests green locally; PR #2 merged with `--admin` 2026-10-29, `b722874`; not run on CI then; B-002 resolved 2026-10-31)
 
 - Port `NottiCore`, `NottiApiClient`, `NottiDeviceStore`, `NottiEventStore`, `NottiNetworkObserver`, parsing and the click relay from RN `v0.8.0`
 - Remove the RN coupling (`NottiModule` companion statics, `ReactApplicationContext`, `WritableMap`) behind an owned runtime that stays cold-start safe
@@ -46,7 +46,7 @@
 - `push_permission` button; `url` actions opened in the browser with the iOS AD-020 allowlist and an option to turn it off (AD-006)
 - Guard script: no URL open outside the one allowlisted file (AD-006 amended)
 
-**example-and-release** - EXECUTED (2026-10-31, branch `feat/example-and-release`, T1..T11 done; awaiting PR; release pending device checklist, B-001, B-002 or local fallback)
+**example-and-release** - DONE (2026-10-31, PR #6 merged `d1f1cad`, CI green; release pending device checklist, Data safety and B-001)
 
 - Example app (one screen per public method), README (setup, FCM, opt-out, data collection, storage keys, Play Data safety, LGPD note, known limitations), CHANGELOG
 - Device checklist (Android counterpart of iOS `DEVICE_CHECKLIST`, plus RN-era open items), image push rendered by the tray in background and killed states
