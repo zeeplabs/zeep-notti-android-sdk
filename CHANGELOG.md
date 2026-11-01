@@ -31,7 +31,7 @@ First release of the native Android SDK: behavior parity with `react-native-nott
 - `singleTop`/`singleTask` Activities must call `setIntent` in `onNewIntent` for warm taps.
 - Without `NottiInitProvider`, a restored Activity's launch tap can be reported again.
 - In-App images are capped in bytes, not in decoded pixels.
-- The POM declares `kotlin-stdlib` 2.2.21.
+- Apps with Kotlin code need Kotlin 2.0 or later (`kotlin-stdlib` 2.0.21 in the POM) and `compileSdk` 34 or later.
 - `logout` unlinking needs `zeep-notti` v0.24.0 or later; tags survive `logout`.
 - Device checks not marked passed in `docs/DEVICE_CHECKLIST.md`.
 

@@ -6,7 +6,8 @@ Native Android SDK (Kotlin) for Notti push notifications and In-App Messages.
 
 ## Requirements
 
-- `minSdk` 24 or higher and `compileSdk` 36 or higher (the AAR declares `minCompileSdk` 36).
+- `minSdk` 24 or higher and `compileSdk` 34 or higher (the AAR declares `minCompileSdk` 34).
+- Kotlin 2.0 or later if your app has Kotlin code (the POM declares `kotlin-stdlib` 2.0.21). Java-only apps need nothing extra.
 - A Firebase project with your app registered, and its `google-services.json`.
 - A Notti app id and client key from the Notti dashboard.
 - A Notti backend (`zeep-notti`) that accepts what the SDK sends: v0.10.0 or later for the device-profile fields, v0.11.0 or later for the `opened` event, v0.23.0 or later for In-App Messages and v0.24.0 or later for the `logout` unlink (see [Known limitations](#known-limitations)). An older backend rejects those fields or events and the SDK drops them.
@@ -328,7 +329,7 @@ This README describes what the SDK does. It is not legal advice and does not sta
 - **A web link opened twice.** With `opensInAppUrls` true, a click listener that also opens a `url` action opens it a second time. Open it in the listener only with `NottiOptions(opensInAppUrls = false)`.
 - **No pixel-size cap on In-App images.** Downloads are capped at 5 MiB and 10 s, but a small file that decodes to a very large bitmap is not rejected.
 - **Next to `react-native-notti`.** The packages differ (`com.zeeplabs.notti` here, `com.notti` there) and the provider authorities differ, so both build in one app, but Android delivers FCM to one service only: do not run both SDKs in one app.
-- **`kotlin-stdlib` 2.2.21.** The POM declares `kotlin-stdlib` 2.2.21 at compile scope, which upgrades an app on an older Kotlin stdlib.
+- **Kotlin 2.0 or later.** The POM declares `kotlin-stdlib` 2.0.21 at compile scope; an app compiling with Kotlin 1.9 or older is not supported.
 - **`logout` and re-registration need `zeep-notti` v0.24.0 or later.** Against an older backend, the unlink answers 2xx but the backend keeps the stored value, so the device stays linked to the previous user until the next launch; the SDK counts the 2xx as delivered and does not retry. An older backend also resets `external_user_id` and tags at every launch registration. `react-native-notti` 0.8.0 has the same limits.
 - **Tags survive `logout`.** Clear them yourself (`removeTags`) if they describe the user.
 - **Device proof.** Every item in the [device checklist](docs/DEVICE_CHECKLIST.md) not yet marked passed is a limitation of this release.

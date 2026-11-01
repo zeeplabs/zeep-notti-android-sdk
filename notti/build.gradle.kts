@@ -39,6 +39,10 @@ android {
     defaultConfig {
         minSdk = 24
         consumerProguardFiles("consumer-rules.pro")
+        // AGP defaults this to compileSdk (36). 34 is the floor core-ktx 1.13.1 already sets (AD-017).
+        aarMetadata {
+            minCompileSdk = 34
+        }
     }
 
     buildFeatures {
@@ -73,6 +77,8 @@ kotlin {
 }
 
 dependencies {
+    // Replaces the compiler's default stdlib, so the POM asks hosts for Kotlin 2.0 only (AD-017).
+    api(libs.kotlin.stdlib)
     // `api`: NottiBridge exposes Firebase's RemoteMessage (push-integration).
     api(libs.firebase.messaging)
     implementation(libs.androidx.lifecycle.process)

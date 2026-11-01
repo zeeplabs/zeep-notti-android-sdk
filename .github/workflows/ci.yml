@@ -102,6 +102,11 @@ jobs:
           if grep -q 'com.facebook.react' "$pom"; then
             echo "error: POM depends on React Native" >&2; exit 1
           fi
+          # Host floors (AD-017): Kotlin 2.0 stdlib in the POM, minCompileSdk 34 in the AAR metadata.
+          stdlib="$(grep -A1 '<artifactId>kotlin-stdlib</artifactId>' "$pom" | sed -nE 's/.*<version>([^<]+)<\/version>.*/\1/p')"
+          [[ "$stdlib" == 2.0.* ]] || { echo "error: POM kotlin-stdlib is '$stdlib', expected 2.0.x (AD-017)" >&2; exit 1; }
+          unzip -p "$aar" META-INF/com/android/build/gradle/aar-metadata.properties | grep -qx 'minCompileSdk=34' \
+            || { echo "error: AAR minCompileSdk is not 34 (AD-017)" >&2; exit 1; }
           echo "artifact ok: com.zeeplabs:notti-android:$version"
 
       # Signed dry run with a throwaway key: every artifact verifies and the POM has what Central requires.

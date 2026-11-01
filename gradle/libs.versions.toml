@@ -3,6 +3,8 @@
 [versions]
 agp = "9.2.1"
 kotlin = "2.2.21"
+# Runtime stdlib in the POM: the host floor is Kotlin 2.0 (AD-017), not the compiler version.
+kotlinStdlib = "2.0.21"
 spotless = "8.10.4"
 ktlint = "1.8.0"
 vanniktech = "0.37.0"
@@ -21,6 +23,7 @@ orgJson = "20240303"
 robolectric = "4.14.1"
 
 [libraries]
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlinStdlib" }
 firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycle" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
