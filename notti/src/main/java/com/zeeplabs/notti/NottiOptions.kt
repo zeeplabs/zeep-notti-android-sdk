@@ -1,8 +1,11 @@
 package com.zeeplabs.notti
 
 /**
- * Options for [Notti.initialize]. A plain class, not a data class: later options are added as new
- * defaulted constructor parameters without breaking the ABI.
+ * Options for [Notti.initialize]. A plain class, not a data class, so no `copy` or `componentN` joins
+ * the ABI. A later option is added as a new defaulted constructor parameter, and the previous
+ * constructor stays as a hidden (`@Deprecated(level = HIDDEN)`) overload: Kotlin callers compiled
+ * against an older version call its synthetic defaults constructor, which would otherwise disappear
+ * (AD-018).
  *
  * @property baseUrl the Notti API host, e.g. `https://push.example.invalid`; null uses the Notti
  * SaaS host.

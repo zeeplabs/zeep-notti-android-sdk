@@ -133,6 +133,16 @@ Result:
 - [ ] Pass - [ ] Fail
 Result:
 
+### DC-27. Permission request from the background
+
+**Source:** pre-release review PRR-07 (AD-019). **Emulator OK.**
+**Device/API:** API 33+, fresh install.
+**Steps:** tap **Request permission in 5 s** and press Home at once; wait 10 s; reopen the app; then tap **Request notification permission**.
+**Expected:** with the app in the background no dialog appears and the answer is `false`; back in the app, **Request notification permission** still shows the system dialog.
+
+- [ ] Pass - [ ] Fail
+Result:
+
 ## Push delivery and taps
 
 ### DC-10. Push received in foreground
@@ -276,6 +286,16 @@ Result:
 **Source:** in-app-messages dev log pending item "cold start". **Emulator OK.**
 **Steps:** a `session_start` message active; swipe the app away; open it.
 **Expected:** the message shows once after launch; tapping a button logs `in-app tap` (listener added before `initialize`).
+
+- [ ] Pass - [ ] Fail
+Result:
+
+### DC-26. Permission request over a visible In-App message
+
+**Source:** pre-release review PRR-06 (AD-019). **Emulator OK.**
+**Device/API:** API 33+, fresh install.
+**Steps:** show a `center` message (`session_start`); while it is visible, tap **Request notification permission** in the example (scroll behind the message if needed, or trigger it from a `bottom` message); answer the dialog.
+**Expected:** the system dialog shows over the app; after the answer the same message is back over the example, not duplicated, with no second impression in the dashboard; no flicker of the message inside the dialog.
 
 - [ ] Pass - [ ] Fail
 Result:

@@ -232,6 +232,28 @@ class NottiInAppPresenterTest {
     }
 
     @Test
+    fun `the SDK permission activity is not a host and the overlay returns to the app`() {
+        val a = resumed()
+        presenter.present(display())
+        idle()
+
+        // requestPermission over a visible message: the host pauses, the SDK's dialog Activity resumes.
+        a.pause()
+        val permission = Robolectric.buildActivity(NottiPermissionActivity::class.java).get()
+        tracker.onActivityResumed(permission)
+        idle()
+        assertNull(tracker.resumed)
+        tracker.onActivityPaused(permission)
+        tracker.onActivityDestroyed(permission)
+        a.resume()
+        idle()
+
+        assertSame(a.get(), tracker.resumed)
+        assertTrue(overlayIn(a.get()) != null)
+        assertEquals(1, events.visible)
+    }
+
+    @Test
     fun `a resume of another activity while still attached moves the overlay`() {
         val a = resumed()
         presenter.present(display())

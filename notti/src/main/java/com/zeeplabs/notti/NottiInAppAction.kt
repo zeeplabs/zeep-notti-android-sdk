@@ -5,6 +5,8 @@ package com.zeeplabs.notti
  * handle. [value] is exactly what the server sent. Built only by the SDK.
  *
  * [toString] prints the [type] only, never the [value]: a link may carry personal data.
+ *
+ * [Type] may gain values in a minor release (AD-018): give a `when` over it an `else` branch.
  */
 class NottiInAppAction internal constructor(
     val type: Type,

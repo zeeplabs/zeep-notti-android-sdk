@@ -23,6 +23,7 @@ internal class NottiRuntime internal constructor(
     private val executorFactory: () -> ExecutorService = { newDaemonExecutor("notti-io") },
     private val clock: () -> Long = { System.currentTimeMillis() },
     permissionRequester: ((callback: (Boolean) -> Unit) -> Unit)? = null,
+    isForeground: () -> Boolean = NottiPermissionRequester::isProcessStarted,
     private val apiClientFactory: (appId: String, clientKey: String, baseUrl: String) -> NottiApiClient =
         { id, key, url -> NottiApiClient(OkHttpClient(), url, id, key) },
 ) {
@@ -84,7 +85,8 @@ internal class NottiRuntime internal constructor(
     private val geoExecutor: ExecutorService = newDaemonExecutor("notti-geo")
 
     /** The API 33+ dialog from the current Activity (RN `requestNativePermission`), the core's default requester. */
-    private val defaultPermissionRequester = NottiPermissionRequester(appContext, deviceStore, currentActivity)
+    private val defaultPermissionRequester =
+        NottiPermissionRequester(appContext, deviceStore, currentActivity, isForeground = isForeground)
 
     private val providers: NottiAndroidProviders =
         providersFactory?.invoke(deviceStore) { currentActivity() }

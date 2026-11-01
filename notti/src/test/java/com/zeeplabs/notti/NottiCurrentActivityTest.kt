@@ -51,6 +51,19 @@ class NottiCurrentActivityTest {
     }
 
     @Test
+    fun theSdkPermissionActivityNeverBecomesCurrent() {
+        val listener = NottiActivityLifecycleListener()
+        val host = Robolectric.buildActivity(Activity::class.java).get()
+        val permission = Robolectric.buildActivity(NottiPermissionActivity::class.java).get()
+
+        listener.onActivityResumed(host)
+        listener.onActivityResumed(permission)
+        listener.onActivityDestroyed(permission)
+
+        assertSame(host, runtime.currentActivity())
+    }
+
+    @Test
     fun lastResumedWins() {
         NottiActivityLifecycleListener.registerOnce(RuntimeEnvironment.getApplication())
 

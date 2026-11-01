@@ -87,6 +87,8 @@ class NottiRuntimeTest {
                 )
             },
             executorFactory = { Executors.newSingleThreadExecutor().also { executors += it } },
+            // Robolectric never moves ProcessLifecycleOwner to STARTED.
+            isForeground = { true },
         )
     }
 

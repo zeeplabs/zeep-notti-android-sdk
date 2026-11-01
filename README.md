@@ -6,7 +6,8 @@ Native Android SDK (Kotlin) for Notti push notifications and In-App Messages.
 
 ## Requirements
 
-- `minSdk` 24 or higher and `compileSdk` 36 or higher (the AAR declares `minCompileSdk` 36).
+- `minSdk` 24 or higher and `compileSdk` 34 or higher (the AAR declares `minCompileSdk` 34).
+- Kotlin 2.0 or later if your app has Kotlin code (the POM declares `kotlin-stdlib` 2.0.21). Java-only apps need nothing extra.
 - A Firebase project with your app registered, and its `google-services.json`.
 - A Notti app id and client key from the Notti dashboard.
 - A Notti backend (`zeep-notti`) that accepts what the SDK sends: v0.10.0 or later for the device-profile fields, v0.11.0 or later for the `opened` event, v0.23.0 or later for In-App Messages and v0.24.0 or later for the `logout` unlink (see [Known limitations](#known-limitations)). An older backend rejects those fields or events and the SDK drops them.
@@ -70,7 +71,7 @@ The SDK talks to `https://app.zeepnotti.app` unless you pass your own host:
 Notti.initialize(this, "YOUR_APP_ID", "YOUR_CLIENT_KEY", NottiOptions(baseUrl = "https://push.example.invalid"))
 ```
 
-`NottiOptions` has two fields: `baseUrl` (null for the default host) and `opensInAppUrls` (default true, see [In-App Messages](#in-app-messages)). The SDK keeps only the application context. Calling `initialize` again with the same values does nothing; with different values the device registers again. Blank ids or an invalid base URL are logged and ignored. No SDK call throws.
+`NottiOptions` has two fields: `baseUrl` (null for the default host) and `opensInAppUrls` (default true, see [In-App Messages](#in-app-messages)). The SDK keeps only the application context. Calling `initialize` again with the same values does nothing; with different values the device registers again. Blank or `null` ids or an invalid base URL are logged and ignored. No SDK call throws, also for `null` text, map or list arguments from Java (listener and callback arguments must not be `null`).
 
 ## Notification permission
 
@@ -80,7 +81,7 @@ Notti.initialize(this, "YOUR_APP_ID", "YOUR_CLIENT_KEY", NottiOptions(baseUrl = 
 Notti.Notifications.requestPermission { granted -> /* update your UI */ }
 ```
 
-On Android 13+ the request shows the system dialog from the Activity in front and reports the answer; with no Activity in front it answers `false` without a dialog. Below Android 13 no runtime permission exists and the request answers `true`. The SDK reports the permission state to the backend (`permission_status`) when it changes.
+On Android 13+ the request shows the system dialog from the Activity in front and reports the answer. With the app in the background, or before an Activity has resumed, it answers `false` without a dialog, and the request does not count as asked (a later `push_permission` button still shows the prompt). Below Android 13 no runtime permission exists and the request answers `true`. The SDK reports the permission state to the backend (`permission_status`) when it changes.
 
 ## Identity and tags
 
@@ -101,7 +102,7 @@ Notti.logout()
 
 `login` links the device to your own user id. Email, phone and tags are optional and are sent only when you set them. `logout` clears the external user id on the device and sends `external_user_id: null` to unlink it on the server, and clears email and phone on the device (each clear is also sent to the server); tags and the subscription stay. The unlink is kept on the device until the backend acknowledges it: a `logout` made offline, before `Notti.initialize`, or whose request failed is sent again at the next registration (a later `login` replaces it).
 
-Call these after `initialize`. Before it, `login`, tags and `setSubscription` are ignored (an error line is logged), while email, phone, location sharing and `logout` are kept and sent at the first registration. The SDK never asks for the location permission: with location sharing on and the permission already granted by your app, it reads the country at the next session start. Turning it off also clears the country on the backend.
+Call these after `initialize`. Before it, `login`, tags and `setSubscription` are ignored (an error line is logged), while email, phone, location sharing and `logout` are kept and sent at the first registration. That needs `NottiInitProvider` (the default): if you removed it, every call before the first `initialize` is dropped with a `WARN` line, which the default `ERROR` level hides. The SDK never asks for the location permission: with location sharing on and the permission already granted by your app, it reads the country at the next session start. Turning it off also clears the country on the backend.
 
 ## Listeners and the initial click
 
@@ -136,6 +137,7 @@ val inAppClicks = Notti.InAppMessages.addClickListener { click ->
     when (action.type) {
         NottiInAppAction.Type.DEEPLINK -> { /* route action.value inside the app */ }
         NottiInAppAction.Type.URL -> { /* opened by the SDK after this listener returns */ }
+        else -> { /* a type added in a later version */ }
     }
 }
 
@@ -146,7 +148,7 @@ inAppClicks.remove()
 ```
 
 - **`Notti.trackEvent`** matches on the device only: the name is never sent, stored or logged. A blank name does nothing. A call before `initialize`, or in the background after a session ended, is ignored. A call after `initialize` and before the first session opens is remembered for that session (up to 32 distinct names). Any thread.
-- **The click listener** runs on the main thread, before the message closes, for a tap on a button, on a tappable image, or on the body of a `top` or `bottom` message that has buttons (it acts as the first button). `NottiInAppClick` carries `messageId`, `buttonId` (`image` for the image) and `action`: a `NottiInAppAction` with `type` (`URL` or `DEEPLINK`) and the untouched `value`, or null. Listeners added before `initialize` are kept; a click with no listener is not replayed.
+- **The click listener** runs on the main thread, before the message closes, for a tap on a button, on a tappable image, or on the body of a `top` or `bottom` message that has buttons (it acts as the first button). `NottiInAppClick` carries `messageId`, `buttonId` (`image` for the image) and `action`: a `NottiInAppAction` with `type` (`URL` or `DEEPLINK`) and the untouched `value`, or null. Public enums (`NottiInAppAction.Type`, `NottiLogLevel`) may gain values in a minor release, so keep an `else` branch. Listeners added before `initialize` are kept; a click with no listener is not replayed.
 - **Web links.** With `opensInAppUrls` true (the default), after the listeners ran and the message closed, the SDK starts one `ACTION_VIEW` intent for a `url` action whose value is an `http` or `https` URL (any letter case) with a host and no whitespace, from the Activity in front (or in a new task when there is none). Any other value is not opened and logs one fixed line at level `DEBUG`; a failed open (no browser) logs one fixed warning and is not retried. The SDK never logs the link. Every valid `initialize` sets the option to the value it carries, like `baseUrl`, without registering again: a later call with `NottiOptions()` turns it back on, so pass the same options on every call.
 - **`push_permission` buttons** run the permission flow instead of a link: the listener gets the click with `action == null`, the message closes, and then the SDK shows the system prompt if it never asked (Android 13+), opens the app's notification settings if notifications are off and it already asked (or below Android 13), and does nothing if they are on. Android cannot tell "never asked" from "permanently denied": after the SDK has shown the prompt once, later taps open the settings. Apart from that settings screen, the only URLs the SDK opens are the `url` actions above (`scripts/check-no-url-open.sh` allowlists one file).
 - **Events.** The SDK reports `impression`, `click` (with the button id) and `dismiss` (with the reason). They are queued in the app's `notti_prefs` file (key `notti_pending_inapp_events`), sent in order, and dropped after 7 days; past 100 queued events the oldest is dropped.
@@ -155,7 +157,7 @@ inAppClicks.remove()
 
 ## Logging
 
-`Notti.logLevel = NottiLogLevel.DEBUG` (levels `VERBOSE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `NONE`; default `ERROR`, `NONE` silences the SDK). Logs go to logcat under the tag `Notti` and never contain email, phone, push token, user id, country, tag values or URLs; errors are logged by class or code, not by message.
+`Notti.logLevel = NottiLogLevel.DEBUG` (levels `VERBOSE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `NONE`; default `ERROR`, `NONE` silences the SDK). Logs go to logcat under the tag `Notti` and never contain email, phone, push token, user id, country, tag values or URLs; errors are logged by class or code, not by message. One exception: an invalid `baseUrl` is logged as given, to explain why `initialize` was ignored. It is your configuration, not user data; keep credentials out of it.
 
 ## Notification icon and color
 
@@ -219,7 +221,7 @@ class MyMessagingService : FirebaseMessagingService() {
 
 ### Removing the process-start hook
 
-You can remove `com.zeeplabs.notti.NottiInitProvider` with `tools:node="remove"`. `Notti.initialize` then installs the same hooks (tap detection, foreground and network observers), once per process. Where you call it decides whether the tap that launched the app is seen:
+You can remove `com.zeeplabs.notti.NottiInitProvider` with `tools:node="remove"`. `Notti.initialize` then installs the same hooks (tap detection, foreground and network observers), once per process. Until that first call no SDK state exists, so every other call (including email, phone, location sharing and `logout`) is dropped with a `WARN` line; call `initialize` before anything else. Where you call it decides whether the tap that launched the app is seen:
 
 - In `Application.onCreate`: same as with the provider.
 - In the launch Activity's `onCreate`: the launch tap is detected when the Activity resumes, and reopening the app from Recents is not reported as a tap.
@@ -260,6 +262,8 @@ Notti.trackEvent("checkout_completed");
 Notti.setLogLevel(NottiLogLevel.DEBUG);
 String deviceId = Notti.getDeviceId();
 ```
+
+Text, map and list arguments accept `null`: the call is logged by method name and ignored, and `null` keys, values or list items are dropped. Listener and callback arguments must not be `null`.
 
 ## Data the SDK handles
 
@@ -328,7 +332,7 @@ This README describes what the SDK does. It is not legal advice and does not sta
 - **A web link opened twice.** With `opensInAppUrls` true, a click listener that also opens a `url` action opens it a second time. Open it in the listener only with `NottiOptions(opensInAppUrls = false)`.
 - **No pixel-size cap on In-App images.** Downloads are capped at 5 MiB and 10 s, but a small file that decodes to a very large bitmap is not rejected.
 - **Next to `react-native-notti`.** The packages differ (`com.zeeplabs.notti` here, `com.notti` there) and the provider authorities differ, so both build in one app, but Android delivers FCM to one service only: do not run both SDKs in one app.
-- **`kotlin-stdlib` 2.2.21.** The POM declares `kotlin-stdlib` 2.2.21 at compile scope, which upgrades an app on an older Kotlin stdlib.
+- **Kotlin 2.0 or later.** The POM declares `kotlin-stdlib` 2.0.21 at compile scope; an app compiling with Kotlin 1.9 or older is not supported.
 - **`logout` and re-registration need `zeep-notti` v0.24.0 or later.** Against an older backend, the unlink answers 2xx but the backend keeps the stored value, so the device stays linked to the previous user until the next launch; the SDK counts the 2xx as delivered and does not retry. An older backend also resets `external_user_id` and tags at every launch registration. `react-native-notti` 0.8.0 has the same limits.
 - **Tags survive `logout`.** Clear them yourself (`removeTags`) if they describe the user.
 - **Device proof.** Every item in the [device checklist](docs/DEVICE_CHECKLIST.md) not yet marked passed is a limitation of this release.

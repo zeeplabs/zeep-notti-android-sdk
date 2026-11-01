@@ -47,8 +47,8 @@ Back up the secret key (`gpg --armor --export-secret-keys KEY_ID > notti-signing
 ### 4. GitHub environment and secrets (CI path)
 
 1. Repository **Settings → Environments → New environment** → `maven-central`.
-2. Optional: add Julio as a **required reviewer**, so every upload waits for an approval.
-3. Optional: **Deployment branches and tags** → allow tags matching `[0-9]*.[0-9]*.[0-9]*` only.
+2. Required: add Julio as a **required reviewer**, so every upload waits for an approval. Without it, anyone with write access can push an `X.Y.Z` tag on any commit and trigger a signed upload.
+3. Required: **Deployment branches and tags** → **Selected branches and tags** → allow tags matching `[0-9]*.[0-9]*.[0-9]*` only, so no branch run can read the secrets.
 4. Add four **environment secrets** (not repository secrets):
 
 | Secret | Value |
@@ -78,7 +78,7 @@ The key is not stored there: it is exported into the shell for the upload only (
 1. The [device checklist](DEVICE_CHECKLIST.md) is run and recorded; every Fail is fixed or listed in the README's known limitations.
 2. Play Data safety wording in the README confirmed (AD-011). Proposed ADs confirmed (AD-005, AD-008..AD-011).
 3. B-001 closed (namespace verified). Release path chosen: CI or the local fallback.
-4. In the release PR: date the CHANGELOG section (`## [0.1.0] - YYYY-MM-DD`) and drop the README banner's "Until the release is published" sentence. `scripts/check-version.sh` checks both on the tag build.
+4. In the release PR: date the CHANGELOG section (`## [0.1.0] - YYYY-MM-DD`) and drop the README banner's "Until the release is published" sentence. On the tag build `scripts/check-version.sh` fails on a `TBD` date and while the README still contains "Until the release is published", "pre-release" or "release candidate".
 5. Run the Full gate (`.specs/codebase/TESTING.md`), including `scripts/check-release-artifacts.sh`. Merge the PR into `main`.
 
 ### Tag
@@ -94,7 +94,7 @@ Tags are `X.Y.Z`, no `v`. `release.yml` ignores any other tag.
 
 ### Upload: CI path
 
-Watch **Actions → Release** for the tag. The `ci` job runs the whole CI (with the tag checks); then `upload` (in `maven-central`, after approval if a reviewer is set) runs `:notti:publishToMavenCentral`. Go to [Portal review](#portal-review-and-publish) when it is green.
+Watch **Actions → Release** for the tag. The `ci` job runs the whole CI (with the tag checks); then `upload` (in `maven-central`, after Julio approves it) runs `:notti:publishToMavenCentral`. Go to [Portal review](#portal-review-and-publish) when it is green.
 
 ### Upload: local fallback
 

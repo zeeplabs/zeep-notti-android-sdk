@@ -10,7 +10,9 @@ import androidx.core.app.NotificationManagerCompat
  *
  * Call [initialize] once, as early as possible (ideally in `Application.onCreate`). Every other call
  * is safe before it: the SDK keeps what it can and sends it after the first registration. Nothing
- * here throws; invalid input is logged and ignored. Listeners and callbacks run on the main thread.
+ * here throws; invalid input is logged and ignored. Text, map and list parameters also accept `null`
+ * from Java: the call is logged and ignored, and `null` keys, values or items are dropped (AD-018).
+ * Listener and callback arguments must not be null. Listeners and callbacks run on the main thread.
  */
 object Notti {
     /** RN `SAAS_BASE_URL`: the host used when [NottiOptions.baseUrl] is null. */
@@ -24,18 +26,20 @@ object Notti {
     /**
      * Starts the SDK and registers the device. Only the application context of [context] is kept.
      * Calling again with the same [appId], [clientKey] and base URL does nothing; with a different one
-     * the device registers again with the new values. Blank ids or an invalid base URL are logged and
-     * ignored, and a previous valid configuration stays in effect. Each valid call applies
+     * the device registers again with the new values. Blank or null ids or an invalid base URL are logged
+     * and ignored, and a previous valid configuration stays in effect. A null [options] means the defaults. Each valid call applies
      * [NottiOptions.opensInAppUrls], also when nothing else changed.
      */
     @JvmStatic
     @JvmOverloads
     fun initialize(
         context: Context,
-        appId: String,
-        clientKey: String,
-        options: NottiOptions = NottiOptions(),
+        appId: String?,
+        clientKey: String?,
+        options: NottiOptions? = NottiOptions(),
     ) {
+        if (appId == null || clientKey == null) return nullArgument("initialize")
+        val validOptions = options ?: NottiOptions()
         try {
             val app = context.applicationContext ?: context
             if (app is Application) {
@@ -45,10 +49,10 @@ object Notti {
             }
             val runtime = NottiRuntime.get(app)
             wire(runtime)
-            val baseUrl = options.baseUrl ?: DEFAULT_BASE_URL
+            val baseUrl = validOptions.baseUrl ?: DEFAULT_BASE_URL
             // RN order: In-App gets the config before the core exists, so the session start that the
             // core's creation replays finds it (same main-thread FIFO as trackEvent).
-            initializeInApp(appId, clientKey, baseUrl, options)
+            initializeInApp(appId, clientKey, baseUrl, validOptions)
             wirePushPermissionPort(app, runtime)
             runtime.start(appId, clientKey, baseUrl)
         } catch (t: Throwable) {
@@ -58,7 +62,8 @@ object Notti {
 
     /** Links this device to your user id; sent after the first registration if called before it. */
     @JvmStatic
-    fun login(externalUserId: String) {
+    fun login(externalUserId: String?) {
+        if (externalUserId == null) return nullArgument("login")
         core("login")?.login(externalUserId)
     }
 
@@ -93,7 +98,8 @@ object Notti {
      * The name is never logged or stored.
      */
     @JvmStatic
-    fun trackEvent(name: String) {
+    fun trackEvent(name: String?) {
+        if (name == null) return nullArgument("trackEvent")
         try {
             NottiInApp.get()?.trackEvent(name)
         } catch (t: Throwable) {
@@ -129,32 +135,37 @@ object Notti {
         /** Sets one tag. */
         @JvmStatic
         fun addTag(
-            key: String,
-            value: String,
+            key: String?,
+            value: String?,
         ) {
+            if (key == null || value == null) return nullArgument("User.addTag")
             core("User.addTag")?.mutateTags(add = mapOf(key to value), remove = null)
         }
 
         /** Sets several tags in one request. */
         @JvmStatic
-        fun addTags(tags: Map<String, String>) {
-            core("User.addTags")?.mutateTags(add = tags.toMap(), remove = null)
+        fun addTags(tags: Map<String, String>?) {
+            if (tags == null) return nullArgument("User.addTags")
+            core("User.addTags")?.mutateTags(add = nonNullEntries("User.addTags", tags), remove = null)
         }
 
         /** Removes one tag. */
         @JvmStatic
-        fun removeTag(key: String) {
+        fun removeTag(key: String?) {
+            if (key == null) return nullArgument("User.removeTag")
             core("User.removeTag")?.mutateTags(add = null, remove = listOf(key))
         }
 
         /** Removes several tags in one request. */
         @JvmStatic
-        fun removeTags(keys: List<String>) {
-            core("User.removeTags")?.mutateTags(add = null, remove = keys.toList())
+        fun removeTags(keys: List<String>?) {
+            if (keys == null) return nullArgument("User.removeTags")
+            core("User.removeTags")?.mutateTags(add = null, remove = nonNullItems("User.removeTags", keys))
         }
 
         @JvmStatic
-        fun setEmail(email: String) {
+        fun setEmail(email: String?) {
+            if (email == null) return nullArgument("User.setEmail")
             core("User.setEmail")?.setEmail(email)
         }
 
@@ -164,7 +175,8 @@ object Notti {
         }
 
         @JvmStatic
-        fun setPhone(phone: String) {
+        fun setPhone(phone: String?) {
+            if (phone == null) return nullArgument("User.setPhone")
             core("User.setPhone")?.setPhone(phone)
         }
 
@@ -282,6 +294,37 @@ object Notti {
                 },
                 logger = { message -> NottiLogger.error(message) },
             )
+    }
+
+    /** A Java caller passed null where Kotlin declares a value (AD-018): logged by method name, ignored. */
+    private fun nullArgument(method: String) {
+        NottiLogger.error("Notti.$method: null argument - ignored")
+    }
+
+    /**
+     * A copy of [map] without null keys or values, which a Java caller can put in a `Map<String, String>`
+     * (AD-018). Typed `Map<*, *>` so the checks are real; drops are logged as a count only.
+     */
+    private fun nonNullEntries(
+        method: String,
+        map: Map<*, *>,
+    ): Map<String, String> {
+        val kept = LinkedHashMap<String, String>()
+        for ((key, value) in map) {
+            if (key is String && value is String) kept[key] = value
+        }
+        if (kept.size != map.size) NottiLogger.error("Notti.$method: ${map.size - kept.size} null entries dropped")
+        return kept
+    }
+
+    /** A copy of [list] without null items (AD-018); drops are logged as a count only. */
+    private fun nonNullItems(
+        method: String,
+        list: List<*>,
+    ): List<String> {
+        val kept = list.filterIsInstance<String>()
+        if (kept.size != list.size) NottiLogger.error("Notti.$method: ${list.size - kept.size} null items dropped")
+        return kept
     }
 
     /** The core of the process runtime (built lazily, RN parity), or null with a warn line. */
