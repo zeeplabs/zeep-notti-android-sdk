@@ -1,7 +1,7 @@
 # State
 
-**Last Updated:** 2026-10-31
-**Current Work:** M1 code complete. `example-and-release` merged (PR #6, `d1f1cad`, admin, CI green, 2026-10-31). Release 0.1.0 waits on the device checklist (`docs/DEVICE_CHECKLIST.md`), Data safety confirmation (AD-011) and B-001; Julio picks the release path (CI or the local fallback in `docs/RELEASING.md`). `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI runs since PR #6 (B-002 resolved).
+**Last Updated:** 2026-11-01
+**Current Work:** M1 code complete. `pre-release-review` fixes (PRR-01..PRR-10, AD-017..AD-019) done on branch `fix/pre-release-review`, PR pending. `example-and-release` merged (PR #6, `d1f1cad`, admin, CI green, 2026-10-31). Release 0.1.0 waits on that PR, the device checklist (`docs/DEVICE_CHECKLIST.md`, DC-01..DC-27), Data safety confirmation (AD-011) and B-001; Julio picks the release path (CI or the local fallback in `docs/RELEASING.md`). `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI runs since PR #6 (B-002 resolved).
 
 ---
 
@@ -209,7 +209,7 @@ From this repo:
 - Confirm the README Play Data safety answers (AD-011; publish gate, not merge gate)
 - Confirm `com.zeeplabs` Central namespace domain (B-001)
 - Confirm AD-005, AD-008..AD-011 (proposed)
-- Pre-release review fixes (`.specs/features/pre-release-review/`, PRR-01..PRR-10, AD-017..AD-019) before tagging 0.1.0
+- Port PRR-07 (foreground check before the permission dialog) and PRR-10 (guarded tap detection) to `react-native-notti`, or let M2 replace its core (AD-019)
 - Move the ABI guard to KGP ABI validation when it supports AGP built-in Kotlin
 
 ---

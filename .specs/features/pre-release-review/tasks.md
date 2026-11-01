@@ -2,7 +2,7 @@
 
 **Spec**: `.specs/features/pre-release-review/spec.md`
 **Testing**: `.specs/codebase/TESTING.md`
-**Status**: In progress (2026-11-01)
+**Status**: Done (T1-T11, 2026-11-01); unit tests 718 -> 725
 
 ---
 
@@ -26,4 +26,4 @@ Full (every task that touches `notti/` or the build): `./gradlew spotlessCheck :
 - [x] **T8** PRR-10: guarded tap detection; test.
 - [x] **T9** PRR-08: README Logging and before-`initialize` wording.
 - [x] **T10** PRR-09: `persist-credentials: false`; `RELEASING.md` environment rules mandatory.
-- [ ] **T11** `docs(specs)`: traceability, STATE, ROADMAP; tasks marked done.
+- [x] **T11** `docs(specs)`: traceability, STATE, ROADMAP; tasks marked done.

@@ -52,6 +52,10 @@
 - Device checklist (Android counterpart of iOS `DEVICE_CHECKLIST`, plus RN-era open items), image push rendered by the tray in background and killed states
 - Release workflow on tag plus a local fallback runbook; signed dry run checked; Julio tags and publishes `0.1.0` (AD-015)
 
+**pre-release-review** - DONE on branch (2026-11-01, PRR-01..PRR-10, AD-017..AD-019; PR pending)
+
+- Fixes from the independent pre-release review: host floors (Kotlin 2.0 stdlib, `minCompileSdk` 34), tag-build banner guard, Java `null` tolerance, API evolution rule, three lifecycle fixes (permission Activity, background permission request, crafted Intent), README and runbook accuracy, checkout credentials
+
 ---
 
 ## M2 - RN SDK on top of the native SDK

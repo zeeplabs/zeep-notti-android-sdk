@@ -54,7 +54,7 @@ No SDK code changed: `notti/src/` untouched, `notti/build.gradle.kts` changed on
 
 ## Open after this feature
 
-- Device checklist run (DC-01..DC-25), then close the cited todos (EXR-13).
+- Device checklist run (DC-01..DC-27; DC-26 and DC-27 added by pre-release-review), then close the cited todos (EXR-13).
 - Play Data safety answers confirmed by Julio (AD-011).
 - B-001 (namespace) and B-002 (CI billing).
 - Proposed ADs to confirm: AD-005, AD-008..AD-011.
