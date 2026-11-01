@@ -120,6 +120,27 @@
 **Trade-off:** A conditional plugin in the example build scripts.
 **Impact:** `example-and-release` EXR-01, EXR-04..EXR-06; `.gitignore`; a tracked-secrets CI check.
 
+### AD-017: Host floors are Kotlin 2.0 and `compileSdk` 34 (2026-11-01, Julio, pre-release review F1/F3)
+
+**Decision:** The library sets `kotlin.stdlib.default.dependency=false` and depends on `kotlin-stdlib` 2.0.21, so the POM no longer carries the 2.2.21 stdlib; class metadata stays at 2.0 (`languageVersion`/`apiVersion` 2.0, AD-012). The AAR declares `aarMetadata.minCompileSdk = 34`, the floor `core-ktx` 1.13.1 already imposes, instead of AGP's default (the library's `compileSdk` 36). CI fails if either drifts.
+**Reason:** AD-013 says the SDK must not force upgrades on hosts. A 2.2.x stdlib in the POM breaks hosts compiling with Kotlin 2.0 (metadata one minor ahead at most), which includes RN hosts on Kotlin 2.0.21 for M2. Both are free to relax later but cheap to fix before the first immutable release.
+**Trade-off:** The library compiles against an older stdlib than its compiler (allowed with `apiVersion` 2.0). A host on Kotlin 1.9 is still not supported.
+**Impact:** Supersedes the AD-012 stdlib trade-off and its todo. `notti/build.gradle.kts`, `gradle.properties`, `gradle/libs.versions.toml`, CI "AAR and POM contents", README Requirements.
+
+### AD-018: Public API evolution rule and Java `null` tolerance (2026-11-01, Julio, pre-release review F4/F5)
+
+**Decision:** After 0.1.0, a new `NottiOptions` field is added as a new defaulted constructor parameter while the previous constructor stays as a `@Deprecated(level = HIDDEN)` overload, so code compiled against the older version (Kotlin callers bind the synthetic defaults constructor) keeps linking; `apiCheck` must show only additions. Public enums (`NottiInAppAction.Type`, `NottiLogLevel`) may gain values in a minor release; docs show `when` with an `else` branch. `Notti` facade methods that take `String`, `Map` or `List` accept Java `null` (Kotlin type `String?` etc. where the JVM signature is unchanged): the call is logged by method name and ignored; `null` entries are dropped. Listener and callback parameters stay non-null.
+**Reason:** The README promises "No SDK call throws", and a library compiled against 0.1.0 (RN M2) must survive a 0.2.0 SDK on the host.
+**Trade-off:** Nullable parameter types in the Kotlin signatures look looser than they are.
+**Impact:** `Notti.kt`, `NottiOptions.kt` KDoc, README In-App and Java sections.
+
+### AD-019: Three lifecycle fixes to ported behavior before 0.1.0 (2026-11-01, Julio, pre-release review F6/F7/F10)
+
+**Decision:** Exceptions to AD-002, approved before the release: (1) the SDK's `NottiPermissionActivity` is invisible to the runtime's current-Activity tracking, to the In-App tracker and to tap detection; (2) the permission dialog is shown only while the process is at least `STARTED`, otherwise the request answers `false` without setting `notti_permission_requested`; (3) tap detection catches any exception from reading the Intent's extras.
+**Reason:** (1) the Activity is new in this SDK (RN used the host's `PermissionAwareActivity`), so RN parity does not cover it; (2) and (10) are RN bugs that leave a user marked "asked" with no dialog, or crash the host on a crafted Intent.
+**Trade-off:** Behavior differs from `react-native-notti` 0.8.0 until M2 moves RN onto this SDK.
+**Impact:** `NottiActivityLifecycleListener`, `NottiInAppPresenter` (tracker), `NottiPermissionRequester`, their tests; `docs/DEVICE_CHECKLIST.md`.
+
 ---
 
 ## Active Blockers
@@ -188,7 +209,7 @@ From this repo:
 - Confirm the README Play Data safety answers (AD-011; publish gate, not merge gate)
 - Confirm `com.zeeplabs` Central namespace domain (B-001)
 - Confirm AD-005, AD-008..AD-011 (proposed)
-- Evaluate `kotlin.stdlib.default.dependency=false` + stdlib 2.0.x in the POM (AD-012 trade-off)
+- Pre-release review fixes (`.specs/features/pre-release-review/`, PRR-01..PRR-10, AD-017..AD-019) before tagging 0.1.0
 - Move the ABI guard to KGP ABI validation when it supports AGP built-in Kotlin
 
 ---
