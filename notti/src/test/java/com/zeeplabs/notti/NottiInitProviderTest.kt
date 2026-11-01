@@ -32,7 +32,9 @@ import org.robolectric.annotation.Config
 class NottiInitProviderTest {
     private val app: Application = RuntimeEnvironment.getApplication()
     private val server = MockWebServer()
-    private val logged = mutableListOf<String>()
+
+    // The sink is process-wide: a late line from another test's background thread can land here.
+    private val logged = java.util.Collections.synchronizedList(mutableListOf<String>())
     private val processLifecycle: LifecycleRegistry
         get() = ProcessLifecycleOwner.get().lifecycle as LifecycleRegistry
 
@@ -125,7 +127,7 @@ class NottiInitProviderTest {
         provider.attachInfo(context, ProviderInfo())
 
         assertNull(NottiRuntime.peek())
-        assertEquals(1, logged.size)
+        assertEquals(1, logged.count { it.startsWith("Notti: no Application context at startup") })
     }
 
     /** An Application with no base context whose lifecycle registration throws. */
