@@ -102,7 +102,7 @@ Notti.logout()
 
 `login` links the device to your own user id. Email, phone and tags are optional and are sent only when you set them. `logout` clears the external user id on the device and sends `external_user_id: null` to unlink it on the server, and clears email and phone on the device (each clear is also sent to the server); tags and the subscription stay. The unlink is kept on the device until the backend acknowledges it: a `logout` made offline, before `Notti.initialize`, or whose request failed is sent again at the next registration (a later `login` replaces it).
 
-Call these after `initialize`. Before it, `login`, tags and `setSubscription` are ignored (an error line is logged), while email, phone, location sharing and `logout` are kept and sent at the first registration. The SDK never asks for the location permission: with location sharing on and the permission already granted by your app, it reads the country at the next session start. Turning it off also clears the country on the backend.
+Call these after `initialize`. Before it, `login`, tags and `setSubscription` are ignored (an error line is logged), while email, phone, location sharing and `logout` are kept and sent at the first registration. That needs `NottiInitProvider` (the default): if you removed it, every call before the first `initialize` is dropped with a `WARN` line, which the default `ERROR` level hides. The SDK never asks for the location permission: with location sharing on and the permission already granted by your app, it reads the country at the next session start. Turning it off also clears the country on the backend.
 
 ## Listeners and the initial click
 
@@ -157,7 +157,7 @@ inAppClicks.remove()
 
 ## Logging
 
-`Notti.logLevel = NottiLogLevel.DEBUG` (levels `VERBOSE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `NONE`; default `ERROR`, `NONE` silences the SDK). Logs go to logcat under the tag `Notti` and never contain email, phone, push token, user id, country, tag values or URLs; errors are logged by class or code, not by message.
+`Notti.logLevel = NottiLogLevel.DEBUG` (levels `VERBOSE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `NONE`; default `ERROR`, `NONE` silences the SDK). Logs go to logcat under the tag `Notti` and never contain email, phone, push token, user id, country, tag values or URLs; errors are logged by class or code, not by message. One exception: an invalid `baseUrl` is logged as given, to explain why `initialize` was ignored. It is your configuration, not user data; keep credentials out of it.
 
 ## Notification icon and color
 
@@ -221,7 +221,7 @@ class MyMessagingService : FirebaseMessagingService() {
 
 ### Removing the process-start hook
 
-You can remove `com.zeeplabs.notti.NottiInitProvider` with `tools:node="remove"`. `Notti.initialize` then installs the same hooks (tap detection, foreground and network observers), once per process. Where you call it decides whether the tap that launched the app is seen:
+You can remove `com.zeeplabs.notti.NottiInitProvider` with `tools:node="remove"`. `Notti.initialize` then installs the same hooks (tap detection, foreground and network observers), once per process. Until that first call no SDK state exists, so every other call (including email, phone, location sharing and `logout`) is dropped with a `WARN` line; call `initialize` before anything else. Where you call it decides whether the tap that launched the app is seen:
 
 - In `Application.onCreate`: same as with the provider.
 - In the launch Activity's `onCreate`: the launch tap is detected when the Activity resumes, and reopening the app from Recents is not reported as a tap.
