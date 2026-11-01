@@ -131,6 +131,45 @@ class NottiUserFacadeTest {
     }
 
     @Test
+    fun nullEntriesFromJavaAreDroppedAndCountedNotLogged() {
+        initialize()
+        // What a Java caller can build: a Map<String, String> holding null keys and values (AD-018).
+        val tags = HashMap<String?, String?>()
+        tags["plan"] = "fixture-plan"
+        tags["tier"] = null
+        tags[null] = "fixture-orphan"
+        @Suppress("UNCHECKED_CAST")
+        Notti.User.addTags(tags as Map<String, String>)
+        awaitUntil { tagPatches().isNotEmpty() }
+        val keys = arrayListOf<String?>("plan", null)
+        @Suppress("UNCHECKED_CAST")
+        Notti.User.removeTags(keys as List<String>)
+        awaitUntil { tagPatches().size == 2 }
+
+        assertEquals(mapOf("plan" to "fixture-plan"), tagPatches()[0])
+        assertEquals(emptyMap<String, String>(), tagPatches()[1])
+        assertTrue(logged.contains("Notti.User.addTags: 2 null entries dropped"))
+        assertTrue(logged.contains("Notti.User.removeTags: 1 null items dropped"))
+        assertFalse(logged.any { it.contains("fixture-orphan") || it.contains("fixture-plan") })
+    }
+
+    @Test
+    fun nullArgumentsAreLoggedByMethodNameAndSendNothing() {
+        initialize()
+        val before = patches().size
+
+        Notti.login(null)
+        Notti.User.setEmail(null)
+        Notti.User.addTag("plan", null)
+        awaitIdle()
+
+        assertEquals(before, patches().size)
+        assertTrue(logged.contains("Notti.login: null argument - ignored"))
+        assertTrue(logged.contains("Notti.User.setEmail: null argument - ignored"))
+        assertTrue(logged.contains("Notti.User.addTag: null argument - ignored"))
+    }
+
+    @Test
     fun removeTagAndRemoveTagsPatchTheRemainingTags() {
         initialize()
         Notti.User.addTags(mapOf("a" to "1", "b" to "2", "c" to "3"))

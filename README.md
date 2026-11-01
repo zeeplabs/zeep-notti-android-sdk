@@ -71,7 +71,7 @@ The SDK talks to `https://app.zeepnotti.app` unless you pass your own host:
 Notti.initialize(this, "YOUR_APP_ID", "YOUR_CLIENT_KEY", NottiOptions(baseUrl = "https://push.example.invalid"))
 ```
 
-`NottiOptions` has two fields: `baseUrl` (null for the default host) and `opensInAppUrls` (default true, see [In-App Messages](#in-app-messages)). The SDK keeps only the application context. Calling `initialize` again with the same values does nothing; with different values the device registers again. Blank ids or an invalid base URL are logged and ignored. No SDK call throws.
+`NottiOptions` has two fields: `baseUrl` (null for the default host) and `opensInAppUrls` (default true, see [In-App Messages](#in-app-messages)). The SDK keeps only the application context. Calling `initialize` again with the same values does nothing; with different values the device registers again. Blank or `null` ids or an invalid base URL are logged and ignored. No SDK call throws, also for `null` text, map or list arguments from Java (listener and callback arguments must not be `null`).
 
 ## Notification permission
 
@@ -261,6 +261,8 @@ Notti.trackEvent("checkout_completed");
 Notti.setLogLevel(NottiLogLevel.DEBUG);
 String deviceId = Notti.getDeviceId();
 ```
+
+Text, map and list arguments accept `null`: the call is logged by method name and ignored, and `null` keys, values or list items are dropped. Listener and callback arguments must not be `null`.
 
 ## Data the SDK handles
 
