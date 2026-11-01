@@ -47,8 +47,8 @@ Back up the secret key (`gpg --armor --export-secret-keys KEY_ID > notti-signing
 ### 4. GitHub environment and secrets (CI path)
 
 1. Repository **Settings → Environments → New environment** → `maven-central`.
-2. Optional: add Julio as a **required reviewer**, so every upload waits for an approval.
-3. Optional: **Deployment branches and tags** → allow tags matching `[0-9]*.[0-9]*.[0-9]*` only.
+2. Required: add Julio as a **required reviewer**, so every upload waits for an approval. Without it, anyone with write access can push an `X.Y.Z` tag on any commit and trigger a signed upload.
+3. Required: **Deployment branches and tags** → **Selected branches and tags** → allow tags matching `[0-9]*.[0-9]*.[0-9]*` only, so no branch run can read the secrets.
 4. Add four **environment secrets** (not repository secrets):
 
 | Secret | Value |
@@ -94,7 +94,7 @@ Tags are `X.Y.Z`, no `v`. `release.yml` ignores any other tag.
 
 ### Upload: CI path
 
-Watch **Actions → Release** for the tag. The `ci` job runs the whole CI (with the tag checks); then `upload` (in `maven-central`, after approval if a reviewer is set) runs `:notti:publishToMavenCentral`. Go to [Portal review](#portal-review-and-publish) when it is green.
+Watch **Actions → Release** for the tag. The `ci` job runs the whole CI (with the tag checks); then `upload` (in `maven-central`, after Julio approves it) runs `:notti:publishToMavenCentral`. Go to [Portal review](#portal-review-and-publish) when it is green.
 
 ### Upload: local fallback
 

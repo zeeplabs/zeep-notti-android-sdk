@@ -25,5 +25,5 @@ Full (every task that touches `notti/` or the build): `./gradlew spotlessCheck :
 - [x] **T7** PRR-07: foreground check before the permission dialog; tests; README Notification permission.
 - [x] **T8** PRR-10: guarded tap detection; test.
 - [x] **T9** PRR-08: README Logging and before-`initialize` wording.
-- [ ] **T10** PRR-09: `persist-credentials: false`; `RELEASING.md` environment rules mandatory.
+- [x] **T10** PRR-09: `persist-credentials: false`; `RELEASING.md` environment rules mandatory.
 - [ ] **T11** `docs(specs)`: traceability, STATE, ROADMAP; tasks marked done.
