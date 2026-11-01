@@ -66,4 +66,8 @@ expect 1 "TBD date fails on a tag build" env GITHUB_REF=refs/tags/0.1.0 "$script
 prerelease="$(fixture prerelease "$v" "## [0.1.0] - 2026-11-02" "Status: pre-release.")"
 expect 1 "tag build with pre-release README fails" env GITHUB_REF=refs/tags/0.1.0 "$script" "$prerelease"
 
+unpublished="$(fixture unpublished "$v" "## [0.1.0] - 2026-11-02" "> **Status: 0.1.0.** Until the release is published on Maven Central the dependency below does not resolve.")"
+expect 1 "tag build with the unpublished banner sentence fails" env GITHUB_REF=refs/tags/0.1.0 "$script" "$unpublished"
+expect 0 "unpublished banner sentence passes on a branch" env -u GITHUB_REF "$script" "$unpublished"
+
 finish

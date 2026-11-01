@@ -6,7 +6,8 @@
 # The top released section is the first `## [x.y.z] - <date>` heading; `## [Unreleased]` is skipped. Its date
 # is `YYYY-MM-DD`, or `TBD` until release day. With no released section yet, only the constant is checked,
 # except on a tag build, which needs a dated section, a tag equal to the constant (`X.Y.Z`, no `v`) and a
-# README that no longer says pre-release.
+# README whose banner no longer says the release is unpublished ("Until the release is published", "pre-release"
+# or "release candidate").
 #
 # Usage: scripts/check-version.sh [repo-root]
 # Reads GITHUB_REF (e.g. refs/tags/0.1.0) when set.
@@ -63,8 +64,8 @@ if [[ "$ref" == refs/tags/* ]]; then
     echo "error: tag $tag needs a dated CHANGELOG section '## [$version] - YYYY-MM-DD'" >&2
     exit 1
   fi
-  if grep -qiE 'pre-release|release candidate' "$readme"; then
-    echo "error: tag $tag but README.md still says pre-release or release candidate (flip the banner first)" >&2
+  if grep -qiE 'until the release is published|pre-release|release candidate' "$readme"; then
+    echo "error: tag $tag but README.md still says the release is unpublished (drop the banner sentence first)" >&2
     exit 1
   fi
 fi
