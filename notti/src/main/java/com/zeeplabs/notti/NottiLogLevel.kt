@@ -1,6 +1,9 @@
 package com.zeeplabs.notti
 
-/** How much the SDK logs (to logcat, tag `Notti`). Lowest first; [NONE] silences it. Default [ERROR]. */
+/**
+ * How much the SDK logs (to logcat, tag `Notti`). Lowest first; [NONE] silences it. Default [ERROR].
+ * May gain values in a minor release (AD-018).
+ */
 enum class NottiLogLevel {
     VERBOSE,
     DEBUG,

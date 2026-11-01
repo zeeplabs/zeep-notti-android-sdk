@@ -20,7 +20,7 @@ Full (every task that touches `notti/` or the build): `./gradlew spotlessCheck :
 - [x] **T2** PRR-02: `check-version.sh` banner pattern, self-test case, `RELEASING.md` wording.
 - [x] **T3** PRR-01, PRR-03: `kotlin.stdlib.default.dependency=false` + `kotlin-stdlib` 2.0.21; `aarMetadata.minCompileSdk = 34`; CI assertions; README Requirements and Known limitations.
 - [x] **T4** PRR-05: Java `null` tolerance in the facade; `NottiJavaNullTest`; README Java section.
-- [ ] **T5** PRR-04: `NottiOptions` KDoc; README `when` example and enum note.
+- [x] **T5** PRR-04: `NottiOptions` KDoc; README `when` example and enum note.
 - [ ] **T6** PRR-06: trackers skip `NottiPermissionActivity`; tests; device checklist item.
 - [ ] **T7** PRR-07: foreground check before the permission dialog; tests; README Notification permission.
 - [ ] **T8** PRR-10: guarded tap detection; test.
