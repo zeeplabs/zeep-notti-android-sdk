@@ -144,7 +144,19 @@ internal class NottiActivityLifecycleListener : Application.ActivityLifecycleCal
     private val handledIntents: MutableSet<Intent> =
         Collections.newSetFromMap(WeakHashMap<Intent, Boolean>())
 
+    /**
+     * Not in RN (AD-019): runs inside the host's lifecycle callbacks, so nothing may escape. Reading a
+     * crafted Intent's extras can throw (`BadParcelableException`); the tap is dropped, logged by class.
+     */
     private fun handle(activity: Activity) {
+        try {
+            handleIntent(activity)
+        } catch (t: Throwable) {
+            NottiLogger.error("Notti: could not read the launch Intent - ${t.javaClass.simpleName}")
+        }
+    }
+
+    private fun handleIntent(activity: Activity) {
         val intent = activity.intent ?: return
         val parsed = parseClickIntentExtras(intent) ?: return
         val firstTimeForThisIntent = synchronized(handledIntents) { handledIntents.add(intent) }
