@@ -59,13 +59,19 @@ internal class NottiInAppActivityTracker : Application.ActivityLifecycleCallback
     val resumed: Activity? get() = resumedRef?.get()
 
     override fun onActivityResumed(activity: Activity) {
+        // Not in RN (AD-019): the SDK's own translucent permission Activity is never a host.
+        if (activity is NottiPermissionActivity) return
         resumedRef = WeakReference(activity)
         listener?.onActivityResumed(activity)
     }
 
-    override fun onActivityPaused(activity: Activity) = gone(activity)
+    override fun onActivityPaused(activity: Activity) {
+        if (activity !is NottiPermissionActivity) gone(activity)
+    }
 
-    override fun onActivityDestroyed(activity: Activity) = gone(activity)
+    override fun onActivityDestroyed(activity: Activity) {
+        if (activity !is NottiPermissionActivity) gone(activity)
+    }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) = Unit
     override fun onActivityStarted(activity: Activity) = Unit

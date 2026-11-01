@@ -280,6 +280,16 @@ Result:
 - [ ] Pass - [ ] Fail
 Result:
 
+### DC-26. Permission request over a visible In-App message
+
+**Source:** pre-release review PRR-06 (AD-019). **Emulator OK.**
+**Device/API:** API 33+, fresh install.
+**Steps:** show a `center` message (`session_start`); while it is visible, tap **Request notification permission** in the example (scroll behind the message if needed, or trigger it from a `bottom` message); answer the dialog.
+**Expected:** the system dialog shows over the app; after the answer the same message is back over the example, not duplicated, with no second impression in the dashboard; no flicker of the message inside the dialog.
+
+- [ ] Pass - [ ] Fail
+Result:
+
 ## Build
 
 ### DC-25. Minified release build on a device

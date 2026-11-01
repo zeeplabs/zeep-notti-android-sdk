@@ -99,6 +99,8 @@ internal class NottiActivityLifecycleListener : Application.ActivityLifecycleCal
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        // Not in RN (AD-019): the SDK's permission Activity is neither a host nor a tap target.
+        if (activity is NottiPermissionActivity) return
         // A1 (CTR, pre-release review round 3): a cold-start Intent instance can
         // be redelivered by the OS without a new user tap - reopening from
         // Recents (`FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY`) or restoring a
@@ -115,6 +117,7 @@ internal class NottiActivityLifecycleListener : Application.ActivityLifecycleCal
     }
     override fun onActivityStarted(activity: Activity) = Unit
     override fun onActivityResumed(activity: Activity) {
+        if (activity is NottiPermissionActivity) return
         // Current-Activity tracking (not in RN, which read ReactContext.currentActivity).
         NottiRuntime.get(activity.applicationContext).activityResumed(activity)
         // Not in RN (public-api D2): with the provider removed and `Notti.initialize` in the launch
