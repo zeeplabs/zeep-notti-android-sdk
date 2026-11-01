@@ -81,7 +81,7 @@ Notti.initialize(this, "YOUR_APP_ID", "YOUR_CLIENT_KEY", NottiOptions(baseUrl = 
 Notti.Notifications.requestPermission { granted -> /* update your UI */ }
 ```
 
-On Android 13+ the request shows the system dialog from the Activity in front and reports the answer; with no Activity in front it answers `false` without a dialog. Below Android 13 no runtime permission exists and the request answers `true`. The SDK reports the permission state to the backend (`permission_status`) when it changes.
+On Android 13+ the request shows the system dialog from the Activity in front and reports the answer. With the app in the background, or before an Activity has resumed, it answers `false` without a dialog, and the request does not count as asked (a later `push_permission` button still shows the prompt). Below Android 13 no runtime permission exists and the request answers `true`. The SDK reports the permission state to the backend (`permission_status`) when it changes.
 
 ## Identity and tags
 

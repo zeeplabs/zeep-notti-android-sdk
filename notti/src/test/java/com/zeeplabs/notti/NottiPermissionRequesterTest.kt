@@ -55,7 +55,11 @@ class NottiPermissionRequesterTest {
             .resume()
             .get()
 
-    private fun requester(activity: () -> Activity?): NottiPermissionRequester = NottiPermissionRequester(app, deviceStore, activity)
+    // Robolectric never moves ProcessLifecycleOwner to STARTED; foreground is injected.
+    private fun requester(
+        foreground: Boolean = true,
+        activity: () -> Activity?,
+    ): NottiPermissionRequester = NottiPermissionRequester(app, deviceStore, activity, isForeground = { foreground })
 
     /** The next Intent the host was asked to start; Robolectric queues started Intents process-wide. */
     private fun startedPermissionIntent(host: Activity): Intent {
@@ -100,6 +104,19 @@ class NottiPermissionRequesterTest {
         requester { null }.request { results += it }
 
         assertEquals(listOf(false), results)
+        assertFalse(deviceStore.getPermissionRequested())
+    }
+
+    @Test
+    fun inTheBackgroundResolvesFalseWithoutADialogOrTheFlag() {
+        // PRR-07 (AD-019): a paused host is still "current", but Android blocks the start from the background.
+        val host = hostActivity()
+        val results = mutableListOf<Boolean>()
+
+        requester(foreground = false) { host }.request { results += it }
+
+        assertEquals(listOf(false), results)
+        assertNull(shadowOf(host).nextStartedActivity)
         assertFalse(deviceStore.getPermissionRequested())
     }
 

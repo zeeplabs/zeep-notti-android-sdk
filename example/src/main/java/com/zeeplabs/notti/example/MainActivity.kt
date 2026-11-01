@@ -85,12 +85,15 @@ class MainActivity : ComponentActivity() {
     private fun permissionSection() {
         section("Permission")
         val result = text("Permission: not requested")
-        button("Request notification permission") {
+        val request = {
             Notti.Notifications.requestPermission { granted ->
                 result.text = "Permission granted: $granted"
                 ExampleEventLog.add("permission result: $granted")
             }
         }
+        button("Request notification permission") { request() }
+        // Device checklist DC-27: press Home before it fires; the SDK answers false without a dialog.
+        button("Request permission in 5 s") { result.postDelayed({ request() }, 5_000) }
     }
 
     private fun identitySection() {

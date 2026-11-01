@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -15,12 +17,17 @@ import java.util.concurrent.atomic.AtomicInteger
  *
  * Each request gets its own id in a process-wide map; [resolve] removes it, so every callback runs
  * exactly once (RN A5: concurrent requests never consume each other's result).
+ *
+ * Not in RN (AD-019): the dialog is asked for only while the app is in the foreground. The current
+ * Activity outlives its pause, and Android blocks Activity starts from the background, so RN marked the
+ * user as asked and its callback could never run.
  */
 internal class NottiPermissionRequester(
     private val context: Context,
     private val deviceStore: NottiDeviceStore,
     private val currentActivity: () -> Activity?,
     private val sdkInt: () -> Int = { Build.VERSION.SDK_INT },
+    private val isForeground: () -> Boolean = ::isProcessStarted,
 ) {
     fun request(callback: (Boolean) -> Unit) {
         // Below Android 13 there is no runtime permission to request (RN P2-AC4).
@@ -29,7 +36,7 @@ internal class NottiPermissionRequester(
             return
         }
         val activity = currentActivity()
-        if (activity == null) {
+        if (activity == null || !isForeground()) {
             callback(false)
             return
         }
@@ -50,6 +57,18 @@ internal class NottiPermissionRequester(
     }
 
     companion object {
+        /** True while the process is at least `STARTED`; true when the state cannot be read (RN behavior). */
+        fun isProcessStarted(): Boolean =
+            try {
+                ProcessLifecycleOwner
+                    .get()
+                    .lifecycle.currentState
+                    .isAtLeast(Lifecycle.State.STARTED)
+            } catch (t: Throwable) {
+                NottiLogger.error("Notti: could not read the foreground state - ${t.javaClass.simpleName}")
+                true
+            }
+
         /** The request id extra of [NottiPermissionActivity]'s Intent. */
         const val EXTRA_REQUEST_ID = "com.zeeplabs.notti.extra.PERMISSION_REQUEST_ID"
 

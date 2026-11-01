@@ -133,6 +133,16 @@ Result:
 - [ ] Pass - [ ] Fail
 Result:
 
+### DC-27. Permission request from the background
+
+**Source:** pre-release review PRR-07 (AD-019). **Emulator OK.**
+**Device/API:** API 33+, fresh install.
+**Steps:** tap **Request permission in 5 s** and press Home at once; wait 10 s; reopen the app; then tap **Request notification permission**.
+**Expected:** with the app in the background no dialog appears and the answer is `false`; back in the app, **Request notification permission** still shows the system dialog.
+
+- [ ] Pass - [ ] Fail
+Result:
+
 ## Push delivery and taps
 
 ### DC-10. Push received in foreground
