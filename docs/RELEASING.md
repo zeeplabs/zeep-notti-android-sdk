@@ -1,6 +1,6 @@
 # Releasing
 
-How Julio releases `com.zeeplabs:notti-android` to Maven Central (AD-015). The agent prepares the release PR, CHANGELOG, this runbook and the device checklist; Julio creates and pushes the tag, runs or watches the upload and presses Publish. A version on Maven Central can never be replaced or deleted, so the Portal review is the last gate.
+How Julio releases `br.com.zeeplabs:notti-android` to Maven Central (AD-015). The agent prepares the release PR, CHANGELOG, this runbook and the device checklist; Julio creates and pushes the tag, runs or watches the upload and presses Publish. A version on Maven Central can never be replaced or deleted, so the Portal review is the last gate.
 
 Two equivalent upload paths:
 
@@ -13,13 +13,13 @@ Never put a token, password, key or key id in this file, in a PR, in a commit or
 
 ## One-time setup
 
-### 1. Namespace `com.zeeplabs` (B-001)
+### 1. Namespace `br.com.zeeplabs` (done 2026-11-03)
 
 1. Sign in at <https://central.sonatype.com> with the account that will own the namespace.
-2. **Namespaces → Add namespace** → `com.zeeplabs`. The Portal shows a verification key.
-3. Add that key as a DNS **TXT** record on the domain that matches the namespace (the reversed domain of `com.zeeplabs`: `zeeplabs.com`). Confirm the domain is ours before this step; if it is not, the group id must change before 0.1.0 (a new decision in `STATE.md`).
+2. **Namespaces → Add namespace** → `br.com.zeeplabs`. The Portal shows a verification key.
+3. Add that key as a DNS **TXT** record on the domain that matches the namespace (the reversed domain of `br.com.zeeplabs`: `zeeplabs.com.br`).
 4. Back in the Portal, **Verify namespace**. Wait until it shows **Verified**. The TXT record can be removed afterwards.
-5. Close B-001 in `.specs/project/STATE.md`.
+5. Close B-001 in `.specs/project/STATE.md` (closed 2026-11-03, AD-020).
 
 ### 2. Portal user token
 
@@ -77,7 +77,7 @@ The key is not stored there: it is exported into the shell for the upload only (
 
 1. The [device checklist](DEVICE_CHECKLIST.md) is run and recorded; every Fail is fixed or listed in the README's known limitations.
 2. Play Data safety wording in the README confirmed (AD-011). Proposed ADs confirmed (AD-005, AD-008..AD-011).
-3. B-001 closed (namespace verified). Release path chosen: CI or the local fallback.
+3. B-001 closed (namespace verified, 2026-11-03). Release path chosen: CI or the local fallback.
 4. In the release PR: date the CHANGELOG section (`## [0.1.0] - YYYY-MM-DD`) and drop the README banner's "Until the release is published" sentence. On the tag build `scripts/check-version.sh` fails on a `TBD` date and while the README still contains "Until the release is published", "pre-release" or "release candidate".
 5. Run the Full gate (`.specs/codebase/TESTING.md`), including `scripts/check-release-artifacts.sh`. Merge the PR into `main`.
 
@@ -115,11 +115,11 @@ Without `signingInMemoryKey` the build stops before any upload ("refusing an uns
 
 ### Portal review and Publish
 
-1. Portal → **Publish → Deployments**. The new deployment for `com.zeeplabs:notti-android:0.1.0` goes through **Validating** to **Validated**.
+1. Portal → **Publish → Deployments**. The new deployment for `br.com.zeeplabs:notti-android:0.1.0` goes through **Validating** to **Validated**.
 2. Open it and check: the group, artifact and version; the files (`.aar`, `.pom`, `-sources.jar`, `-javadoc.jar`, `.module`, each with `.asc` and checksums); no validation error.
 3. If anything is wrong: **Drop**. Nothing was released; fix, and upload again (same version is fine while nothing was published).
 4. If it is right: **Publish**. The deployment goes to **Publishing** and then **Published**. The artifact reaches `repo1.maven.org` within about 30 minutes, search later.
-5. Check resolution from a clean project: `implementation("com.zeeplabs:notti-android:0.1.0")` with `mavenCentral()`.
+5. Check resolution from a clean project: `implementation("br.com.zeeplabs:notti-android:0.1.0")` with `mavenCentral()`.
 
 ### GitHub Release
 

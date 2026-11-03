@@ -46,7 +46,7 @@
 - `push_permission` button; `url` actions opened in the browser with the iOS AD-020 allowlist and an option to turn it off (AD-006)
 - Guard script: no URL open outside the one allowlisted file (AD-006 amended)
 
-**example-and-release** - DONE (2026-10-31, PR #6 merged `d1f1cad`, CI green; release pending device checklist, Data safety and B-001)
+**example-and-release** - DONE (2026-10-31, PR #6 merged `d1f1cad`, CI green; release pending device checklist and Data safety; B-001 closed 2026-11-03, AD-020)
 
 - Example app (one screen per public method), README (setup, FCM, opt-out, data collection, storage keys, Play Data safety, LGPD note, known limitations), CHANGELOG
 - Device checklist (Android counterpart of iOS `DEVICE_CHECKLIST`, plus RN-era open items), image push rendered by the tray in background and killed states
@@ -66,7 +66,7 @@
 
 **rn-consumes-native-sdk** - PLANNED (work happens mostly in `zeep-notti-react-native`)
 
-- RN `android/build.gradle` depends on `com.zeeplabs:notti-android`; `NottiModule` maps JS calls and events onto the public API
+- RN `android/build.gradle` depends on `br.com.zeeplabs:notti-android`; `NottiModule` maps JS calls and events onto the public API
 - RN's Kotlin core, its manifest components and their tests are deleted
 - On-device upgrade path verified (same `notti_prefs` keys, same device id)
 

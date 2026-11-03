@@ -29,7 +29,7 @@ val nottiVersion: String =
         matches.single()
     }
 
-group = "com.zeeplabs"
+group = "br.com.zeeplabs"
 version = nottiVersion
 
 android {
@@ -142,7 +142,7 @@ mavenPublishing {
             variant = "release",
         ),
     )
-    coordinates("com.zeeplabs", "notti-android", nottiVersion)
+    coordinates("br.com.zeeplabs", "notti-android", nottiVersion)
 
     // Central Portal upload without automatic release: Julio reviews the deployment and presses Publish
     // (AD-015). Credentials are read only by the upload task, so local and PR builds need none.

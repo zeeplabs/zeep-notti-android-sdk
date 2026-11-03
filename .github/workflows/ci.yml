@@ -88,7 +88,7 @@ jobs:
         run: |
           set -euo pipefail
           version="$(sed -nE 's/^[[:space:]]*const val CURRENT = "([^"]+)".*/\1/p' notti/src/main/java/com/zeeplabs/notti/NottiSdkVersion.kt)"
-          dir="build/repo/com/zeeplabs/notti-android/$version"
+          dir="build/repo/br/com/zeeplabs/notti-android/$version"
           aar="$dir/notti-android-$version.aar"
           pom="$dir/notti-android-$version.pom"
           for f in "$aar" "$pom" "$dir/notti-android-$version-sources.jar" "$dir/notti-android-$version-javadoc.jar"; do
@@ -100,7 +100,7 @@ jobs:
           if unzip -l "$RUNNER_TEMP/classes.jar" | grep -qE ' com/notti/'; then
             echo "error: classes.jar contains com/notti/ classes" >&2; exit 1
           fi
-          grep -q '<groupId>com.zeeplabs</groupId>' "$pom"
+          grep -q '<groupId>br.com.zeeplabs</groupId>' "$pom"
           grep -q '<artifactId>notti-android</artifactId>' "$pom"
           grep -q "<version>$version</version>" "$pom"
           if grep -q 'com.facebook.react' "$pom"; then
@@ -111,7 +111,7 @@ jobs:
           [[ "$stdlib" == 2.0.* ]] || { echo "error: POM kotlin-stdlib is '$stdlib', expected 2.0.x (AD-017)" >&2; exit 1; }
           unzip -p "$aar" META-INF/com/android/build/gradle/aar-metadata.properties | grep -qx 'minCompileSdk=34' \
             || { echo "error: AAR minCompileSdk is not 34 (AD-017)" >&2; exit 1; }
-          echo "artifact ok: com.zeeplabs:notti-android:$version"
+          echo "artifact ok: br.com.zeeplabs:notti-android:$version"
 
       # Signed dry run with a throwaway key: every artifact verifies and the POM has what Central requires.
       # Nothing is uploaded (EXR-17). gpg ships with the runner image.

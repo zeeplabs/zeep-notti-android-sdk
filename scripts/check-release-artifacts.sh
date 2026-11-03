@@ -25,7 +25,7 @@ key="$(gpg --batch --armor --export-secret-keys 'release-check@example.invalid')
 
 version="$(sed -nE 's/^[[:space:]]*const val CURRENT = "([^"]+)".*/\1/p' \
   "$root/notti/src/main/java/com/zeeplabs/notti/NottiSdkVersion.kt")"
-dir="$root/build/repo/com/zeeplabs/notti-android/$version"
+dir="$root/build/repo/br/com/zeeplabs/notti-android/$version"
 rm -rf "$dir"
 
 if ! (cd "$root" && ORG_GRADLE_PROJECT_signingInMemoryKey="$key" \
@@ -83,4 +83,4 @@ if [[ "$failures" -gt 0 ]]; then
   echo "$failures failure(s)"
   exit 1
 fi
-echo "release artifacts ok: com.zeeplabs:notti-android:$version signed and complete"
+echo "release artifacts ok: br.com.zeeplabs:notti-android:$version signed and complete"

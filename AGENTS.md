@@ -1,6 +1,6 @@
 # Notti Android SDK (zeep-notti-android-sdk): agent and contributor rules
 
-Native Android SDK for Zeep Notti push notifications and In-App Messages. Kotlin, `minSdk 24`, `compileSdk 36`, JVM 17. One library module (`:notti`, namespace `com.zeeplabs.notti`) published as `com.zeeplabs:notti-android` on Maven Central, plus `:example`.
+Native Android SDK for Zeep Notti push notifications and In-App Messages. Kotlin, `minSdk 24`, `compileSdk 36`, JVM 17. One library module (`:notti`, namespace `com.zeeplabs.notti`) published as `br.com.zeeplabs:notti-android` on Maven Central, plus `:example`.
 
 These rules apply to every contributor and every coding agent (Claude Code, Codex, Cursor, Copilot, etc.). This file is the single source of truth; `CLAUDE.md` only points here.
 

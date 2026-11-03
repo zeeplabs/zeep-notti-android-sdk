@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-11-01
-**Current Work:** M1 code complete. `pre-release-review` merged (PR #12, `52b31cb`, admin, CI green on the third attempt, 2026-11-01; PRR-01..PRR-10, AD-017..AD-019). `example-and-release` merged (PR #6, `d1f1cad`, admin, CI green, 2026-10-31). Release 0.1.0 waits on the device checklist (`docs/DEVICE_CHECKLIST.md`, DC-01..DC-27), Data safety confirmation (AD-011) and B-001; Julio picks the release path (CI or the local fallback in `docs/RELEASING.md`). `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI runs since PR #6 (B-002 resolved).
+**Current Work:** M1 code complete. `pre-release-review` merged (PR #12, `52b31cb`, admin, CI green on the third attempt, 2026-11-01; PRR-01..PRR-10, AD-017..AD-019). `example-and-release` merged (PR #6, `d1f1cad`, admin, CI green, 2026-10-31). Release 0.1.0 waits on the device checklist (`docs/DEVICE_CHECKLIST.md`, DC-01..DC-27), Data safety confirmation (AD-011); B-001 closed (namespace `br.com.zeeplabs` verified, AD-020, 2026-11-03); Julio picks the release path (CI or the local fallback in `docs/RELEASING.md`). `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI runs since PR #6 (B-002 resolved).
 
 ---
 
@@ -23,7 +23,7 @@
 
 ### AD-003: Package `com.zeeplabs.notti`, coordinates `com.zeeplabs:notti-android` (2026-10-28, Julio)
 
-**Decision:** Kotlin package and Android namespace `com.zeeplabs.notti`; Maven groupId `com.zeeplabs`, artifactId `notti-android`. The `notti_prefs` file name and keys do not change.
+**Decision:** Kotlin package and Android namespace `com.zeeplabs.notti`; Maven groupId `com.zeeplabs` (superseded by AD-020: `br.com.zeeplabs`), artifactId `notti-android`. The `notti_prefs` file name and keys do not change.
 **Reason:** RN 0.8.0 ships `com.notti.*`. In M2 (and in a brownfield app today) both are on the classpath; equal fully qualified names fail the build with duplicate classes (Android counterpart of iOS AD-021).
 **Trade-off:** Ported files change their `package` line and imports; parity diffs must ignore that line.
 **Impact:** `package-foundation`, every port task, README. Manifest authorities use `${applicationId}` plus a name distinct from RN's `nottiinitprovider` (see push-integration).
@@ -141,20 +141,29 @@
 **Trade-off:** Behavior differs from `react-native-notti` 0.8.0 until M2 moves RN onto this SDK.
 **Impact:** `NottiActivityLifecycleListener`, `NottiInAppPresenter` (tracker), `NottiPermissionRequester`, their tests; `docs/DEVICE_CHECKLIST.md`.
 
+### AD-020: Maven group id `br.com.zeeplabs` (2026-11-03, Julio)
+
+**Decision:** Coordinates are `br.com.zeeplabs:notti-android`. Supersedes the group id part of AD-003; the Kotlin package and Android namespace stay `com.zeeplabs.notti`, and the `notti_prefs` file and keys do not change.
+**Reason:** Central verifies a namespace by DNS on its reversed domain. ZeepLabs owns `zeeplabs.com.br`, not `zeeplabs.com`; `br.com.zeeplabs` was verified on 2026-11-03 (B-001).
+**Trade-off:** Group id and Kotlin package differ. Central checks only the group id, and nothing was published, so no host breaks.
+**Impact:** `notti/build.gradle.kts` (`group`, `coordinates`), the example apps, CI artifact path and POM check, `scripts/check-release-artifacts.sh`, README, CHANGELOG, `docs/RELEASING.md`, `AGENTS.md`. RN M2 depends on `br.com.zeeplabs:notti-android`.
+
 ---
 
 ## Active Blockers
+
+None.
+
+---
+
+## Resolved Blockers
 
 ### B-001: Maven Central namespace for `com.zeeplabs`
 
 **Discovered:** 2026-10-28
 **Impact:** Blocks only the 0.1.0 publish (`example-and-release`), not development.
 **Workaround:** Local Maven repository / `mavenLocal()` for the example app and RN M2 experiments.
-**Resolution:** Confirm the domain that owns `com.zeeplabs`, add the Central Portal DNS TXT record, generate the signing key.
-
----
-
-## Resolved Blockers
+**Resolution:** The domain is `zeeplabs.com.br`, not `zeeplabs.com`. Namespace `br.com.zeeplabs` verified in the Central Portal by DNS TXT (Julio, 2026-11-03); group id changed (AD-020). Signing key is a separate setup step in `docs/RELEASING.md`.
 
 ### B-002: GitHub Actions did not start jobs (billing)
 
@@ -202,12 +211,11 @@ From this repo:
 
 - [Provável] Inherited RN 0.8.0 bug: `NottiActivityLifecycleListener.onActivityCreated` skips a restored (`savedInstanceState != null`) or Recents (`FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY`) launch intent but does not mark it handled, so the `onActivityResumed` right after reports a phantom `opened` + `clicked`. RN tests call only `onActivityCreated`. Recents half fixed here by public-api T3 (resumed path skips the history flag; created+resumed test `a Recents reopen seen by onActivityCreated then onActivityResumed emits nothing`). Open: the restore half here (not detectable on resume: mark the intent handled in `onActivityCreated`?) and both halves in RN (found 2026-10-30, public-api design D2)
 
-- [x] Flaky `NottiCoreTest` logout family: root cause found and fixed in the test fake (2026-11-02, branch `fix/logout-flaky-test`). `FakePrefsForCore` was a plain `LinkedHashMap`; `NottiCore.setContactField` writes the held email/phone on the caller's thread (e.g. from `logout()`) while the executor reads `device_id`/token, so a read mid-resize could return `null`, queue the mutation as "not registered" and drop a request (expected 5, saw 4; no `external_user_id` PATCH). Evidence: an overlap probe on the fake saw concurrent access in 9 of 128 tests, the known flaky ones included; baseline 1/60 runs failed (another probe-flagged test), with the fake synchronized 0/60. Production is not affected: the real `SharedPreferences` is thread-safe. Open: the same unsynchronized fake is in `../zeep-notti-react-native` (`android/src/test/java/com/notti/NottiCoreTest.kt`); port the fix there
+- [x] Flaky `NottiCoreTest` logout family: root cause found and fixed in the test fake (2026-11-02, branch `fix/logout-flaky-test`). `FakePrefsForCore` was a plain `LinkedHashMap`; `NottiCore.setContactField` writes the held email/phone on the caller's thread (e.g. from `logout()`) while the executor reads `device_id`/token, so a read mid-resize could return `null`, queue the mutation as "not registered" and drop a request (expected 5, saw 4; no `external_user_id` PATCH). Evidence: an overlap probe on the fake saw concurrent access in 9 of 128 tests, the known flaky ones included; baseline 1/60 runs failed (another probe-flagged test), with the fake synchronized 0/60. Production is not affected: the real `SharedPreferences` is thread-safe. Ported to `../zeep-notti-react-native` (PR #45, `5b25d33`, 2026-11-03)
 
 - Cross-SDK (RN, iOS N5, here): In-App image loader caps bytes (5 MB) but not decoded pixel dimensions; a small file can still decode to a huge bitmap. Out of scope of `in-app-messages` (ported as RN, Julio 2026-10-31); needs its own spec in all SDKs.
 - Run `docs/DEVICE_CHECKLIST.md` before tagging 0.1.0; tick the todos its items cite only after they pass (example-and-release EXR-13)
 - Confirm the README Play Data safety answers (AD-011; publish gate, not merge gate)
-- Confirm `com.zeeplabs` Central namespace domain (B-001)
 - Confirm AD-005, AD-008..AD-011 (proposed)
 - Port PRR-07 (foreground check before the permission dialog) and PRR-10 (guarded tap detection) to `react-native-notti`, or let M2 replace its core (AD-019)
 - Move the ABI guard to KGP ABI validation when it supports AGP built-in Kotlin
