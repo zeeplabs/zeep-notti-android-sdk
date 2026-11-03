@@ -27,7 +27,7 @@ dependencyResolutionManagement {
 
 // app/build.gradle.kts
 dependencies {
-    implementation("com.zeeplabs:notti-android:0.1.0")
+    implementation("br.com.zeeplabs:notti-android:0.1.0")
 }
 ```
 

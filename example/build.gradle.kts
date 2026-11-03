@@ -65,7 +65,7 @@ dependencies {
     if (providers.gradleProperty("notti.usePublished").orNull == "true") {
         // CI: resolve the published AAR and POM from build/repo (PKG-03). Run the publish task in a
         // separate Gradle invocation first.
-        implementation("com.zeeplabs:notti-android:${project(":notti").version}")
+        implementation("br.com.zeeplabs:notti-android:${project(":notti").version}")
     } else {
         implementation(project(":notti"))
     }

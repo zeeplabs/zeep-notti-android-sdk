@@ -54,7 +54,7 @@ evaluationDependsOn(":notti")
 
 dependencies {
     if (providers.gradleProperty("notti.usePublished").orNull == "true") {
-        implementation("com.zeeplabs:notti-android:${project(":notti").version}")
+        implementation("br.com.zeeplabs:notti-android:${project(":notti").version}")
     } else {
         implementation(project(":notti"))
     }
