@@ -21,3 +21,5 @@ secring.*
 
 # OS
 .DS_Store
+
+.maven-token
