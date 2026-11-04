@@ -1,7 +1,7 @@
 # Roadmap
 
 **Current Milestone:** M2 - RN SDK on top of the native SDK
-**Status:** M1 done: 0.1.0 published on Maven Central (2026-11-04); M2 not started
+**Status:** M1 done: 0.1.0 published on Maven Central (2026-11-04). M2 in progress: 0.2.0 (`wrapper-support`) published 2026-11-04; next is the RN side
 
 ---
 
@@ -64,7 +64,7 @@
 
 ### Features
 
-**wrapper-support** (0.2.0) - SPECIFIED (2026-11-04, `.specs/features/wrapper-support/`, AD-022)
+**wrapper-support** (0.2.0) - DONE (2026-11-04, PR #18, released in PR #19, `.specs/features/wrapper-support/`, AD-022)
 
 - Opt-in `@NottiWrapperApi` entry point for `sdk_name`/`sdk_version`; native hosts send `sdk_name: "android"`
 

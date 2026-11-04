@@ -23,7 +23,7 @@ point. Kotlin has no SPI; Julio chose an opt-in annotation (2026-11-04, AD-022).
 - [ ] A wrapper sets the `sdk_version` and `sdk_name` the backend receives through an API that native hosts
       do not see unless they opt in.
 - [ ] Native hosts report `sdk_name: "android"` and `sdk_version` = `NottiSdkVersion.CURRENT`.
-- [ ] 0.2.0 published on Maven Central (`br.com.zeeplabs:notti-android:0.2.0`).
+- [x] 0.2.0 published on Maven Central (`br.com.zeeplabs:notti-android:0.2.0`).
 
 ## Out of Scope
 
@@ -135,10 +135,10 @@ cleared on device id change.
 | WRP-09 | `sdk_name` ack cleared on device id change | Execute | Implemented |
 | WRP-10 | Upgrade sends `sdk_name` once | Execute | Implemented |
 | WRP-11 | Release 0.2.0: version, CHANGELOG, README | Execute | Implemented |
-| WRP-12 | Release 0.2.0: tag and upload (Julio publishes) | Specify | Pending |
+| WRP-12 | Release 0.2.0: tag and upload (Julio publishes) | Execute | Done (2026-11-04) |
 | WRP-13 | Data safety lists `sdk_name` | Execute | Implemented |
 
-**Coverage:** 13 total; WRP-01..10 and WRP-13 implemented (unit tests 725 -> 737); WRP-11/12 pending the 0.2.0 release.
+**Coverage:** 13 total, all done (unit tests 725 -> 737); 0.2.0 published on Maven Central 2026-11-04.
 
 ## Success Criteria
 
