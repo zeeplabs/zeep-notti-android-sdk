@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-11-01
-**Current Work:** M1 code complete. `pre-release-review` merged (PR #12, `52b31cb`, admin, CI green on the third attempt, 2026-11-01; PRR-01..PRR-10, AD-017..AD-019). `example-and-release` merged (PR #6, `d1f1cad`, admin, CI green, 2026-10-31). Release PR #16 (`release/0.1.0`): device test done by Julio (AD-021), Data safety and AD-005, AD-008..AD-011 confirmed (2026-11-04); B-001 closed (namespace `br.com.zeeplabs` verified, AD-020, 2026-11-03); release path is CI (environment `maven-central`, secrets and signing key set 2026-11-03). `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI runs since PR #6 (B-002 resolved).
+**Current Work:** **0.1.0 released** on Maven Central as `br.com.zeeplabs:notti-android` (2026-11-04): release PR #16 merged (`02cd883`), tag `0.1.0`, release run 41833990890 (first upload refused with `Invalid token`, Portal token regenerated, re-run green), published by Julio in the Central Portal; GitHub Release `0.1.0`. M1 complete. Next: M2 (`react-native-notti` depends on this artifact). Earlier: `pre-release-review` (PR #12), `example-and-release` (PR #6), `in-app-messages` (PR #5), `public-api` (PR #4), `push-integration` (PR #3), `core-port` (PR #2), `package-foundation` (PR #1); group id change (PR #15, AD-020).
 
 ---
 
