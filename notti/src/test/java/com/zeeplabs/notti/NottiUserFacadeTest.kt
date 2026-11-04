@@ -111,6 +111,9 @@ class NottiUserFacadeTest {
     private fun initialize() {
         Notti.initialize(app, "app-fixture", "key-fixture", NottiOptions(mockUrl))
         awaitUntil { runtime.deviceStore.getDeviceId() == "device-fixture" }
+        // The device id is stored mid-registration; the profile PATCHes follow it. Language is
+        // the last profile field synced, so its ack means the registration sync is done.
+        awaitUntil { runtime.deviceStore.getLastSyncedLanguage() != null }
         awaitIdle()
     }
 
