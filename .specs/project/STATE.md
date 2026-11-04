@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-11-01
-**Current Work:** **0.1.0 released** on Maven Central as `br.com.zeeplabs:notti-android` (2026-11-04): release PR #16 merged (`02cd883`), tag `0.1.0`, release run 41833990890 (first upload refused with `Invalid token`, Portal token regenerated, re-run green), published by Julio in the Central Portal; GitHub Release `0.1.0`. M1 complete. Next: M2 (`react-native-notti` depends on this artifact); first `wrapper-support` 0.2.0 (spec written 2026-11-04, AD-022). Earlier: `pre-release-review` (PR #12), `example-and-release` (PR #6), `in-app-messages` (PR #5), `public-api` (PR #4), `push-integration` (PR #3), `core-port` (PR #2), `package-foundation` (PR #1); group id change (PR #15, AD-020).
+**Current Work:** **0.2.0 released** on Maven Central (2026-11-04): `wrapper-support` (PR #18: `sdk_name`, opt-in `Notti.initializeForWrapper`, AD-022; CI caught a test race in `NottiUserFacadeTest`, fixed in the test), release PR #19, tag `0.2.0`, release run 41892221441, published by Julio in the Central Portal; GitHub Release `0.2.0`. Next: M2 in `zeep-notti-react-native` (feature `android-native-sdk`, RN AD-006): design, tasks, implementation against 0.2.0. Earlier: 0.1.0 released 2026-11-04 (PR #16, run 41833990890, M1 complete); `pre-release-review` (PR #12), `example-and-release` (PR #6), `in-app-messages` (PR #5), `public-api` (PR #4), `push-integration` (PR #3), `core-port` (PR #2), `package-foundation` (PR #1); group id change (PR #15, AD-020).
 
 ---
 
