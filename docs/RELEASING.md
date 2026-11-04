@@ -124,7 +124,7 @@ Without `signingInMemoryKey` the build stops before any upload ("refusing an uns
 ### GitHub Release
 
 ```sh
-gh release create 0.1.0 --title "0.1.0" --notes-file <(sed -n '/^## \[0.1.0\]/,/^## \[/p' CHANGELOG.md | sed '$d')
+gh release create 0.1.0 --title "0.1.0" --notes-file <(awk '/^## \[0.1.0\]/{f=1;print;next} f&&/^## \[/{exit} f' CHANGELOG.md)
 ```
 
 Attach nothing: the artifacts live on Maven Central.

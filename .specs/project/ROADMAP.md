@@ -1,11 +1,11 @@
 # Roadmap
 
-**Current Milestone:** M1 - Native SDK with RN 0.8.0 parity
-**Status:** In Progress
+**Current Milestone:** M2 - RN SDK on top of the native SDK
+**Status:** M1 done: 0.1.0 published on Maven Central (2026-11-04); M2 not started
 
 ---
 
-## M1 - Native SDK with RN 0.8.0 parity (v0.1.0)
+## M1 - Native SDK with RN 0.8.0 parity (v0.1.0) - DONE (2026-11-04)
 
 **Goal:** A native Android app can integrate Notti from Maven Central and get the same behavior as `react-native-notti` 0.8.0 on Android, In-App Messages included (AD-007).
 **Target:** Ported JUnit suite green in CI; Julio tests on a device (checklist is a guide, AD-021); `0.1.0` published to Maven Central.
