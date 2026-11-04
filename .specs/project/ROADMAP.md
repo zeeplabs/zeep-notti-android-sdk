@@ -64,7 +64,11 @@
 
 ### Features
 
-**rn-consumes-native-sdk** - PLANNED (work happens mostly in `zeep-notti-react-native`)
+**wrapper-support** (0.2.0) - SPECIFIED (2026-11-04, `.specs/features/wrapper-support/`, AD-022)
+
+- Opt-in `@NottiWrapperApi` entry point for `sdk_name`/`sdk_version`; native hosts send `sdk_name: "android"`
+
+**rn-consumes-native-sdk** - SPECIFIED on the RN side (`zeep-notti-react-native` `.specs/features/android-native-sdk/`, RN AD-006, 2026-11-04) (work happens mostly in `zeep-notti-react-native`)
 
 - RN `android/build.gradle` depends on `br.com.zeeplabs:notti-android`; `NottiModule` maps JS calls and events onto the public API
 - RN's Kotlin core, its manifest components and their tests are deleted
