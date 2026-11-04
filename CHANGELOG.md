@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-04
+
+Wrapper support: lets `react-native-notti` run on this SDK and report its own identity.
+
 ### Added
 
 - Native devices send the profile field `sdk_name: "android"` with `sdk_version`, under the same sync and ack rules (ack stored in the new key `notti_last_synced_sdk_name`).
