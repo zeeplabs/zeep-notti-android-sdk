@@ -2,7 +2,7 @@
 
 Native Android SDK (Kotlin) for Notti push notifications and In-App Messages.
 
-> **Status: 0.1.0.** Behavior parity with `react-native-notti` 0.8.0 on Android, plus the SDK opening In-App web links. Check the [known limitations](#known-limitations) before adopting it.
+> **Status: 0.2.0.** Behavior parity with `react-native-notti` 0.8.0 on Android, plus the SDK opening In-App web links. Check the [known limitations](#known-limitations) before adopting it.
 
 ## Requirements
 
@@ -27,7 +27,7 @@ dependencyResolutionManagement {
 
 // app/build.gradle.kts
 dependencies {
-    implementation("br.com.zeeplabs:notti-android:0.1.0")
+    implementation("br.com.zeeplabs:notti-android:0.2.0")
 }
 ```
 
@@ -327,7 +327,7 @@ This README describes what the SDK does. It is not legal advice and does not sta
 
 ## Known limitations
 
-- **No consent API in 0.1.0.** There is no call to hold collection until the user consents. Gate `Notti.initialize` and `Notti.login` yourself.
+- **No consent API yet.** There is no call to hold collection until the user consents. Gate `Notti.initialize` and `Notti.login` yourself.
 - **Personal data in plain `SharedPreferences`.** Email, phone, external user id and tags are stored unencrypted in `notti_prefs`, in your app's private storage.
 - **No `Retry-After` on device requests.** A device or push-event request is tried up to 5 times, with 2, 4, 8 and 16 second waits. Network errors, 5xx, 408 and 429 are retried; other 4xx are final. A `Retry-After` header is ignored there (the In-App client honors it).
 - **No notification shown in the foreground.** While your app is in the foreground, Firebase does not show a notification-type push; the SDK reports `received` and calls your received listeners, and showing it is up to you.

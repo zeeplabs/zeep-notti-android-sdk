@@ -134,7 +134,7 @@ cleared on device id change.
 | WRP-08 | `sdk_name` unacked/rejected handling | Execute | Implemented |
 | WRP-09 | `sdk_name` ack cleared on device id change | Execute | Implemented |
 | WRP-10 | Upgrade sends `sdk_name` once | Execute | Implemented |
-| WRP-11 | Release 0.2.0: version, CHANGELOG, README | Specify | Pending |
+| WRP-11 | Release 0.2.0: version, CHANGELOG, README | Execute | Implemented |
 | WRP-12 | Release 0.2.0: tag and upload (Julio publishes) | Specify | Pending |
 | WRP-13 | Data safety lists `sdk_name` | Execute | Implemented |
 
