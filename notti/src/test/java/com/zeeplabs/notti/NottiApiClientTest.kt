@@ -176,6 +176,22 @@ class NottiApiClientTest {
     }
 
     @Test
+    fun `patchDevice ack exposes an echoed sdk_name`() {
+        server.enqueue(
+            MockResponse().setResponseCode(200)
+                .setBody("""{"id":"device-1","tags":{},"sdk_name":"react-native","sdk_version":"0.9.0"}""")
+        )
+
+        val result = client.patchDevice(deviceId = "device-1", token = "fcm-token", fields = mapOf("sdk_name" to "react-native"))
+
+        assertTrue("expected a Success, got $result", result is ApiResult.Success)
+        assertEquals(
+            mapOf("sdk_version" to "0.9.0", "sdk_name" to "react-native"),
+            (result as ApiResult.Success).response.profileFields
+        )
+    }
+
+    @Test
     fun `patchDevice ack without a device body has no echoed profile fields`() {
         server.enqueue(MockResponse().setResponseCode(204))
 

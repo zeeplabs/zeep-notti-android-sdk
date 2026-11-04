@@ -169,6 +169,60 @@ class NottiFacadeTest {
     }
 
     @Test
+    fun initializeReportsTheAndroidSdkNameAndThisSdkVersion() {
+        val runtime = installRuntime()
+        initializeAndAwaitRegistration(runtime)
+
+        awaitUntil { patches().any { it.has("sdk_name") } && patches().any { it.has("sdk_version") } }
+        assertEquals("android", patches().single { it.has("sdk_name") }.getString("sdk_name"))
+        assertEquals(NottiSdkVersion.CURRENT, patches().single { it.has("sdk_version") }.getString("sdk_version"))
+    }
+
+    @OptIn(NottiWrapperApi::class)
+    @Test
+    fun initializeForWrapperReportsTheWrapperIdentityAndThePublicCallSwitchesBack() {
+        val runtime = installRuntime()
+
+        Notti.initializeForWrapper(app, "app-fixture", "key-fixture", NottiOptions(mockUrl), "react-native", "0.9.0")
+        awaitUntil { runtime.deviceStore.getLastSyncedSdkName() == "react-native" }
+        awaitIdle()
+        assertEquals(1, registrations().size)
+        assertEquals(listOf("react-native"), patches().filter { it.has("sdk_name") }.map { it.getString("sdk_name") })
+        assertEquals(listOf("0.9.0"), patches().filter { it.has("sdk_version") }.map { it.getString("sdk_version") })
+        assertEquals("0.9.0", runtime.deviceStore.getLastSyncedSdkVersion())
+
+        // Same call again: no-op (SDK-07).
+        Notti.initializeForWrapper(app, "app-fixture", "key-fixture", NottiOptions(mockUrl), "react-native", "0.9.0")
+        awaitIdle()
+        assertEquals(1, registrations().size)
+
+        // The public call with an otherwise equal config is a config change: identity back to android/CURRENT.
+        Notti.initialize(app, "app-fixture", "key-fixture", NottiOptions(mockUrl))
+        awaitUntil { runtime.deviceStore.getLastSyncedSdkName() == "android" }
+        awaitIdle()
+        assertEquals(2, registrations().size)
+        assertEquals(NottiSdkVersion.CURRENT, runtime.deviceStore.getLastSyncedSdkVersion())
+    }
+
+    @OptIn(NottiWrapperApi::class)
+    @Test
+    fun initializeForWrapperOmitsNullOrBlankIdentityAndIgnoresNullIds() {
+        val runtime = installRuntime()
+
+        Notti.initializeForWrapper(app, null, "key-fixture", NottiOptions(mockUrl), "react-native", "0.9.0")
+        Notti.initializeForWrapper(app, "app-fixture", null, NottiOptions(mockUrl), "react-native", "0.9.0")
+        awaitIdle()
+        assertTrue(registrations().isEmpty())
+
+        Notti.initializeForWrapper(app, "app-fixture", "key-fixture", NottiOptions(mockUrl), " ", null)
+        awaitUntil { runtime.deviceStore.getDeviceId() == "device-fixture" }
+        awaitIdle()
+        awaitIdle()
+        assertEquals(1, registrations().size)
+        assertFalse(patches().toString(), patches().any { it.has("sdk_name") || it.has("sdk_version") })
+    }
+
+    @Test
     fun invalidInputNeitherThrowsNorRegistersAndKeepsTheConfig() {
         val runtime = installRuntime()
         initializeAndAwaitRegistration(runtime)

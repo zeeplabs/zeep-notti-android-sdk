@@ -138,12 +138,12 @@ class NottiRuntimeTest {
     @Test
     fun stopIsIdentityGuarded() {
         val runtime = testRuntime()
-        val first = runtime.start("app-fixture", "key-fixture", baseUrl)
+        val first = runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
         runtime.stop(first)
         assertNull(runtime.core)
         assertTrue(executors[0].isShutdown)
 
-        val second = runtime.start("app-fixture", "key-fixture", baseUrl)
+        val second = runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
         runtime.stop(first)
         assertSame(second, runtime.core)
 
@@ -156,17 +156,17 @@ class NottiRuntimeTest {
     @Test
     fun secondStartKeepsTheCoreAndRegistersOnlyForADifferentConfig() {
         val runtime = testRuntime()
-        val first = runtime.start("app-fixture", "key-fixture", baseUrl)
+        val first = runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
         awaitUntil { runtime.deviceStore.getDeviceId() == "device-fixture" }
         awaitIdle()
         assertEquals(1, registrations())
 
-        val same = runtime.start("app-fixture", "key-fixture", baseUrl)
+        val same = runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
         awaitIdle()
         assertSame(first, same)
         assertEquals(1, registrations())
 
-        val other = runtime.start("app-fixture", "key-other", baseUrl)
+        val other = runtime.start("app-fixture", "key-other", baseUrl, "android", NottiSdkVersion.CURRENT)
         awaitUntil { registrations() == 2 }
         assertSame(first, other)
         assertEquals(1, executors.size)
@@ -245,7 +245,7 @@ class NottiRuntimeTest {
         val changes = Collections.synchronizedList(mutableListOf<String>())
         runtime.onDeviceIdChanged = { changes += it }
 
-        runtime.start("app-fixture", "key-fixture", baseUrl)
+        runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
 
         awaitUntil { changes.isNotEmpty() }
         assertEquals(listOf("device-fixture"), changes.toList())
@@ -260,7 +260,7 @@ class NottiRuntimeTest {
         repeat(8) {
             pool.execute {
                 go.await()
-                cores += System.identityHashCode(runtime.start("app-fixture", "key-fixture", baseUrl))
+                cores += System.identityHashCode(runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT))
             }
         }
         go.countDown()
@@ -286,7 +286,7 @@ class NottiRuntimeTest {
         val runtime = testRuntime()
         runtime.enqueueEvent("notification-fixture", "delivery-fixture", NottiEventType.RECEIVED)
 
-        runtime.start("app-fixture", "key-fixture", baseUrl)
+        runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
 
         awaitUntil { runtime.eventStore.all().isEmpty() }
         val paths = synchronized(requests) { requests.map { "${it.method} ${it.path}" } }
@@ -304,7 +304,7 @@ class NottiRuntimeTest {
     @Test
     fun registrationSyncSendsTheSdkVersionConstant() {
         val runtime = testRuntime()
-        runtime.start("app-fixture", "key-fixture", baseUrl)
+        runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
 
         fun sdkVersionBodies() =
             synchronized(requests) {
@@ -320,6 +320,26 @@ class NottiRuntimeTest {
         assertEquals(NottiSdkVersion.CURRENT, runtime.deviceStore.getLastSyncedSdkVersion())
     }
 
+    /** `sdk_name` follows the `sdk_version` rules: PATCHed after registration, acked on the echo (WRP-07). */
+    @Test
+    fun registrationSyncSendsTheSdkNameAndVersionItWasStartedWith() {
+        val runtime = testRuntime()
+        runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
+
+        fun patchesWith(field: String) =
+            synchronized(requests) {
+                requests
+                    .filter { it.method == "PATCH" }
+                    .map { JSONObject(it.body.clone().readUtf8()) }
+                    .filter { it.has(field) }
+            }
+        awaitUntil { patchesWith("sdk_name").isNotEmpty() && patchesWith("sdk_version").isNotEmpty() }
+        assertEquals("android", patchesWith("sdk_name").single().getString("sdk_name"))
+        assertEquals(NottiSdkVersion.CURRENT, patchesWith("sdk_version").single().getString("sdk_version"))
+        awaitUntil { runtime.deviceStore.getLastSyncedSdkName() != null }
+        assertEquals("android", runtime.deviceStore.getLastSyncedSdkName())
+    }
+
     @Test
     fun observersReachTheRuntimeThroughPeek() {
         assertNull(NottiForegroundObserver.coreProvider())
@@ -329,7 +349,7 @@ class NottiRuntimeTest {
         assertSame(runtime.sessionGate, NottiForegroundObserver.gateProvider())
         assertSame(NottiInApp.lifecycle, NottiForegroundObserver.inAppProvider())
 
-        val core = runtime.start("app-fixture", "key-fixture", baseUrl)
+        val core = runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
         assertNotNull(core)
         assertSame(core, NottiForegroundObserver.coreProvider())
     }
@@ -353,7 +373,7 @@ class NottiRuntimeTest {
                 .get()
         assertSame(activity, runtime.currentActivity())
 
-        runtime.start("app-fixture", "key-fixture", baseUrl)
+        runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
 
         fun statusBodies() =
             synchronized(requests) {
@@ -377,7 +397,7 @@ class NottiRuntimeTest {
                 .resume()
                 .get()
         runtime.activityResumed(activity)
-        val core = runtime.start("app-fixture", "key-fixture", baseUrl)
+        val core = runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
 
         core.requestPermission { }
 

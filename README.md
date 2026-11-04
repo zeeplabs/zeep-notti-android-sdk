@@ -73,6 +73,10 @@ Notti.initialize(this, "YOUR_APP_ID", "YOUR_CLIENT_KEY", NottiOptions(baseUrl = 
 
 `NottiOptions` has two fields: `baseUrl` (null for the default host) and `opensInAppUrls` (default true, see [In-App Messages](#in-app-messages)). The SDK keeps only the application context. Calling `initialize` again with the same values does nothing; with different values the device registers again. Blank or `null` ids or an invalid base URL are logged and ignored. No SDK call throws, also for `null` text, map or list arguments from Java (listener and callback arguments must not be `null`).
 
+### Wrapper SDKs
+
+`Notti.initializeForWrapper` exists only for wrapper SDKs built on this one, such as `react-native-notti`: it is `initialize` plus the SDK name and version the device reports (`sdk_name`, `sdk_version`) instead of `android` and this SDK's version. It is marked `@NottiWrapperApi`, so Kotlin callers must opt in with `@OptIn(NottiWrapperApi::class)` (Java callers are not checked), and it is outside the semantic versioning promise: it may change or disappear in any release. Apps call `Notti.initialize`.
+
 ## Notification permission
 
 `POST_NOTIFICATIONS` is declared by the SDK.
@@ -280,7 +284,7 @@ Requests go to the host set at [Initialize](#initialize): `/v1/apps/<appId>/devi
 | `setEmail`, `setPhone`, `clearEmail`, `clearPhone`, `logout` | `email`, `phone` (`null` on a clear) |
 | `addTag`, `addTags`, `removeTag`, `removeTags` | `tags` (your own key/value pairs) |
 | Permission and `setSubscription` | `permission_status`, `subscribed`, `last_unsubscribed_at` |
-| Device profile, synced when changed | `app_version`, `sdk_version`, `device_os`, `device_model`, `timezone_id`, `language` |
+| Device profile, synced when changed | `app_version`, `sdk_version`, `sdk_name` (`android`), `device_os`, `device_model`, `timezone_id`, `language` |
 | Sessions | `first_session_at`, `last_session_at`, `session_count`, `session_time_seconds` |
 | Location sharing on, and your app already holds location permission | `country` only (`null` when you turn sharing off) |
 | A push is received, opened or clicked | `delivery_id`, `type` (`received`, `opened`, `clicked`), `token`, reported under the notification id |
@@ -293,9 +297,9 @@ Do not put personal data in tag keys or values unless your own basis for process
 
 `SharedPreferences` file `notti_prefs`, unencrypted, in your app's private storage. The keys are:
 
-`notti_device_id`, `notti_last_token`, `notti_external_user_id`, `notti_subscribed`, `notti_tag_<key>` (one entry per tag), `notti_app_version`, `notti_first_session_at_ms`, `notti_last_session_at_ms`, `notti_session_count`, `notti_session_time_ms`, `notti_session_started_at_ms`, `notti_last_foreground_at_ms`, `notti_location_sharing_enabled`, `notti_pending_country_clear`, `notti_pending_external_user_id_clear`, `notti_last_synced_country`, `notti_last_synced_device_os`, `notti_last_synced_device_model`, `notti_last_synced_sdk_version`, `notti_last_synced_timezone_id`, `notti_last_synced_language`, `notti_last_synced_permission_status`, `notti_last_unsubscribed_at_ms`, `notti_pending_unsubscribe_at_ms`, `notti_pending_permission_unsubscribe_at_ms`, `notti_permission_requested`, `notti_email`, `notti_phone`, `notti_last_synced_email`, `notti_last_synced_phone`, `notti_profile_field_ack_migrated`, `notti_pending_events`, `notti_pending_inapp_events`.
+`notti_device_id`, `notti_last_token`, `notti_external_user_id`, `notti_subscribed`, `notti_tag_<key>` (one entry per tag), `notti_app_version`, `notti_first_session_at_ms`, `notti_last_session_at_ms`, `notti_session_count`, `notti_session_time_ms`, `notti_session_started_at_ms`, `notti_last_foreground_at_ms`, `notti_location_sharing_enabled`, `notti_pending_country_clear`, `notti_pending_external_user_id_clear`, `notti_last_synced_country`, `notti_last_synced_device_os`, `notti_last_synced_device_model`, `notti_last_synced_sdk_version`, `notti_last_synced_sdk_name`, `notti_last_synced_timezone_id`, `notti_last_synced_language`, `notti_last_synced_permission_status`, `notti_last_unsubscribed_at_ms`, `notti_pending_unsubscribe_at_ms`, `notti_pending_permission_unsubscribe_at_ms`, `notti_permission_requested`, `notti_email`, `notti_phone`, `notti_last_synced_email`, `notti_last_synced_phone`, `notti_profile_field_ack_migrated`, `notti_pending_events`, `notti_pending_inapp_events`.
 
-The file name and keys are the same as in `react-native-notti` 0.8.0, so an app that moves from the React Native module keeps its device id and pending events. `notti_pending_external_user_id_clear` is a flag with no personal data: a `logout` unlink the backend has not acknowledged yet. `notti_pending_inapp_events` is the In-App event queue (message id, event type, button id or dismiss reason, time and app id; no token, device id, message text or event name). Whether the file is backed up follows your app's `allowBackup` and backup rules; the SDK sets none.
+The file name and keys are the same as in `react-native-notti` 0.8.0 (plus `notti_last_synced_sdk_name`, added in 0.2.0), so an app that moves from the React Native module keeps its device id and pending events. `notti_pending_external_user_id_clear` is a flag with no personal data: a `logout` unlink the backend has not acknowledged yet. `notti_pending_inapp_events` is the In-App event queue (message id, event type, button id or dismiss reason, time and app id; no token, device id, message text or event name). Whether the file is backed up follows your app's `allowBackup` and backup rules; the SDK sets none.
 
 ### Google Play Data safety
 
@@ -310,7 +314,7 @@ The file name and keys are the same as in `react-native-notti` 0.8.0, so an app 
 | Location: Approximate location | you enable location sharing (country only) | App functionality |
 | App activity: App interactions | always (push `received`/`opened`/`clicked`, In-App `impression`/`click`/`dismiss`, session counts) | App functionality, Analytics |
 | App activity: Other actions | you set tags | App functionality |
-| App info and performance: Other app performance data | always (app version, SDK version, OS version, device model, time zone, language) | App functionality |
+| App info and performance: Other app performance data | always (app version, SDK name and version, OS version, device model, time zone, language) | App functionality |
 
 - **Encrypted in transit:** yes with the default host or any `https` base URL. The SDK also accepts an `http` base URL; do not use one in production.
 - **Shared with third parties:** the data goes to your Notti backend, which processes it for you; whether that counts as sharing in your form depends on your contract with the Notti operator. The SDK sends nothing to other parties (Firebase receives only what Firebase Messaging itself needs to deliver pushes).

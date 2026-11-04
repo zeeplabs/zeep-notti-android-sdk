@@ -124,7 +124,7 @@ class NottiCoreGapsTest {
         // Production providers: FirebaseMessaging.getInstance() throws with no FirebaseApp.
         val runtime = NottiRuntime.get(app)
 
-        runtime.start("app-fixture", "key-fixture", baseUrl)
+        runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
         awaitUntil { lines.any { it.contains("no push token available") } }
 
         assertTrue(lines.any { it == "Notti: failed to fetch FCM token - IllegalStateException" })
@@ -140,7 +140,7 @@ class NottiCoreGapsTest {
                 prompts++
                 callback(true)
             })
-        val core = runtime.start("app-fixture", "key-fixture", baseUrl)
+        val core = runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
         awaitUntil { runtime.deviceStore.getDeviceId() == "device-fixture" }
 
         var answered: Boolean? = null
@@ -160,7 +160,7 @@ class NottiCoreGapsTest {
     @Test
     fun sdk08DefaultRuntimeRequesterDeniesWithoutPromptingWhenNoActivityIsResumed() {
         val runtime = runtime()
-        val core = runtime.start("app-fixture", "key-fixture", baseUrl)
+        val core = runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
         awaitUntil { runtime.deviceStore.getDeviceId() == "device-fixture" }
 
         var answered: Boolean? = null
@@ -174,7 +174,7 @@ class NottiCoreGapsTest {
     @Test
     fun sdk12AddTagsMergesIntoTheCachedMapAndPatchesTheFullMap() {
         val runtime = runtime()
-        val core = runtime.start("app-fixture", "key-fixture", baseUrl)
+        val core = runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
         awaitUntil { runtime.deviceStore.getTags() == mapOf("seed" to "fixture-seed") }
 
         core.mutateTags(mapOf("plan" to "fixture-plan"), null)
@@ -186,7 +186,7 @@ class NottiCoreGapsTest {
     @Test
     fun sdk13RemoveTagsDropsTheKeyAndPatchesTheFullRemainingMap() {
         val runtime = runtime()
-        val core = runtime.start("app-fixture", "key-fixture", baseUrl)
+        val core = runtime.start("app-fixture", "key-fixture", baseUrl, "android", NottiSdkVersion.CURRENT)
         awaitUntil { runtime.deviceStore.getTags() == mapOf("seed" to "fixture-seed") }
 
         core.mutateTags(mapOf("plan" to "fixture-plan", "tier" to "fixture-tier"), null)

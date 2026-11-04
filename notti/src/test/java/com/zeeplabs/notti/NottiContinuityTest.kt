@@ -141,6 +141,8 @@ class NottiContinuityTest {
             appId = "app-fixture",
             clientKey = "key-fixture",
             baseUrl = server.url("/").toString().trimEnd('/'),
+            sdkName = "android",
+            sdkVersion = NottiSdkVersion.CURRENT,
         )
     }
 
@@ -204,6 +206,9 @@ class NottiContinuityTest {
         // Acks survive: the acked sdk_version is not re-sent.
         assertFalse(patches().any { it.has("sdk_version") })
         assertEquals(NottiSdkVersion.CURRENT, runtime.deviceStore.getLastSyncedSdkVersion())
+        // A pre-0.2.0 install has no sdk_name ack: sdk_name goes out once (WRP-10).
+        awaitUntil { runtime.deviceStore.getLastSyncedSdkName() == "android" }
+        assertEquals(listOf("android"), patches().filter { it.has("sdk_name") }.map { it.getString("sdk_name") })
         // Pending logout clear is honored, then dropped.
         assertTrue(patches().any { it.has("external_user_id") && it.isNull("external_user_id") })
         // The RN-queued event is reported to its notification.

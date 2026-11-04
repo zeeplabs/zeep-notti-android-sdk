@@ -131,7 +131,7 @@ class NottiFirebaseMessagingServiceRuntimeTest {
                 executorFactory = { Executors.newSingleThreadExecutor().also { executors += it } },
             )
         NottiRuntime.setForTest(runtime)
-        val core = runtime.start("app-fixture", "key-fixture", server.url("/").toString().trimEnd('/'))
+        val core = runtime.start("app-fixture", "key-fixture", server.url("/").toString().trimEnd('/'), "android", NottiSdkVersion.CURRENT)
         assertSame(core, NottiRuntime.peek()?.core)
 
         service().onNewToken("refreshed-token-fixture")

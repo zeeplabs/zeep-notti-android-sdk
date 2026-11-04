@@ -40,7 +40,7 @@ class NottiBridgeTest {
         // bridge to JS) -- this only proves onMessageReceived's own null-guard
         // with no live core; NottiBridgeRuntimeTest covers the full path.
         val runtime = NottiRuntime.get(RuntimeEnvironment.getApplication())
-        val core = runtime.start("app-1", "key", "https://notti.example.com")
+        val core = runtime.start("app-1", "key", "https://notti.example.com", "android", NottiSdkVersion.CURRENT)
         runtime.stop(core)
         assertNull(NottiRuntime.peek()?.core)
 
@@ -55,7 +55,7 @@ class NottiBridgeTest {
     @Test
     fun `onNewToken reaches the active core without throwing`() {
         val runtime = NottiRuntime.get(RuntimeEnvironment.getApplication())
-        runtime.start("app-1", "key", "https://notti.example.com")
+        runtime.start("app-1", "key", "https://notti.example.com", "android", NottiSdkVersion.CURRENT)
         assertNotNull(NottiRuntime.peek()?.core)
 
         NottiBridge.onNewToken("new-token-value")

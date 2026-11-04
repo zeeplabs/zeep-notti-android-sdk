@@ -124,21 +124,21 @@ cleared on device id change.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| WRP-01 | Wrapper identity: values reach the PATCH | Specify | Pending |
-| WRP-02 | Wrapper identity: blank omitted | Specify | Pending |
-| WRP-03 | Wrapper identity: opt-in required (Kotlin) | Specify | Pending |
-| WRP-04 | Wrapper identity: same behavior as public initialize | Specify | Pending |
-| WRP-05 | Wrapper identity: identity change rebuilds | Specify | Pending |
-| WRP-06 | Wrapper identity: API dump and docs | Specify | Pending |
-| WRP-07 | Native `sdk_name: "android"` with ack rules | Specify | Pending |
-| WRP-08 | `sdk_name` unacked/rejected handling | Specify | Pending |
-| WRP-09 | `sdk_name` ack cleared on device id change | Specify | Pending |
-| WRP-10 | Upgrade sends `sdk_name` once | Specify | Pending |
+| WRP-01 | Wrapper identity: values reach the PATCH | Execute | Implemented |
+| WRP-02 | Wrapper identity: blank omitted | Execute | Implemented |
+| WRP-03 | Wrapper identity: opt-in required (Kotlin) | Execute | Implemented |
+| WRP-04 | Wrapper identity: same behavior as public initialize | Execute | Implemented |
+| WRP-05 | Wrapper identity: identity change rebuilds | Execute | Implemented |
+| WRP-06 | Wrapper identity: API dump and docs | Execute | Implemented |
+| WRP-07 | Native `sdk_name: "android"` with ack rules | Execute | Implemented |
+| WRP-08 | `sdk_name` unacked/rejected handling | Execute | Implemented |
+| WRP-09 | `sdk_name` ack cleared on device id change | Execute | Implemented |
+| WRP-10 | Upgrade sends `sdk_name` once | Execute | Implemented |
 | WRP-11 | Release 0.2.0: version, CHANGELOG, README | Specify | Pending |
 | WRP-12 | Release 0.2.0: tag and upload (Julio publishes) | Specify | Pending |
-| WRP-13 | Data safety lists `sdk_name` | Specify | Pending |
+| WRP-13 | Data safety lists `sdk_name` | Execute | Implemented |
 
-**Coverage:** 13 total, 0 mapped to tasks.
+**Coverage:** 13 total; WRP-01..10 and WRP-13 implemented (unit tests 725 -> 737); WRP-11/12 pending the 0.2.0 release.
 
 ## Success Criteria
 

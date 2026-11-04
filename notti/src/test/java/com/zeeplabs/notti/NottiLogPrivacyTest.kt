@@ -124,7 +124,7 @@ class NottiLogPrivacyTest {
     @Test
     fun fullFlowWithFailuresLogsNoSentinel() {
         val runtime = runtime { Tasks.forResult(TOKEN) }
-        val core = runtime.start(APP_ID, CLIENT_KEY, baseUrl)
+        val core = runtime.start(APP_ID, CLIENT_KEY, baseUrl, "android", NottiSdkVersion.CURRENT)
         awaitUntil { runtime.deviceStore.getDeviceId() == DEVICE_ID }
 
         core.login(EXTERNAL_USER_ID)
@@ -144,7 +144,7 @@ class NottiLogPrivacyTest {
     @Test
     fun tokenFetchFailureLogsTheClassNotTheMessage() {
         val runtime = runtime { Tasks.forException(IOException("$EXCEPTION_SENTINEL $baseUrl")) }
-        runtime.start(APP_ID, CLIENT_KEY, baseUrl)
+        runtime.start(APP_ID, CLIENT_KEY, baseUrl, "android", NottiSdkVersion.CURRENT)
         awaitExecutorsIdle()
 
         assertTrue(lines.any { it.contains("IOException") })

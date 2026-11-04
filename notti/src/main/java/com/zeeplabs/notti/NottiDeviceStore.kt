@@ -41,6 +41,7 @@ internal data class DeviceState(
     val lastSyncedDeviceOs: String?, // P1 last synced OS version
     val lastSyncedDeviceModel: String?, // P1 last synced device model
     val lastSyncedSdkVersion: String?, // P1 last synced SDK version
+    val lastSyncedSdkName: String?, // last synced SDK name (wrapper-support, AD-022)
     val lastSyncedTimezoneId: String?, // P2 last synced IANA timezone
     val lastSyncedLanguage: String?, // P2 last synced ISO 639-1 language
     val lastSyncedPermissionStatus: String?, // P3 last synced OS permission state
@@ -78,6 +79,7 @@ internal class NottiDeviceStore(private val prefs: SharedPreferences) {
         private const val KEY_LAST_SYNCED_DEVICE_OS = "notti_last_synced_device_os"
         private const val KEY_LAST_SYNCED_DEVICE_MODEL = "notti_last_synced_device_model"
         private const val KEY_LAST_SYNCED_SDK_VERSION = "notti_last_synced_sdk_version"
+        private const val KEY_LAST_SYNCED_SDK_NAME = "notti_last_synced_sdk_name"
         private const val KEY_LAST_SYNCED_TIMEZONE_ID = "notti_last_synced_timezone_id"
         private const val KEY_LAST_SYNCED_LANGUAGE = "notti_last_synced_language"
         private const val KEY_LAST_SYNCED_PERMISSION_STATUS = "notti_last_synced_permission_status"
@@ -174,6 +176,7 @@ internal class NottiDeviceStore(private val prefs: SharedPreferences) {
         lastSyncedDeviceOs = getLastSyncedDeviceOs(),
         lastSyncedDeviceModel = getLastSyncedDeviceModel(),
         lastSyncedSdkVersion = getLastSyncedSdkVersion(),
+        lastSyncedSdkName = getLastSyncedSdkName(),
         lastSyncedTimezoneId = getLastSyncedTimezoneId(),
         lastSyncedLanguage = getLastSyncedLanguage(),
         lastSyncedPermissionStatus = getLastSyncedPermissionStatus(),
@@ -310,6 +313,7 @@ internal class NottiDeviceStore(private val prefs: SharedPreferences) {
             .remove(KEY_LAST_SYNCED_DEVICE_OS)
             .remove(KEY_LAST_SYNCED_DEVICE_MODEL)
             .remove(KEY_LAST_SYNCED_SDK_VERSION)
+            .remove(KEY_LAST_SYNCED_SDK_NAME)
             .remove(KEY_LAST_SYNCED_TIMEZONE_ID)
             .remove(KEY_LAST_SYNCED_LANGUAGE)
             .remove(KEY_LAST_SYNCED_PERMISSION_STATUS)
@@ -332,6 +336,12 @@ internal class NottiDeviceStore(private val prefs: SharedPreferences) {
 
     fun setLastSyncedSdkVersion(value: String?) {
         prefs.edit().putString(KEY_LAST_SYNCED_SDK_VERSION, value).apply()
+    }
+
+    fun getLastSyncedSdkName(): String? = prefs.getString(KEY_LAST_SYNCED_SDK_NAME, null)
+
+    fun setLastSyncedSdkName(value: String?) {
+        prefs.edit().putString(KEY_LAST_SYNCED_SDK_NAME, value).apply()
     }
 
     fun getLastSyncedTimezoneId(): String? = prefs.getString(KEY_LAST_SYNCED_TIMEZONE_ID, null)

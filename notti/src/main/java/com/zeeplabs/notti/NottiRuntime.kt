@@ -134,16 +134,23 @@ internal class NottiRuntime internal constructor(
     }
 
     /**
-     * Initializes the core of [ensureCore] with [NottiSdkVersion.CURRENT] (RN `NottiModule.initialize`
-     * on its lazy core). The core is re-initialized in place: an identical config is a no-op (SDK-07),
-     * a different one registers again (AD-014).
+     * Initializes the core of [ensureCore] (RN `NottiModule.initialize` on its lazy core) with the
+     * identity the device reports: [sdkName] and [sdkVersion] (`"android"` and [NottiSdkVersion.CURRENT]
+     * from `Notti.initialize`, the wrapper's own from `Notti.initializeForWrapper`, AD-022; null or blank
+     * omits the field). The core is re-initialized in place: an identical config, identity included, is
+     * a no-op (SDK-07), a different one registers again (AD-014, WRP-05).
      */
     @Synchronized
     fun start(
         appId: String,
         clientKey: String,
         baseUrl: String,
-    ): NottiCore = ensureCore().also { it.initialize(appId, clientKey, baseUrl, NottiSdkVersion.CURRENT) }
+        sdkName: String?,
+        sdkVersion: String?,
+    ): NottiCore =
+        ensureCore().also {
+            it.initialize(appId, clientKey, baseUrl, sdkVersion = sdkVersion, sdkName = sdkName)
+        }
 
     /** Clears [core] and shuts its executor down, only if [core] is still the live one. */
     @Synchronized
