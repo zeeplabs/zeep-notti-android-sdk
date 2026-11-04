@@ -1,6 +1,6 @@
 # Releasing
 
-How Julio releases `br.com.zeeplabs:notti-android` to Maven Central (AD-015). The agent prepares the release PR, CHANGELOG, this runbook and the device checklist; Julio creates and pushes the tag, runs or watches the upload and presses Publish. A version on Maven Central can never be replaced or deleted, so the Portal review is the last gate.
+How Julio releases `br.com.zeeplabs:notti-android` to Maven Central (AD-015). The agent prepares the release PR, CHANGELOG and this runbook; Julio creates and pushes the tag, runs or watches the upload and presses Publish. A version on Maven Central can never be replaced or deleted, so the Portal review is the last gate.
 
 Two equivalent upload paths:
 
@@ -75,7 +75,7 @@ The key is not stored there: it is exported into the shell for the upload only (
 
 ### Before the tag
 
-1. The [device checklist](DEVICE_CHECKLIST.md) is run and recorded; every Fail is fixed or listed in the README's known limitations.
+1. Julio has tested the release on a device; the [device checklist](DEVICE_CHECKLIST.md) is a guide and recording results is optional (AD-021). A known failure is fixed or listed in the README's known limitations.
 2. Play Data safety wording in the README confirmed (AD-011). Proposed ADs confirmed (AD-005, AD-008..AD-011).
 3. B-001 closed (namespace verified, 2026-11-03). Release path chosen: CI or the local fallback.
 4. In the release PR: date the CHANGELOG section (`## [0.1.0] - YYYY-MM-DD`) and drop the README banner's "Until the release is published" sentence. On the tag build `scripts/check-version.sh` fails on a `TBD` date and while the README still contains "Until the release is published", "pre-release" or "release candidate".
@@ -131,7 +131,7 @@ Attach nothing: the artifacts live on Maven Central.
 
 ### After the release
 
-1. `.specs/project/STATE.md`: current work, the release date and commit, closed blockers and the device-checklist todos that passed (EXR-13).
+1. `.specs/project/STATE.md`: current work, the release date and commit, closed blockers.
 2. `CHANGELOG.md`: keep an empty `## [Unreleased]` above `## [0.1.0]`.
 3. The next version starts by bumping `NottiSdkVersion.CURRENT` with its CHANGELOG section (`TBD`).
 4. Vault and Cortex: release noted.

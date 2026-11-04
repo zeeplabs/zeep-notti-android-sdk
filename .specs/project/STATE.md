@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-11-01
-**Current Work:** M1 code complete. `pre-release-review` merged (PR #12, `52b31cb`, admin, CI green on the third attempt, 2026-11-01; PRR-01..PRR-10, AD-017..AD-019). `example-and-release` merged (PR #6, `d1f1cad`, admin, CI green, 2026-10-31). Release 0.1.0 waits on the device checklist (`docs/DEVICE_CHECKLIST.md`, DC-01..DC-27), Data safety confirmation (AD-011); B-001 closed (namespace `br.com.zeeplabs` verified, AD-020, 2026-11-03); Julio picks the release path (CI or the local fallback in `docs/RELEASING.md`). `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI runs since PR #6 (B-002 resolved).
+**Current Work:** M1 code complete. `pre-release-review` merged (PR #12, `52b31cb`, admin, CI green on the third attempt, 2026-11-01; PRR-01..PRR-10, AD-017..AD-019). `example-and-release` merged (PR #6, `d1f1cad`, admin, CI green, 2026-10-31). Release PR #16 (`release/0.1.0`): device test done by Julio (AD-021), Data safety and AD-005, AD-008..AD-011 confirmed (2026-11-04); B-001 closed (namespace `br.com.zeeplabs` verified, AD-020, 2026-11-03); release path is CI (environment `maven-central`, secrets and signing key set 2026-11-03). `in-app-messages` merged (PR #5, `da644c3`, admin); `public-api` merged (PR #4, `8abc0d9`); `push-integration` merged (PR #3, `d5ab683`); `core-port` merged (PR #2, `b722874`); `package-foundation` merged (PR #1). CI runs since PR #6 (B-002 resolved).
 
 ---
 
@@ -35,11 +35,11 @@
 **Trade-off:** Needs namespace verification of `com.zeeplabs` (DNS TXT on the domain that backs it) and a GPG signing key stored as CI secrets. Releases are immutable.
 **Impact:** `package-foundation` wires `maven-publish` + `signing` with a local-repository dry run; `example-and-release` does the real publish. [Incerto] which domain verifies `com.zeeplabs`: to validate before the first publish (B-001).
 
-### AD-005: Integration through manifest-merged components plus a manual API (2026-10-28; `ContentProvider` kept in push-integration design 2026-10-29)
+### AD-005: Integration through manifest-merged components plus a manual API (2026-10-28; `ContentProvider` kept in push-integration design 2026-10-29; confirmed by Julio 2026-11-04)
 
 **Decision:** Keep RN's model: the library manifest declares `NottiFirebaseMessagingService` (`MESSAGING_EVENT`) and `NottiInitProvider` (process-start hook, no I/O), so a host only calls `Notti.initialize`. Hosts with their own `FirebaseMessagingService` forward through `NottiBridge.onMessageReceived` / `onNewToken` and remove ours with `tools:node="remove"`.
 **Reason:** One-line integration (iOS AD-004 counterpart). The `ContentProvider` is the only hook early enough for a cold-start click (RN P3-AC7). Android delivers FCM to one service per app, so the manual path is required.
-**Trade-off:** A `ContentProvider` adds process-start cost and can be disabled by a host's manifest; `androidx.startup` would be the alternative. To settle in `push-integration` design.
+**Trade-off:** A `ContentProvider` adds process-start cost and can be disabled by a host's manifest; `androidx.startup` would be the alternative. Settled in `push-integration` design: `ContentProvider` kept.
 **Impact:** `push-integration` spec; README opt-out section.
 
 ### AD-006: In-App `url` actions are opened by the SDK, like iOS AD-020 (2026-10-28, Julio)
@@ -57,33 +57,33 @@
 **Trade-off:** Larger first release (In-App is ~2.9k lines and ~5.6k test lines in RN).
 **Impact:** ROADMAP M1 feature list.
 
-### AD-008: Follow the iOS SDK where RN is silent (proposed, 2026-10-28)
+### AD-008: Follow the iOS SDK where RN is silent (confirmed by Julio 2026-11-04; proposed 2026-10-28)
 
 **Decision:** For behavior RN 0.8.0 does not define (it lives in the RN JS layer or did not exist), Android adopts the iOS SDK's decisions: multi-listener with removable subscriptions over the core's single handler, host callbacks on the main thread, `initialize` with the same normalized config is a no-op and a different one rebuilds the core, `baseUrl` defaults to `https://app.zeepnotti.app` (RN `SAAS_BASE_URL`), identity calls before `initialize` warn and are dropped. Each feature spec carries a parity table (RN 0.8.0 / iOS SDK / Android) and lists any divergence.
 **Reason:** The two native SDKs become RN's engines; the RN JS facade must see one behavior.
 **Trade-off:** New facade code outside the port rule; needs its own tests.
 **Impact:** `public-api`, `push-integration`, `in-app-messages` specs.
 
-### AD-009: Ported file formatting (proposed, 2026-10-28)
+### AD-009: Ported file formatting (confirmed by Julio 2026-11-04; proposed 2026-10-28)
 
 **Decision:** Ported Kotlin files are re-indented from RN's 2 spaces to 4 (Kotlin official style) and checked with a whitespace-insensitive diff against RN (`diff -w`, ignoring the `package`/import lines). Lint findings RN code already has are suppressed per file (`@file:Suppress` or baseline), not fixed in M1.
 **Reason:** Same approach as iOS AD-007: style rules for new code without breaking the token-level port.
 **Trade-off:** Plain `diff` shows every line changed; reviewers use `diff -w`.
 **Impact:** `core-port`, `in-app-messages` port tasks; lint tool choice in `package-foundation` design.
 
-### AD-010: Public API guarded by Binary Compatibility Validator (proposed, 2026-10-28)
+### AD-010: Public API guarded by Binary Compatibility Validator (confirmed by Julio 2026-11-04; proposed 2026-10-28)
 
 **Decision:** The Kotlin Binary Compatibility Validator plugin dumps the public ABI to `notti/api/notti.api`; `apiCheck` runs in CI and every public change commits the updated dump. Ported internals are `internal`.
 **Reason:** Counterpart of iOS `PUBLIC_SURFACE.txt` + `check-public-surface.sh`, with a maintained tool instead of a script.
 **Trade-off:** One more Gradle plugin.
 **Impact:** `package-foundation`, every feature touching public API.
 
-### AD-011: Privacy, logging and Play Data safety (proposed, 2026-10-28)
+### AD-011: Privacy, logging and Play Data safety (confirmed by Julio 2026-11-04, including the README Data safety answers; proposed 2026-10-28)
 
 **Decision:** Logs go only through `NottiLogger` (default level error). No email, phone, push token, external user id, country, tag values or URLs in a log line; errors logged by class/code, not by message. README documents the Play Data safety answers for data the SDK collects (device ids, email, phone, user id, coarse country, app interactions, diagnostics). Test fixtures in new tests use synthetic values (`example.invalid`, `fixture`); ported tests keep RN's (iOS AD-008).
 **Reason:** LGPD; iOS AD-005/AD-011/AD-014 counterparts. RN 0.8.0 calls `android.util.Log` directly in 19 places.
 **Trade-off:** Rerouting those 19 calls is an allowed change in the port tasks.
-**Impact:** `public-api` (logger), port tasks, `example-and-release` README. Data safety wording to confirm with Julio before 0.1.0.
+**Impact:** `public-api` (logger), port tasks, `example-and-release` README. Data safety wording confirmed by Julio 2026-11-04.
 
 ### AD-012: Toolchain Gradle 9.4.1 + AGP 9.2.1 (built-in Kotlin) + Kotlin 2.2.21 (`apiVersion 2.0`), proved by spike S1 (2026-10-28, Julio; amended same day with S1 results)
 
@@ -147,6 +147,13 @@
 **Reason:** Central verifies a namespace by DNS on its reversed domain. ZeepLabs owns `zeeplabs.com.br`, not `zeeplabs.com`; `br.com.zeeplabs` was verified on 2026-11-03 (B-001).
 **Trade-off:** Group id and Kotlin package differ. Central checks only the group id, and nothing was published, so no host breaks.
 **Impact:** `notti/build.gradle.kts` (`group`, `coordinates`), the example apps, CI artifact path and POM check, `scripts/check-release-artifacts.sh`, README, CHANGELOG, `docs/RELEASING.md`, `AGENTS.md`. RN M2 depends on `br.com.zeeplabs:notti-android`.
+
+### AD-021: Device checklist is a guide, not a recorded release gate (2026-11-04, Julio)
+
+**Decision:** `docs/DEVICE_CHECKLIST.md` stays as a testing guide. Recording Pass/Fail per item is optional and no longer gates a release; Julio tests on a device and states it in the release PR. Supersedes EXR-12/EXR-13 as gates. 0.1.0: Julio reported a full device test on Android (2026-11-04).
+**Reason:** Julio's call: recording 27 items per release costs more than it gives for a one-maintainer SDK.
+**Trade-off:** No written per-item evidence of what passed on which device and API level; a regression found later cannot be traced to a recorded run.
+**Impact:** `docs/DEVICE_CHECKLIST.md`, `docs/RELEASING.md` (Before the tag, After the release), README (Device proof limitation removed), CHANGELOG known limitations, ROADMAP.
 
 ---
 
@@ -214,9 +221,6 @@ From this repo:
 - [x] Flaky `NottiCoreTest` logout family: root cause found and fixed in the test fake (2026-11-02, branch `fix/logout-flaky-test`). `FakePrefsForCore` was a plain `LinkedHashMap`; `NottiCore.setContactField` writes the held email/phone on the caller's thread (e.g. from `logout()`) while the executor reads `device_id`/token, so a read mid-resize could return `null`, queue the mutation as "not registered" and drop a request (expected 5, saw 4; no `external_user_id` PATCH). Evidence: an overlap probe on the fake saw concurrent access in 9 of 128 tests, the known flaky ones included; baseline 1/60 runs failed (another probe-flagged test), with the fake synchronized 0/60. Production is not affected: the real `SharedPreferences` is thread-safe. Ported to `../zeep-notti-react-native` (PR #45, `5b25d33`, 2026-11-03)
 
 - Cross-SDK (RN, iOS N5, here): In-App image loader caps bytes (5 MB) but not decoded pixel dimensions; a small file can still decode to a huge bitmap. Out of scope of `in-app-messages` (ported as RN, Julio 2026-10-31); needs its own spec in all SDKs.
-- Run `docs/DEVICE_CHECKLIST.md` before tagging 0.1.0; tick the todos its items cite only after they pass (example-and-release EXR-13)
-- Confirm the README Play Data safety answers (AD-011; publish gate, not merge gate)
-- Confirm AD-005, AD-008..AD-011 (proposed)
 - Port PRR-07 (foreground check before the permission dialog) and PRR-10 (guarded tap detection) to `react-native-notti`, or let M2 replace its core (AD-019)
 - Move the ABI guard to KGP ABI validation when it supports AGP built-in Kotlin
 

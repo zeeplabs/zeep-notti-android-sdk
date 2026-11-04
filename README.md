@@ -2,7 +2,7 @@
 
 Native Android SDK (Kotlin) for Notti push notifications and In-App Messages.
 
-> **Status: 0.1.0.** Behavior parity with `react-native-notti` 0.8.0 on Android, plus the SDK opening In-App web links. Until the release is published on Maven Central the dependency below does not resolve; check the [device checklist](docs/DEVICE_CHECKLIST.md) and [known limitations](#known-limitations) before adopting it.
+> **Status: 0.1.0.** Behavior parity with `react-native-notti` 0.8.0 on Android, plus the SDK opening In-App web links. Check the [known limitations](#known-limitations) before adopting it.
 
 ## Requirements
 
@@ -335,7 +335,6 @@ This README describes what the SDK does. It is not legal advice and does not sta
 - **Kotlin 2.0 or later.** The POM declares `kotlin-stdlib` 2.0.21 at compile scope; an app compiling with Kotlin 1.9 or older is not supported.
 - **`logout` and re-registration need `zeep-notti` v0.24.0 or later.** Against an older backend, the unlink answers 2xx but the backend keeps the stored value, so the device stays linked to the previous user until the next launch; the SDK counts the 2xx as delivered and does not retry. An older backend also resets `external_user_id` and tags at every launch registration. `react-native-notti` 0.8.0 has the same limits.
 - **Tags survive `logout`.** Clear them yourself (`removeTags`) if they describe the user.
-- **Device proof.** Every item in the [device checklist](docs/DEVICE_CHECKLIST.md) not yet marked passed is a limitation of this release.
 
 ## Example app
 
