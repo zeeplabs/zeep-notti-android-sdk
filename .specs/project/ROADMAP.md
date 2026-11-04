@@ -8,7 +8,7 @@
 ## M1 - Native SDK with RN 0.8.0 parity (v0.1.0)
 
 **Goal:** A native Android app can integrate Notti from Maven Central and get the same behavior as `react-native-notti` 0.8.0 on Android, In-App Messages included (AD-007).
-**Target:** Ported JUnit suite green in CI; example app passes the device checklist; `0.1.0` published to Maven Central.
+**Target:** Ported JUnit suite green in CI; Julio tests on a device (checklist is a guide, AD-021); `0.1.0` published to Maven Central.
 
 ### Features
 
@@ -46,7 +46,7 @@
 - `push_permission` button; `url` actions opened in the browser with the iOS AD-020 allowlist and an option to turn it off (AD-006)
 - Guard script: no URL open outside the one allowlisted file (AD-006 amended)
 
-**example-and-release** - DONE (2026-10-31, PR #6 merged `d1f1cad`, CI green; release pending device checklist and Data safety; B-001 closed 2026-11-03, AD-020)
+**example-and-release** - DONE (2026-10-31, PR #6 merged `d1f1cad`, CI green; device test and Data safety confirmed 2026-11-04; B-001 closed 2026-11-03, AD-020)
 
 - Example app (one screen per public method), README (setup, FCM, opt-out, data collection, storage keys, Play Data safety, LGPD note, known limitations), CHANGELOG
 - Device checklist (Android counterpart of iOS `DEVICE_CHECKLIST`, plus RN-era open items), image push rendered by the tray in background and killed states

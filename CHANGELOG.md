@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-11-03
+## [0.1.0] - 2026-11-04
 
 First release of the native Android SDK: behavior parity with `react-native-notti` 0.8.0 on Android, as `br.com.zeeplabs:notti-android` on Maven Central.
 
@@ -33,7 +33,6 @@ First release of the native Android SDK: behavior parity with `react-native-nott
 - In-App images are capped in bytes, not in decoded pixels.
 - Apps with Kotlin code need Kotlin 2.0 or later (`kotlin-stdlib` 2.0.21 in the POM) and `compileSdk` 34 or later.
 - `logout` unlinking needs `zeep-notti` v0.24.0 or later; tags survive `logout`.
-- Device checks not marked passed in `docs/DEVICE_CHECKLIST.md`.
 
 See the README's "Known limitations" for details.
 

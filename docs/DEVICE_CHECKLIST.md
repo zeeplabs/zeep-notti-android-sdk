@@ -1,8 +1,6 @@
 # Device validation checklist for 0.1.0
 
-CI cannot prove the items below: they need a real FCM path, a device or emulator with Google Play services, and the Notti dashboard. Run them with the example apps before the `0.1.0` tag. This is a gate for Julio, not for contributors (EXR-12).
-
-Closing a `STATE.md` todo or a traceability gap an item cites is a **post-checklist step**: tick it there only after the item passes (EXR-13).
+CI cannot prove the items below: they need a real FCM path, a device or emulator with Google Play services, and the Notti dashboard. Use them as a guide when testing a release on a device. Recording results here is optional and not a release gate (AD-021).
 
 ## Run
 
@@ -23,9 +21,9 @@ Closing a `STATE.md` todo or a traceability gap an item cites is a **post-checkl
 - `adb` on the computer. Install with `./gradlew :example:installDebug` unless an item says otherwise.
 - The example screen: **Status**, **Permission**, **Identity**, **User**, **Device**, **Notifications**, **In-App** and **Event log** sections. Event log lines also go to `adb logcat -s NottiExample`; SDK lines to `adb logcat -s Notti` (set **Log level** to `DEBUG`).
 
-## How to record results
+## How to record results (optional)
 
-Tick **Pass** or **Fail** and add one line under `Result:` with what you saw. Do **not** write the app id, client key, push token, device id, email, phone or any tag value here or in a PR: write "present", "absent" or a count. Test data: external user id `checklist-user`, email at `example.invalid`, phone `+5511900000000`.
+If you record a run, tick **Pass** or **Fail** and add one line under `Result:` with what you saw. Do **not** write the app id, client key, push token, device id, email, phone or any tag value here or in a PR: write "present", "absent" or a count. Test data: external user id `checklist-user`, email at `example.invalid`, phone `+5511900000000`.
 
 To kill the app: `adb shell am force-stop com.zeeplabs.notti.example` (a force-stopped app does not receive FCM until launched again; use swipe-away from Recents for the "killed" state below).
 
