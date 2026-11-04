@@ -16,6 +16,7 @@ API='public final class com/zeeplabs/notti/Notti {
 	public static final fun getLogLevel ()Lcom/zeeplabs/notti/NottiLogLevel;
 	public static final fun initialize (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)V
 	public static final fun initialize (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Lcom/zeeplabs/notti/NottiOptions;)V
+	public static final fun initializeForWrapper (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Lcom/zeeplabs/notti/NottiOptions;Ljava/lang/String;Ljava/lang/String;)V
 	public static synthetic fun initialize$default (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Lcom/zeeplabs/notti/NottiOptions;ILjava/lang/Object;)V
 	public static final fun setLogLevel (Lcom/zeeplabs/notti/NottiLogLevel;)V
 	public static final fun setSubscription (Z)V
@@ -71,6 +72,8 @@ expect 1 "another owner does not count (Notti.addTag for Notti.User.addTag)" "$s
   "$(repo owner "$API" "${FULL//Notti.User.addTag(/Notti.addTag(}" "$BRIDGE")"
 expect 1 "a longer receiver does not count (MyNotti.setSubscription)" "$script" \
   "$(repo receiver "$API" "${FULL//Notti.setSubscription/MyNotti.setSubscription}" "$BRIDGE")"
+expect 1 "an excluded name is still not a cover for another member" "$script" \
+  "$(repo excl "${API//initializeForWrapper/initializeForOther}" "$FULL" "$BRIDGE")"
 expect 2 "a missing owner block is an input error" "$script" \
   "$(repo noblock "${API//com\/zeeplabs\/notti\/NottiBridge/com\/zeeplabs\/notti\/Other}" "$FULL" "$BRIDGE")"
 expect 2 "a missing api file is an input error" "$script" "$(repo noapi - "$FULL" "$BRIDGE")"

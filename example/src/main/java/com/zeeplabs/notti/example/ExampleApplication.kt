@@ -29,8 +29,6 @@ class ExampleApplication : Application() {
         // controls still run and the SDK drops them. Without google-services.json the SDK logs why it cannot
         // register and the app keeps running.
         if (ExampleConfig.isComplete) {
-            // Apps call Notti.initialize. Notti.initializeForWrapper (@NottiWrapperApi) is only for wrapper SDKs
-            // such as react-native-notti, outside semver; this app never calls it.
             Notti.initialize(this, ExampleConfig.appId, ExampleConfig.clientKey, ExampleConfig.options)
             ExampleEventLog.add("initialize called")
         } else {
