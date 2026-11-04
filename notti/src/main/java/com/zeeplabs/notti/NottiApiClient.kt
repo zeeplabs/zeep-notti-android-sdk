@@ -39,7 +39,7 @@ internal data class DeviceResponse(
 )
 
 /** Device fields the SDK syncs once per registration and acks via the echo. */
-internal val PROFILE_FIELD_KEYS = listOf("app_version", "device_os", "device_model", "sdk_version", "timezone_id", "language")
+internal val PROFILE_FIELD_KEYS = listOf("app_version", "device_os", "device_model", "sdk_version", "sdk_name", "timezone_id", "language")
 
 internal sealed class ApiResult {
     data class Success(val response: DeviceResponse) : ApiResult()

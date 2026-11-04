@@ -3,7 +3,7 @@
 # Notti.InAppMessages or NottiBridge (EXR-02). Members come from the ABI dump notti/api/notti.api; a
 # get<X>/set<X> pair is the Kotlin property <x>. A member counts as covered when "<Owner>.<member>" appears
 # word-bounded in a source under example*/src/main (the example writes calls fully qualified). A getter or
-# setter name ("Notti.getLogLevel") also covers its property, for Java sources.
+# setter name ("Notti.getLogLevel") also covers its property, for Java sources. Members in EXCLUDED are skipped.
 #
 # Usage: scripts/check-example-coverage.sh [repo-root]
 # Exit: 0 covered, 1 members not referenced, 2 input error (no api file, owner block or example source).
@@ -18,6 +18,11 @@ OWNERS=(
   'com/zeeplabs/notti/Notti$Notifications:Notti.Notifications'
   'com/zeeplabs/notti/Notti$InAppMessages:Notti.InAppMessages'
   'com/zeeplabs/notti/NottiBridge:NottiBridge'
+)
+# Public members the example apps must not call, with the reason. Wrapper-only API (AD-022) is for SDKs such
+# as react-native-notti; an app that called it would misreport its sdk_name.
+EXCLUDED=(
+  'Notti.initializeForWrapper'
 )
 
 if [[ ! -f "$api" ]]; then
@@ -76,6 +81,7 @@ for entry in "${OWNERS[@]}"; do
   fi
   while read -r kind name; do
     [[ -z "${name:-}" ]] && continue
+    if printf '%s\n' "${EXCLUDED[@]}" | grep -qxF "$prefix.$name"; then continue; fi
     if referenced "$prefix.$name"; then continue; fi
     if [[ "$kind" == prop ]]; then
       cap="$(tr '[:lower:]' '[:upper:]' <<<"${name:0:1}")${name:1}"

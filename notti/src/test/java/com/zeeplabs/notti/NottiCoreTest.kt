@@ -1106,6 +1106,171 @@ class NottiCoreTest {
     }
 
     // ---------------------------------------------------------------------
+    // sdk_name and the reported identity (wrapper-support, WRP-01..10)
+    // ---------------------------------------------------------------------
+
+    /** A backend that echoes every PATCHed field and records each request body by method. */
+    private fun recordingEchoBackend(
+        deviceId: () -> String = { "device-1" },
+        rejectField: String? = null
+    ): MutableList<Pair<String, JSONObject>> {
+        val seen = java.util.Collections.synchronizedList(mutableListOf<Pair<String, JSONObject>>())
+        server.dispatcher = object : okhttp3.mockwebserver.Dispatcher() {
+            override fun dispatch(request: okhttp3.mockwebserver.RecordedRequest): MockResponse {
+                val sent = JSONObject(request.body.clone().readUtf8().ifEmpty { "{}" })
+                seen.add(request.method!! to sent)
+                if (rejectField != null && request.method == "PATCH" && sent.has(rejectField)) {
+                    return MockResponse().setResponseCode(422).setBody("""{"error":"fixture"}""")
+                }
+                val echo = JSONObject().put("id", deviceId()).put("tags", JSONObject())
+                if (request.method == "PATCH") {
+                    sent.keys().forEach { key -> if (key != "token") echo.put(key, sent.get(key)) }
+                }
+                return MockResponse().setResponseCode(200).setBody(echo.toString())
+            }
+        }
+        return seen
+    }
+
+    private fun MutableList<Pair<String, JSONObject>>.registrations() = synchronized(this) { count { it.first == "POST" } }
+
+    private fun MutableList<Pair<String, JSONObject>>.patchesWith(field: String) =
+        synchronized(this) { filter { it.first == "PATCH" && it.second.has(field) }.map { it.second } }
+
+    @Test
+    fun `sdk_name passed through initialize is PATCHed and acked when echoed`() {
+        val seen = recordingEchoBackend()
+        val core = newCore()
+
+        core.initialize("app-1", "key", validBaseUrl, "0.9.0", "react-native")
+        awaitIdle()
+        awaitIdle()
+
+        assertEquals(listOf("react-native"), seen.patchesWith("sdk_name").map { it.getString("sdk_name") })
+        assertEquals(listOf("0.9.0"), seen.patchesWith("sdk_version").map { it.getString("sdk_version") })
+        assertEquals("react-native", store.getLastSyncedSdkName())
+        assertEquals("0.9.0", store.getLastSyncedSdkVersion())
+    }
+
+    @Test
+    fun `an unechoed sdk_name stays unacked and is re-sent on the next registration`() {
+        // A backend before AD-044 answers 2xx but does not store or echo sdk_name.
+        repeat(4) { server.enqueue(MockResponse().setResponseCode(200).setBody("""{"id":"device-1","tags":{}}""")) }
+        val logs = mutableListOf<String>()
+        val core = newCore(logs = logs)
+
+        core.initialize("app-1", "key", validBaseUrl, null, "android")
+        awaitIdle()
+        awaitIdle()
+        assertNull(store.getLastSyncedSdkName())
+
+        core.onTokenRefreshed("new-fcm-token")
+        awaitIdle()
+        awaitIdle()
+
+        // register + PATCH, then register + the same PATCH again.
+        assertEquals(4, server.requestCount)
+        server.takeRequest(5, TimeUnit.SECONDS) // first register
+        assertEquals("android", JSONObject(requireNotNull(server.takeRequest(5, TimeUnit.SECONDS)).body.readUtf8()).getString("sdk_name"))
+        server.takeRequest(5, TimeUnit.SECONDS) // second register
+        assertEquals("android", JSONObject(requireNotNull(server.takeRequest(5, TimeUnit.SECONDS)).body.readUtf8()).getString("sdk_name"))
+        assertNull(store.getLastSyncedSdkName())
+        assertTrue(logs.any { it.contains("Notti.sdk_name") && it.contains("not echoed") })
+    }
+
+    @Test
+    fun `a rejected sdk_name fails alone and the other profile fields still sync`() {
+        val seen = recordingEchoBackend(rejectField = "sdk_name")
+        val logs = mutableListOf<String>()
+        val core = newCore(logs = logs, deviceOsProvider = { "15.0" })
+
+        core.initialize("app-1", "key", validBaseUrl, "0.9.0", "fixture-unknown-sdk")
+        awaitIdle()
+        awaitIdle()
+
+        assertEquals(1, seen.patchesWith("sdk_name").size)
+        assertNull(store.getLastSyncedSdkName())
+        assertEquals("0.9.0", store.getLastSyncedSdkVersion())
+        assertEquals("15.0", store.getLastSyncedDeviceOs())
+        assertTrue(logs.any { it.contains("Notti.sdk_name: PATCH failed") })
+        // The rejected value never reaches a log line.
+        assertFalse(logs.toString(), logs.any { it.contains("fixture-unknown-sdk") })
+    }
+
+    @Test
+    fun `a blank sdk_name is omitted`() {
+        val seen = recordingEchoBackend()
+        val core = newCore()
+
+        core.initialize("app-1", "key", validBaseUrl, "0.9.0", "  ")
+        awaitIdle()
+        awaitIdle()
+
+        assertEquals(1, seen.patchesWith("sdk_version").size)
+        assertTrue(seen.patchesWith("sdk_name").isEmpty())
+        assertNull(store.getLastSyncedSdkName())
+    }
+
+    @Test
+    fun `a different sdk_name or sdk_version on an otherwise identical initialize registers again`() {
+        val seen = recordingEchoBackend()
+        val core = newCore()
+
+        core.initialize("app-1", "key", validBaseUrl, "0.2.0", "android")
+        awaitIdle()
+        awaitIdle()
+        assertEquals(1, seen.registrations())
+
+        // Identical config, identity included: no-op (SDK-07).
+        core.initialize("app-1", "key", validBaseUrl, "0.2.0", "android")
+        awaitIdle()
+        awaitIdle()
+        assertEquals(1, seen.registrations())
+
+        // Only sdk_name changes: a config change (WRP-05).
+        core.initialize("app-1", "key", validBaseUrl, "0.2.0", "react-native")
+        awaitIdle()
+        awaitIdle()
+        assertEquals(2, seen.registrations())
+        assertEquals(listOf("android", "react-native"), seen.patchesWith("sdk_name").map { it.getString("sdk_name") })
+
+        // Only sdk_version changes: also a config change.
+        core.initialize("app-1", "key", validBaseUrl, "0.9.0", "react-native")
+        awaitIdle()
+        awaitIdle()
+        assertEquals(3, seen.registrations())
+        assertEquals(listOf("0.2.0", "0.9.0"), seen.patchesWith("sdk_version").map { it.getString("sdk_version") })
+        assertEquals("react-native", store.getLastSyncedSdkName())
+        assertEquals("0.9.0", store.getLastSyncedSdkVersion())
+    }
+
+    @Test
+    fun `a registration that answers with a new device id re-sends sdk_name`() {
+        var deviceId = "device-1"
+        val seen = recordingEchoBackend(deviceId = { deviceId })
+        val core = newCore()
+
+        core.initialize("app-1", "key", validBaseUrl, null, "android")
+        awaitIdle()
+        awaitIdle()
+        assertEquals(1, seen.patchesWith("sdk_name").size)
+
+        // Same device id: the ack holds, nothing is re-sent.
+        core.onTokenRefreshed("fcm-2")
+        awaitIdle()
+        awaitIdle()
+        assertEquals(1, seen.patchesWith("sdk_name").size)
+
+        // A new server row: the ack is cleared and sdk_name goes out again.
+        deviceId = "device-2"
+        core.onTokenRefreshed("fcm-3")
+        awaitIdle()
+        awaitIdle()
+        assertEquals(2, seen.patchesWith("sdk_name").size)
+        assertEquals("android", store.getLastSyncedSdkName())
+    }
+
+    // ---------------------------------------------------------------------
     // Permission status + last_unsubscribed_at (device-profile-fields, T4)
     // ---------------------------------------------------------------------
 

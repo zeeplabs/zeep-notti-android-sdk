@@ -323,6 +323,23 @@ class NottiDeviceStoreTest {
     }
 
     @Test
+    fun `the sdk_name ack round-trips, is cleared with the profile acks and is not touched by the migration`() {
+        assertNull(store.getLastSyncedSdkName())
+        assertNull(store.getState().lastSyncedSdkName)
+
+        store.setLastSyncedSdkName("android")
+        assertEquals("android", store.getLastSyncedSdkName())
+        assertEquals("android", NottiDeviceStore(prefs).getState().lastSyncedSdkName)
+
+        // Added after the 0.6.0 migration: an old install simply has no value.
+        store.migrateProfileFieldAckIfNeeded()
+        assertEquals("android", store.getLastSyncedSdkName())
+
+        store.clearProfileFieldAcks()
+        assertNull(store.getLastSyncedSdkName())
+    }
+
+    @Test
     fun `device profile fields round-trip through SharedPreferences`() {
         store.setLastSyncedDeviceOs("15.0")
         store.setLastSyncedDeviceModel("Pixel 8")

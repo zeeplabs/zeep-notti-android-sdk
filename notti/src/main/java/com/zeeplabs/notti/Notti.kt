@@ -18,6 +18,9 @@ object Notti {
     /** RN `SAAS_BASE_URL`: the host used when [NottiOptions.baseUrl] is null. */
     internal const val DEFAULT_BASE_URL = "https://app.zeepnotti.app"
 
+    /** The `sdk_name` a native host reports (backend enum, `zeep-notti` AD-044). */
+    internal const val NATIVE_SDK_NAME = "android"
+
     private val deviceIdListeners = NottiListeners<String>("device id")
 
     /** Installed into the runtime's device-id slot whenever the facade reaches a runtime (design D3). */
@@ -39,13 +42,50 @@ object Notti {
         options: NottiOptions? = NottiOptions(),
     ) {
         if (appId == null || clientKey == null) return nullArgument("initialize")
+        start("initialize", context, appId, clientKey, options, NATIVE_SDK_NAME, NottiSdkVersion.CURRENT)
+    }
+
+    /**
+     * For wrapper SDKs such as `react-native-notti` only (AD-022): [initialize], except that the device
+     * reports [sdkName] and [sdkVersion] (the wrapper's own name and package version) to the backend
+     * instead of `"android"` and this SDK's version. A null or blank value omits that field. Calling again
+     * with an otherwise equal configuration but a different [sdkName] or [sdkVersion] registers again, as
+     * for a different app id. Native apps call [initialize].
+     *
+     * Not covered by semantic versioning: it may change or disappear in any release. Kotlin callers opt in
+     * with `@OptIn(NottiWrapperApi::class)`; Java callers are not checked by the compiler.
+     */
+    @NottiWrapperApi
+    @JvmStatic
+    fun initializeForWrapper(
+        context: Context,
+        appId: String?,
+        clientKey: String?,
+        options: NottiOptions?,
+        sdkName: String?,
+        sdkVersion: String?,
+    ) {
+        if (appId == null || clientKey == null) return nullArgument("initializeForWrapper")
+        start("initializeForWrapper", context, appId, clientKey, options, sdkName, sdkVersion)
+    }
+
+    /** The body of [initialize] and [initializeForWrapper]; [operation] names the caller in logs. */
+    private fun start(
+        operation: String,
+        context: Context,
+        appId: String,
+        clientKey: String,
+        options: NottiOptions?,
+        sdkName: String?,
+        sdkVersion: String?,
+    ) {
         val validOptions = options ?: NottiOptions()
         try {
             val app = context.applicationContext ?: context
             if (app is Application) {
                 NottiProcessHooks.installOnce(app)
             } else {
-                NottiLogger.error("Notti.initialize: no Application context - process hooks not installed")
+                NottiLogger.error("Notti.$operation: no Application context - process hooks not installed")
             }
             val runtime = NottiRuntime.get(app)
             wire(runtime)
@@ -54,9 +94,9 @@ object Notti {
             // core's creation replays finds it (same main-thread FIFO as trackEvent).
             initializeInApp(appId, clientKey, baseUrl, validOptions)
             wirePushPermissionPort(app, runtime)
-            runtime.start(appId, clientKey, baseUrl)
+            runtime.start(appId, clientKey, baseUrl, sdkName, sdkVersion)
         } catch (t: Throwable) {
-            NottiLogger.error("Notti.initialize: failed - ${t.javaClass.simpleName}")
+            NottiLogger.error("Notti.$operation: failed - ${t.javaClass.simpleName}")
         }
     }
 

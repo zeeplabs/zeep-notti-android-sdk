@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Native devices send the profile field `sdk_name: "android"` with `sdk_version`, under the same sync and ack rules (ack stored in the new key `notti_last_synced_sdk_name`).
+- Wrapper entry point `Notti.initializeForWrapper` (`@NottiWrapperApi`, opt-in): a wrapper SDK such as `react-native-notti` reports its own `sdk_name` and `sdk_version`. For wrappers only, outside semver.
+
 ## [0.1.0] - 2026-11-04
 
 First release of the native Android SDK: behavior parity with `react-native-notti` 0.8.0 on Android, as `br.com.zeeplabs:notti-android` on Maven Central.

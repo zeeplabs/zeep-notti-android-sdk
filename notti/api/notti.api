@@ -6,6 +6,7 @@ public final class com/zeeplabs/notti/Notti {
 	public static final fun initialize (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;)V
 	public static final fun initialize (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Lcom/zeeplabs/notti/NottiOptions;)V
 	public static synthetic fun initialize$default (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Lcom/zeeplabs/notti/NottiOptions;ILjava/lang/Object;)V
+	public static final fun initializeForWrapper (Landroid/content/Context;Ljava/lang/String;Ljava/lang/String;Lcom/zeeplabs/notti/NottiOptions;Ljava/lang/String;Ljava/lang/String;)V
 	public static final fun login (Ljava/lang/String;)V
 	public static final fun logout ()V
 	public static final fun setLocationSharingEnabled (Z)V
@@ -121,5 +122,8 @@ public abstract interface class com/zeeplabs/notti/NottiPermissionCallback {
 
 public final class com/zeeplabs/notti/NottiSubscription {
 	public final fun remove ()V
+}
+
+public abstract interface annotation class com/zeeplabs/notti/NottiWrapperApi : java/lang/annotation/Annotation {
 }
 

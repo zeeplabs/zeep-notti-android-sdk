@@ -197,6 +197,7 @@ internal class NottiCore(
         private const val KEY_DEVICE_OS = "deviceOs"
         private const val KEY_DEVICE_MODEL = "deviceModel"
         private const val KEY_SDK_VERSION = "sdkVersion"
+        private const val KEY_SDK_NAME = "sdkName"
         private const val KEY_TIMEZONE_ID = "timezoneId"
         private const val KEY_LANGUAGE = "language"
         private const val KEY_PERMISSION_STATUS = "permissionStatus"
@@ -313,6 +314,18 @@ internal class NottiCore(
     private val sdkVersionProvider: () -> String? = { sdkVersion }
 
     /**
+     * The SDK name the device reports (`sdk_name`: `android` from the
+     * public `Notti.initialize`, the wrapper's own from
+     * `Notti.initializeForWrapper`, AD-022). `null` when not provided or
+     * blank - the field is then omitted. Same rules as [sdkVersion].
+     */
+    @Volatile
+    private var sdkName: String? = null
+
+    /** Feeds the `sdk_name` profile field, read at call time like [sdkVersionProvider]. */
+    private val sdkNameProvider: () -> String? = { sdkName }
+
+    /**
      * Where the device's registration stands right now. Drives both the
      * app-foreground retry (spec SDK-05: after the 5-attempt backoff is
      * exhausted the SDK stops "until the next app foreground or the next
@@ -374,7 +387,13 @@ internal class NottiCore(
      */
     private val countryClearScheduled = AtomicBoolean(false)
 
-    fun initialize(appId: String, clientKey: String, baseUrl: String, sdkVersion: String? = null) {
+    fun initialize(
+        appId: String,
+        clientKey: String,
+        baseUrl: String,
+        sdkVersion: String? = null,
+        sdkName: String? = null
+    ) {
         if (appId.isBlank() || clientKey.isBlank() || baseUrl.isBlank()) {
             logger("Notti.initialize: appId, clientKey, or baseUrl is missing/empty - skipping registration")
             return
@@ -382,8 +401,11 @@ internal class NottiCore(
 
         // Blank/empty sdkVersion (resolution failure on the JS side) is stored as
         // null so the `sdk_version` field is omitted from the payload, never sent
-        // as an empty string.
+        // as an empty string. Same for sdkName (`sdk_name`, AD-022).
+        val previousSdkVersion = this.sdkVersion
+        val previousSdkName = this.sdkName
         this.sdkVersion = sdkVersion?.takeIf { it.isNotBlank() }
+        this.sdkName = sdkName?.takeIf { it.isNotBlank() }
 
         // Validated and normalized exactly once, here (SDK-03 crash safety): a
         // scheme-less or otherwise malformed host would otherwise only blow up
@@ -401,7 +423,11 @@ internal class NottiCore(
         }
 
         // Repeat call with identical args in the same session: no-op (SDK-07).
-        if (appId == this.appId && clientKey == this.clientKey && normalizedBaseUrl == this.baseUrl) {
+        // The reported identity (sdk_version, sdk_name) is part of the config:
+        // a change of either registers again like a different appId (WRP-05).
+        if (appId == this.appId && clientKey == this.clientKey && normalizedBaseUrl == this.baseUrl &&
+            this.sdkVersion == previousSdkVersion && this.sdkName == previousSdkName
+        ) {
             return
         }
 
@@ -1156,7 +1182,7 @@ internal class NottiCore(
      *
      * Generalization (device-profile-fields, DPF-01..09): every read-once
      * profile field - `app_version`, `device_os`, `device_model`,
-     * `sdk_version`, `timezone_id`, `language` - is diffed against its own
+     * `sdk_version`, `sdk_name`, `timezone_id`, `language` - is diffed against its own
      * last-synced store value and enqueued independently on change. Opaque
      * strings, no parsing; a `null` provider skips only that field (DPF-04/09).
      */
@@ -1186,6 +1212,7 @@ internal class NottiCore(
         sync("device_os", KEY_DEVICE_OS, deviceOsProvider, deviceStore::getLastSyncedDeviceOs, deviceStore::setLastSyncedDeviceOs)
         sync("device_model", KEY_DEVICE_MODEL, deviceModelProvider, deviceStore::getLastSyncedDeviceModel, deviceStore::setLastSyncedDeviceModel)
         sync("sdk_version", KEY_SDK_VERSION, sdkVersionProvider, deviceStore::getLastSyncedSdkVersion, deviceStore::setLastSyncedSdkVersion)
+        sync("sdk_name", KEY_SDK_NAME, sdkNameProvider, deviceStore::getLastSyncedSdkName, deviceStore::setLastSyncedSdkName)
         sync("timezone_id", KEY_TIMEZONE_ID, timezoneProvider, deviceStore::getLastSyncedTimezoneId, deviceStore::setLastSyncedTimezoneId)
         sync("language", KEY_LANGUAGE, languageProvider, deviceStore::getLastSyncedLanguage, deviceStore::setLastSyncedLanguage)
     }

@@ -1,7 +1,7 @@
 # State
 
 **Last Updated:** 2026-11-01
-**Current Work:** **0.1.0 released** on Maven Central as `br.com.zeeplabs:notti-android` (2026-11-04): release PR #16 merged (`02cd883`), tag `0.1.0`, release run 41833990890 (first upload refused with `Invalid token`, Portal token regenerated, re-run green), published by Julio in the Central Portal; GitHub Release `0.1.0`. M1 complete. Next: M2 (`react-native-notti` depends on this artifact). Earlier: `pre-release-review` (PR #12), `example-and-release` (PR #6), `in-app-messages` (PR #5), `public-api` (PR #4), `push-integration` (PR #3), `core-port` (PR #2), `package-foundation` (PR #1); group id change (PR #15, AD-020).
+**Current Work:** **0.1.0 released** on Maven Central as `br.com.zeeplabs:notti-android` (2026-11-04): release PR #16 merged (`02cd883`), tag `0.1.0`, release run 41833990890 (first upload refused with `Invalid token`, Portal token regenerated, re-run green), published by Julio in the Central Portal; GitHub Release `0.1.0`. M1 complete. Next: M2 (`react-native-notti` depends on this artifact); first `wrapper-support` 0.2.0 (spec written 2026-11-04, AD-022). Earlier: `pre-release-review` (PR #12), `example-and-release` (PR #6), `in-app-messages` (PR #5), `public-api` (PR #4), `push-integration` (PR #3), `core-port` (PR #2), `package-foundation` (PR #1); group id change (PR #15, AD-020).
 
 ---
 
@@ -154,6 +154,13 @@
 **Reason:** Julio's call: recording 27 items per release costs more than it gives for a one-maintainer SDK.
 **Trade-off:** No written per-item evidence of what passed on which device and API level; a regression found later cannot be traced to a recorded run.
 **Impact:** `docs/DEVICE_CHECKLIST.md`, `docs/RELEASING.md` (Before the tag, After the release), README (Device proof limitation removed), CHANGELOG known limitations, ROADMAP.
+
+### AD-022: Wrapper identity through an opt-in API (2026-11-04, Julio)
+
+**Decision:** Wrapper SDKs (`react-native-notti`) set `sdk_name` and `sdk_version` through a public entry point marked with a `@RequiresOptIn(level = ERROR)` annotation `@NottiWrapperApi`. Native hosts send `sdk_name: "android"` and `NottiSdkVersion.CURRENT`. Feature `wrapper-support` (0.2.0).
+**Reason:** Kotlin has no SPI; this is the closest to the iOS SDK's `@_spi(Wrapper)`. A plain `NottiOptions` field would let any app overwrite its identity and become a stable contract.
+**Trade-off:** The declarations are public bytecode and appear in `notti.api`; Java callers are not stopped by the compiler. KDoc and README say the API is for wrappers only and outside semver.
+**Impact:** `Notti` (wrapper entry point), `NottiRuntime`, `NottiCore` (`sdk_name` profile field, `notti_last_synced_sdk_name`), README data collection, RN `android-native-sdk`.
 
 ---
 
